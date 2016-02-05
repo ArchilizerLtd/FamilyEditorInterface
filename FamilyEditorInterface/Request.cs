@@ -80,7 +80,8 @@ namespace FamilyEditorInterface
    {
       // Storing the value as a plain Int makes using the interlocking mechanism simpler
       private int m_request = (int)RequestId.None;
-
+      // try tp tramsport information
+      private double value;
       /// <summary>
       ///   Take - The Idling handler calls this to obtain the latest request. 
       /// </summary>
@@ -104,6 +105,16 @@ namespace FamilyEditorInterface
       public void Make(RequestId request)
       {
          Interlocked.Exchange(ref m_request, (int)request);
+      }
+      // try to trasport the message
+      internal void Value(double value)
+      {
+          this.value = value;
+      }
+      // try to transport the message
+      internal double GetValue()
+      {
+          return this.value;
       }
    }
 }

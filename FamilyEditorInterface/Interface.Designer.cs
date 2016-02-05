@@ -45,11 +45,17 @@
             // 
             // trackBar1
             // 
-            this.trackBar1.Location = new System.Drawing.Point(12, 12);
+            this.trackBar1.Location = new System.Drawing.Point(12, 105);
+            this.trackBar1.Maximum = 100;
             this.trackBar1.Name = "trackBar1";
             this.trackBar1.Size = new System.Drawing.Size(260, 45);
+            this.trackBar1.SmallChange = 0;
             this.trackBar1.TabIndex = 1;
+            this.trackBar1.TickFrequency = 10;
+            this.trackBar1.Value = 1;
             this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
+            this.trackBar1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.trackBar1_MouseUp);
+            this.trackBar1.ValueChanged += new System.EventHandler(this.trackBar1_ValueChanged);
             // 
             // Interface
             // 
@@ -60,6 +66,7 @@
             this.Controls.Add(this.btnExit);
             this.Name = "Interface";
             this.Text = "Family Parameters";
+            this.Load += new System.EventHandler(this.Interface_Load);
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
