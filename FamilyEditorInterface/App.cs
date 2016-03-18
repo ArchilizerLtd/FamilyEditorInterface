@@ -130,10 +130,13 @@ namespace FamilyEditorInterface
             c_app.DocumentChanged
                 += new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(
                     c_app_DocumentChanged);
-
             return Result.Succeeded;
         }
-
+        /// <summary>
+        /// On document change, update Family Parameters
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void c_app_DocumentChanged(object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e)
         {
             if (m_MyForm != null && m_MyForm.Visible)

@@ -47,7 +47,7 @@ namespace FamilyEditorInterface
                         {
                             return;
                         }
-                    case RequestId.SlideFirstParam:
+                    case RequestId.SlideParam:
                         {
                             ExecuteParameterChange(uiapp, "Slide First Parameter", Request.GetValue());
                             break;
@@ -77,7 +77,7 @@ namespace FamilyEditorInterface
         /// <param name="text">Caption of the transaction for the operation.</param>
         /// <param name="operation">A delegate to perform the operation on an instance of a door.</param>
         /// 
-        private void ExecuteParameterChange(UIApplication uiapp, String text, double value)
+        private void ExecuteParameterChange(UIApplication uiapp, String text, Tuple<string,double> value)
         {
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uidoc.Document;
@@ -86,14 +86,13 @@ namespace FamilyEditorInterface
             {
                 Command.global_message =
                   "Please run this command in a family document.";
-
                 TaskDialog.Show("Message", Command.global_message);
             }
 
             if ((uidoc != null))
             {
                 FamilyManager mgr = doc.FamilyManager;
-                FamilyParameter fp = mgr.get_Parameter("Height");
+                FamilyParameter fp = mgr.get_Parameter(value.Item1);
                 // Since we'll modify the document, we need a transaction
                 // It's best if a transaction is scoped by a 'using' block
                 using (Transaction trans = new Transaction(uidoc.Document))
@@ -102,10 +101,11 @@ namespace FamilyEditorInterface
 
                     if (trans.Start(text) == TransactionStatus.Started)
                     {
-                        mgr.Set(fp, value);
+                        mgr.Set(fp, value.Item2*0.01);
                         //operation(mgr, fp);
-
+                        doc.Regenerate();
                         trans.Commit();
+                        uidoc.RefreshActiveView();
                     }
                 }
             }

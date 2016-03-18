@@ -40,8 +40,31 @@ namespace FamilyEditorInterface
             this.handler = handler;
             this.famParam = new SortedList<string, FamilyParameter>();
             InitializeComponent();
+            this.SetStyle(
+                ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.UserPaint |
+                ControlStyles.DoubleBuffer, true);
+            this.StartPosition = FormStartPosition.Manual;
+            this.Location = new System.Drawing.Point(Screen.PrimaryScreen.WorkingArea.Width - 400, Convert.ToInt32(Screen.PrimaryScreen.WorkingArea.Height * 0.5 - this.Height * 0.5));
             CollectData();
         }
+        internal Autodesk.Revit.DB.Document Document()
+        {
+            return this.doc;
+        }
+        internal void Document(Autodesk.Revit.DB.Document doc)
+        {
+            this.doc = doc;
+        }
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000;
+                return cp;
+            }
+        } 
         /// <summary>
         /// Check parameter conditions
         /// </summary>
@@ -66,10 +89,10 @@ namespace FamilyEditorInterface
             {
                 return false;
             }
-            //if (!parameters.Keys.Contains(fp.Definition.Name))
-            //{
-            //    parameters.Add(fp.Definition.Name, fp);
-            //}
+            if (ft.AsDouble(fp) == 0 || ft.AsDouble(fp) == null)
+            {
+                return false;
+            }
             return true;
         }
         /// <summary>
@@ -111,22 +134,28 @@ namespace FamilyEditorInterface
 
             foreach(FamilyParameter fp in famParam.Values)
             {
-                if (fp.StorageType == StorageType.Double) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsDouble(fp)), DisplayUnitType.DUT_MILLIMETERS);
-                else if (fp.StorageType == StorageType.Integer) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsInteger(fp)), DisplayUnitType.DUT_MILLIMETERS);
-
+                //if (fp.StorageType == StorageType.Double) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsDouble(fp)), DisplayUnitType.DUT_MILLIMETERS);
+                //else if (fp.StorageType == StorageType.Integer) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsInteger(fp)), DisplayUnitType.DUT_MILLIMETERS);
+                if (fp.StorageType == StorageType.Double) value = Convert.ToDouble(familyType.AsDouble(fp));
+                else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
                 eId.Add(fp.Id);
 
                 track[index] = new TrackBar();
                 track[index].Name = fp.Definition.Name;
-                track[index].Location = new System.Drawing.Point(25, 15 + index * vOffset);
-                track[index].Size = new Size(200, 8);
-                track[index].Maximum = Convert.ToInt32(value) * 2;
-                track[index].Value = Convert.ToInt32(value);
+                track[index].Text = fp.Definition.Name;
+                track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset);
+                track[index].Size = new Size(180, 8);
+                track[index].Maximum = Convert.ToInt32(value * 100) * 2;
+                track[index].Minimum = 1;
+                track[index].Value = Convert.ToInt32(value*100);
                 track[index].TickFrequency = Convert.ToInt32(track[index].Maximum * 0.05);
-
+                track[index].MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
+                track[index].ValueChanged += new EventHandler(trackBar_ValueChanged);
+                track[index].Tag = index;
                 label[index] = new Label();
                 label[index].Size = new Size(100, 30);
-                label[index].Location = new System.Drawing.Point(250, 15 + index * vOffset);
+                label[index].Font = new Font("Arial", 8);
+                label[index].Location = new System.Drawing.Point(200, 15 + index * vOffset);
                 //label[index].Text =  String.Format("{0}: 0 to {1}", fp.Definition.Name, track[index].Maximum);
                 label[index].Text = fp.Definition.Name;
                 label[index].Name = fp.Definition.Name;
@@ -139,6 +168,17 @@ namespace FamilyEditorInterface
 
             this.panel1.Controls.AddRange(track);
             this.panel1.Controls.AddRange(label);
+        }
+        
+        private void trackBar_MouseUp(object sender, MouseEventArgs e)
+        {
+            TrackBar tbar = sender as TrackBar;
+
+            if (user_done_updating)
+            {
+                user_done_updating = false;
+                MakeRequest(RequestId.SlideParam, new Tuple<string, double> (tbar.Text, (double)tbar.Value));
+            }
         }
 
         /// <summary>
@@ -162,8 +202,8 @@ namespace FamilyEditorInterface
         /// 
         private void DozeOff()
         {
-            MessageBox.Show("You are in the Control.Doze off event.");
-            EnableCommands(false);
+            //MessageBox.Show("You are in the Control.Doze off event.");
+            //EnableCommands(false);
         }
         /// <summary>
         ///   WakeUp -> enable all controls
@@ -171,8 +211,8 @@ namespace FamilyEditorInterface
         /// 
         public void WakeUp()
         {
-            MessageBox.Show("You are in the Control.Wake up event.");
-            EnableCommands(true);
+            //MessageBox.Show("You are in the Control.Wake up event.");
+            //EnableCommands(true);
         }
 
         /// <summary>
@@ -200,9 +240,9 @@ namespace FamilyEditorInterface
         ///   wake the dialog up after finishing the execution.
         /// </remarks>
         ///
-        private void MakeRequest(RequestId request, double value)
+        private void MakeRequest(RequestId request, Tuple<string, double> value)
         {
-            MessageBox.Show("You are in the Control.Request event.");
+            //MessageBox.Show("You are in the Control.Request event.");
             handler.Request.Value(value);
             handler.Request.Make(request);
             exEvent.Raise();
@@ -225,18 +265,9 @@ namespace FamilyEditorInterface
 
         Boolean user_done_updating = false;
 
-        private void trackBar1_ValueChanged(object sender, EventArgs e)
+        private void trackBar_ValueChanged(object sender, EventArgs e)
         {
             user_done_updating = true;
-        }
-
-        private void trackBar1_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (user_done_updating)
-            {
-                user_done_updating = false;
-                //MakeRequest(RequestId.SlideFirstParam, (double)trackBar1.Value);
-            }
         }
         /// <summary>
         /// Document Changed triggered event
@@ -266,40 +297,19 @@ namespace FamilyEditorInterface
             }
         }
         /// <summary>
-        /// Create dynamically sliders for each parameter - WIP
+        /// Push update new document
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Interface_Load(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            //UIDocument uidoc = uiapp.ActiveUIDocument;
-            //Autodesk.Revit.DB.Document doc = uidoc.Document;
-
-            //if (!doc.IsFamilyDocument)
-            //{
-            //    Command.global_message =
-            //      "Please run this command in a family document.";
-
-            //    TaskDialog.Show("Message", Command.global_message);
-            //}
-
-            //FamilyManager family_manager = doc.FamilyManager;
-            //Label lbl = new Label();
-
-
-            //lbl.Text = family_manager.Parameters.Size.ToString();
-            //lbl.Location = new System.Drawing.Point(25, 2);
-            //this.Controls.Add(lbl);
-
-            //MessageBox.Show(family_manager.Parameters.Size.ToString());
-            //int current = 0;
-            //foreach (FamilyParameter fp in family_manager.Parameters)
-            //{
-            //    TrackBar track = new TrackBar();
-            //    lbl.Location = new System.Drawing.Point(100, current*2);
-            //    this.Controls.Add(track);
-            //    current++;
-            //}
+            Autodesk.Revit.DB.Document doc = uiapp.ActiveUIDocument.Document;
+            if (!doc.Equals(this.Document()))
+            {
+                this.Document(doc);
+                this.DocumentChanged();
+            }
+            DocumentChanged();
         }
     }
 }

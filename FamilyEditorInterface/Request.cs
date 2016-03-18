@@ -37,35 +37,7 @@ namespace FamilyEditorInterface
         /// <summary>
         /// "Delete" request
         /// </summary>
-        SlideFirstParam = 1,
-        /// <summary>
-        /// "FlipLeftRight" request
-        /// </summary>
-        FlipLeftRight = 2,
-        /// <summary>
-        /// "FlipInOut" request
-        /// </summary>
-        FlipInOut = 3,
-        /// <summary>
-        /// "MakeRight" request
-        /// </summary>
-        MakeRight = 4,
-        /// <summary>
-        /// "MakeLeft" request
-        /// </summary>
-        MakeLeft = 5,
-        /// <summary>
-        /// "TurnOut" request
-        /// </summary>
-        TurnOut = 6,
-        /// <summary>
-        /// "TurnIn" request
-        /// </summary>
-        TurnIn = 7,
-        /// <summary>
-        /// "Rotate" request
-        /// </summary>
-        Rotate = 8,
+        SlideParam = 1,
     }
 
    /// <summary>
@@ -81,7 +53,7 @@ namespace FamilyEditorInterface
       // Storing the value as a plain Int makes using the interlocking mechanism simpler
       private int m_request = (int)RequestId.None;
       // try tp tramsport information
-      private double value;
+      private Tuple<string, double> value;
       /// <summary>
       ///   Take - The Idling handler calls this to obtain the latest request. 
       /// </summary>
@@ -107,12 +79,12 @@ namespace FamilyEditorInterface
          Interlocked.Exchange(ref m_request, (int)request);
       }
       // try to trasport the message
-      internal void Value(double value)
+      internal void Value(Tuple<string, double> value)
       {
           this.value = value;
       }
       // try to transport the message
-      internal double GetValue()
+      internal Tuple<string, double> GetValue()
       {
           return this.value;
       }

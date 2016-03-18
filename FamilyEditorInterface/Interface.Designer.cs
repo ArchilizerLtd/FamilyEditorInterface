@@ -1,4 +1,6 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Forms;
+using System.Windows.Input;
 namespace FamilyEditorInterface
 {
     partial class Interface
@@ -31,14 +33,15 @@ namespace FamilyEditorInterface
         {
             this.btnExit = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnExit
             // 
             this.btnExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExit.Location = new System.Drawing.Point(389, 226);
+            this.btnExit.Location = new System.Drawing.Point(203, 434);
             this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(75, 23);
+            this.btnExit.Size = new System.Drawing.Size(109, 23);
             this.btnExit.TabIndex = 0;
             this.btnExit.Text = "Exit";
             this.btnExit.UseVisualStyleBackColor = true;
@@ -53,22 +56,32 @@ namespace FamilyEditorInterface
             this.panel1.AutoScrollMinSize = new System.Drawing.Size(0, 300);
             this.panel1.Location = new System.Drawing.Point(12, 12);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(480, 237);
+            this.panel1.Size = new System.Drawing.Size(300, 416);
             this.panel1.TabIndex = 1;
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(12, 434);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(109, 23);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "Refresh Document";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Interface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(504, 261);
+            this.ClientSize = new System.Drawing.Size(324, 469);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.panel1);
-            this.MinimumSize = new System.Drawing.Size(520, 120);
+            this.MinimumSize = new System.Drawing.Size(340, 120);
             this.Name = "Interface";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Family Parameters";
-            this.Load += new System.EventHandler(this.Interface_Load);
             this.GotFocus += new System.EventHandler(this.Control1_GotFocus);
             this.ResumeLayout(false);
 
@@ -78,5 +91,6 @@ namespace FamilyEditorInterface
 
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Panel panel1;
+        private Button button1;
     }
 }
