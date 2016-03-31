@@ -1,4 +1,5 @@
-﻿//
+﻿using Autodesk.Revit.DB;
+//
 // (C) Copyright 2003-2014 by Autodesk, Inc.
 //
 // Permission to use, copy, modify, and distribute this software in
@@ -35,9 +36,13 @@ namespace FamilyEditorInterface
         /// </summary>
         None = 0,
         /// <summary>
-        /// "Delete" request
+        /// "Change parameter value" request
         /// </summary>
         SlideParam = 1,
+        /// <summary>
+        /// "Regenerate Document" request
+        /// </summary>
+        DeleteId = 2,
     }
 
    /// <summary>

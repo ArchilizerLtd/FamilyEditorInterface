@@ -25,7 +25,7 @@ namespace FamilyEditorInterface
           ExternalCommandData commandData,
           ref string message,
           ElementSet elements)
-        {
+        {            
             try
             {
                 // why do we need the form to be shown in the application? 

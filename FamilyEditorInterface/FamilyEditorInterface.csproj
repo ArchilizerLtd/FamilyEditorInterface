@@ -44,8 +44,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>bear.png.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build" />
@@ -96,6 +95,9 @@
   <ItemGroup>
     <EmbeddedResource Include="archilizer-06 copy.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="bear.png.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterClean">
     <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2015\AutodeskRibbonTemplate.addin" />
@@ -103,6 +105,8 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>copy "$(ProjectDir)FamilyEditorInterface.addin" "$(AppData)\Autodesk\REVIT\Addins\2015"
-copy "$(ProjectDir)bin\debug\FamilyEditorInterface.dll" "$(AppData)\Autodesk\REVIT\Addins\2015"</PostBuildEvent>
+copy "$(ProjectDir)bin\debug\FamilyEditorInterface.dll" "$(AppData)\Autodesk\REVIT\Addins\2015"
+copy "$(ProjectDir)FamilyEditorInterface.addin" "$(AppData)\Autodesk\REVIT\Addins\2016"
+copy "$(ProjectDir)bin\debug\FamilyEditorInterface.dll" "$(AppData)\Autodesk\REVIT\Addins\2016"</PostBuildEvent>
   </PropertyGroup>
 </Project>

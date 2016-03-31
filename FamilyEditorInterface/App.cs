@@ -79,7 +79,8 @@ namespace FamilyEditorInterface
 
             RibbonItem item = rvtRibbonPanel.AddItem(data);
             PulldownButton optionsBtn = item as PulldownButton;
-
+            ContextualHelp ch = new ContextualHelp(ContextualHelpType.Url, "file:///C:/Users/adicted/AppData/Roaming/Autodesk/Revit/Addins/2015/help.htm");
+            optionsBtn.SetContextualHelp(ch);
             optionsBtn.AddPushButton(new PushButtonData("Family Editor", "Family Editor Interface", path,
                 "FamilyEditorInterface.Command"));
             //optionsBtn.AddPushButton(new PushButtonData("Automatic Dimensions", "AutoDim", path,
@@ -158,6 +159,11 @@ namespace FamilyEditorInterface
 
         public Result OnShutdown(UIControlledApplication a)
         {
+            ControlledApplication c_app = a.ControlledApplication;
+            c_app.DocumentChanged
+                -= new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(
+                    c_app_DocumentChanged);
+
             if (m_MyForm != null && m_MyForm.Visible)
             {
                 m_MyForm.Close();

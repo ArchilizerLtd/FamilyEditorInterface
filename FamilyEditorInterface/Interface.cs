@@ -20,8 +20,7 @@ namespace FamilyEditorInterface
         private UIApplication uiapp;
         private UIDocument uidoc;
         private Autodesk.Revit.DB.Document doc;
-        private FamilyManager familyManager;
-        private int vOffset = 42;
+        private int vOffset = 50;
         private SortedList<string, FamilyParameter> famParam;
 
 
@@ -35,7 +34,6 @@ namespace FamilyEditorInterface
             this.uiapp = uiapp;
             this.uidoc = uiapp.ActiveUIDocument;
             this.doc = uidoc.Document;
-            this.familyManager = doc.FamilyManager;
             this.exEvent = exEvent;
             this.handler = handler;
             this.famParam = new SortedList<string, FamilyParameter>();
@@ -50,7 +48,8 @@ namespace FamilyEditorInterface
         }
         internal Autodesk.Revit.DB.Document Document()
         {
-            return this.doc;
+            if (this.doc.IsValidObject) return this.doc;
+            else return null;
         }
         internal void Document(Autodesk.Revit.DB.Document doc)
         {
@@ -77,19 +76,27 @@ namespace FamilyEditorInterface
             {
                 return false;
             }
-            if (fp.UserModifiable)
+            else if (fp.UserModifiable)
             {
                 return false;
             }
-            if (fp.IsDeterminedByFormula)
+            else if (fp.IsDeterminedByFormula)
             {
                 return false;
             }
-            if (!ft.HasValue(fp))
+            else if (!ft.HasValue(fp))
             {
                 return false;
             }
-            if (ft.AsDouble(fp) == 0 || ft.AsDouble(fp) == null)
+            else if (ft.AsDouble(fp) == null)
+            {
+                return false;
+            }
+            else if (fp.IsReporting)
+            {
+                return false;
+            }
+            else if (fp.IsDeterminedByFormula)
             {
                 return false;
             }
@@ -100,17 +107,18 @@ namespace FamilyEditorInterface
         /// </summary>
         private void CollectData()
         {
+
             if (!doc.IsFamilyDocument)
             {
-                Command.global_message =
-                  "Please run this command in a family document.";
+                //Command.global_message =
+                //  "Please run this command in a family document.";
 
-                TaskDialog.Show("Message", Command.global_message);
+                //TaskDialog.Show("Message", Command.global_message);
             }
             
+            FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
-
-            this.familyManager = doc.FamilyManager;
+            
             this.panel1.Controls.Clear();
 
             int index = 0;
@@ -124,52 +132,98 @@ namespace FamilyEditorInterface
             foreach (FamilyParameter fp in familyManager.Parameters)
             {
                 if (!famEdit(fp, familyType)) continue;
-
-                famParam.Add(fp.Definition.Name, fp);
+                else famParam.Add(fp.Definition.Name, fp);
+                
             }
             //sort by name
 
             //add controlls
             List<ElementId> eId = new List<ElementId>();
+            if (famParam.Count == 0)
+            {
+                panel1.Controls.Add(WarningLabel("No active parameters"));
+            }
 
             foreach(FamilyParameter fp in famParam.Values)
             {
                 //if (fp.StorageType == StorageType.Double) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsDouble(fp)), DisplayUnitType.DUT_MILLIMETERS);
                 //else if (fp.StorageType == StorageType.Integer) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsInteger(fp)), DisplayUnitType.DUT_MILLIMETERS);
+                
                 if (fp.StorageType == StorageType.Double) value = Convert.ToDouble(familyType.AsDouble(fp));
                 else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
                 eId.Add(fp.Id);
+                if (value != 0)
+                {
+                    track[index] = new TrackBar();
+                    track[index].Name = fp.Definition.Name;
+                    track[index].Text = fp.Definition.Name;
+                    track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset);
+                    track[index].Size = new Size(180, 10);
+                    track[index].Maximum = Convert.ToInt32(value * 100) * 2;
+                    track[index].Minimum = 1;
+                    track[index].Value = Convert.ToInt32(value * 100);
+                    track[index].TickFrequency = Convert.ToInt32(track[index].Maximum * 0.05);
+                    track[index].MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
+                    track[index].ValueChanged += new EventHandler(trackBar_ValueChanged);
+                    track[index].Tag = index;
+                    label[index] = new Label();
+                    label[index].AutoSize = true;
+                    label[index].MaximumSize = new Size(100, 0);
+                    label[index].Font = new Font("Arial", 8);
+                    label[index].Location = new System.Drawing.Point(200, 15 + index * vOffset);
+                    //label[index].Text =  String.Format("{0}: 0 to {1}", fp.Definition.Name, track[index].Maximum);
+                    label[index].Text = fp.Definition.Name;
+                    label[index].Name = fp.Definition.Name;
+                    //label[index].ForeColor = System.Drawing.Color.LightGray;
+                    label[index].Visible = true;
+                    index++;
+                }
+                else
+                {
+                    track[index] = new TrackBar();
+                    track[index].Name = fp.Definition.Name;
+                    track[index].Text = fp.Definition.Name;
+                    track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset);
+                    track[index].Size = new Size(180, 10);
+                    track[index].Tag = index;
+                    track[index].Enabled = false;
+                    label[index] = new Label();
+                    label[index].AutoSize = true;
+                    label[index].MaximumSize = new Size(100, 0);
+                    label[index].Font = new Font("Arial", 8);
+                    label[index].ForeColor = System.Drawing.Color.LightGray;
+                    label[index].Location = new System.Drawing.Point(200, 15 + index * vOffset);
+                    label[index].Text = fp.Definition.Name;
+                    label[index].Name = fp.Definition.Name;
+                    label[index].Visible = true;
 
-                track[index] = new TrackBar();
-                track[index].Name = fp.Definition.Name;
-                track[index].Text = fp.Definition.Name;
-                track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset);
-                track[index].Size = new Size(180, 8);
-                track[index].Maximum = Convert.ToInt32(value * 100) * 2;
-                track[index].Minimum = 1;
-                track[index].Value = Convert.ToInt32(value*100);
-                track[index].TickFrequency = Convert.ToInt32(track[index].Maximum * 0.05);
-                track[index].MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
-                track[index].ValueChanged += new EventHandler(trackBar_ValueChanged);
-                track[index].Tag = index;
-                label[index] = new Label();
-                label[index].Size = new Size(100, 30);
-                label[index].Font = new Font("Arial", 8);
-                label[index].Location = new System.Drawing.Point(200, 15 + index * vOffset);
-                //label[index].Text =  String.Format("{0}: 0 to {1}", fp.Definition.Name, track[index].Maximum);
-                label[index].Text = fp.Definition.Name;
-                label[index].Name = fp.Definition.Name;
-                //label[index].Text = fp.StorageType.ToString();
-                //label[index].Name = fp.Definition.ParameterType.ToString();
-                label[index].Visible = true;
-
-                index++;
+                    index++;
+                }
             }
 
-            this.panel1.Controls.AddRange(track);
-            this.panel1.Controls.AddRange(label);
+            if (track.Length > 0) this.panel1.Controls.AddRange(track);
+            if (label.Length > 0) this.panel1.Controls.AddRange(label);
         }
-        
+        /// <summary>
+        /// Helper method to assign label to an empty panel
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private System.Windows.Forms.Label WarningLabel(string p)
+        {
+            Label l = new Label();
+            l.AutoSize = true;
+            l.MaximumSize = new Size(90, 0);
+            l.Location = new System.Drawing.Point(Convert.ToInt32(panel1.Width * 0.5 - l.Size.Width * 0.5), Convert.ToInt32(panel1.Height * 0.5 - l.Size.Height * 0.5));
+            l.Font = new Font("Arial", 8, FontStyle.Italic);
+            l.Text = p;
+            return l;
+        }
+        /// <summary>
+        /// On update
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void trackBar_MouseUp(object sender, MouseEventArgs e)
         {
             TrackBar tbar = sender as TrackBar;
@@ -297,19 +351,43 @@ namespace FamilyEditorInterface
             }
         }
         /// <summary>
-        /// Push update new document
+        /// "Refresh Document" - Push update new document
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
-        {
-            Autodesk.Revit.DB.Document doc = uiapp.ActiveUIDocument.Document;
-            if (!doc.Equals(this.Document()))
+        {          
+            try
             {
-                this.Document(doc);
-                this.DocumentChanged();
+                Autodesk.Revit.DB.Document doc = uiapp.ActiveUIDocument.Document;
+
+                if (this.Document() != null && !doc.Equals(this.Document()))
+                {
+                    this.Document(doc);
+                    this.DocumentChanged();
+                }
+                else if (this.Document() == null && doc.IsValidObject && doc.IsFamilyDocument)
+                {
+                    this.Document(doc);
+                    this.DocumentChanged();
+                }
+                else
+                {
+                    this.DocumentChanged();
+                }
             }
-            DocumentChanged();
+            catch (Exception ex)
+            {
+                this.InvalidDocument(ex);
+            }
+        }
+        /// <summary>
+        /// Trigers if no valid Family Document is available on Refresh Document
+        /// </summary>
+        private void InvalidDocument(Exception ex)
+        {
+            this.panel1.Controls.Clear();
+            this.panel1.Controls.Add(WarningLabel("Please, run in a Family Document"));
         }
     }
 }

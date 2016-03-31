@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
-  <AddIn Type="Command">
+  <!--<AddIn Type="Command">
     <Text>Command FamilyEditorInterface</Text>
     <Description>Some description for FamilyEditorInterface</Description>
     <Assembly>FamilyEditorInterface.dll</Assembly>
@@ -8,13 +8,13 @@
     <ClientId>948e4a6e-16ff-473d-8c6a-78336281e938</ClientId>
     <VendorId>TBC_</VendorId>
     <VendorDescription>Archilizer LTD, http://archilizer.com</VendorDescription>
-  </AddIn>
+  </AddIn>-->
   <AddIn Type="Application">
-    <Name>Application FamilyEditorInterface</Name>
-    <Assembly>FamilyEditorInterface.dll</Assembly>
+    <Name>Family Editor Interface</Name>
+    <Assembly>.\FamilyEditorInterface.dll</Assembly>
     <FullClassName>FamilyEditorInterface.Application</FullClassName>
-    <ClientId>4c74ad85-3508-4e26-af63-92dbca39a55f</ClientId>
-    <VendorId>TBC_</VendorId>
+    <ClientId>8e2fea3e-f39d-413d-b5eb-e1c27da5a80b</ClientId>
+    <VendorId>Archilizer</VendorId>
     <VendorDescription>Archilizer LTD, http://archilizer.com</VendorDescription>
   </AddIn>
 </RevitAddIns>

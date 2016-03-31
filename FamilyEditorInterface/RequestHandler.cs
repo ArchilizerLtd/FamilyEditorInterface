@@ -110,19 +110,5 @@ namespace FamilyEditorInterface
                 }
             }
         }
-        /// <summary>
-        /// Delegate - not used (partly because I don't know how :D)
-        /// </summary>
-        /// <param name="fm"></param>
-        /// <param name="fp"></param>
-        private static void Slide(FamilyManager fm, FamilyParameter fp)
-        {
-            TaskDialog.Show("Message", String.Format("Executing .. {0} for value {1}", fp.Definition.Name, "empty"));
-            if(fp.UserModifiable)
-            {
-                fm.Set(fp, "200");
-            }
-        }
-
     }
 }
