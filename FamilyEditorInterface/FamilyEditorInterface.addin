@@ -1,14 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
-  <!--<AddIn Type="Command">
-    <Text>Command FamilyEditorInterface</Text>
-    <Description>Some description for FamilyEditorInterface</Description>
-    <Assembly>FamilyEditorInterface.dll</Assembly>
-    <FullClassName>FamilyEditorInterface.Command</FullClassName>
-    <ClientId>948e4a6e-16ff-473d-8c6a-78336281e938</ClientId>
-    <VendorId>TBC_</VendorId>
-    <VendorDescription>Archilizer LTD, http://archilizer.com</VendorDescription>
-  </AddIn>-->
   <AddIn Type="Application">
     <Name>Family Editor Interface</Name>
     <Assembly>.\FamilyEditorInterface.dll</Assembly>

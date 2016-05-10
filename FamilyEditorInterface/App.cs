@@ -38,11 +38,15 @@ namespace FamilyEditorInterface
         /// <summary>
         /// Tooltip
         /// </summary>
-        public const string Message = "Create views and sheets from excel file";
+        public const string Message = "Interactive interface for Family Editor.";
         /// <summary>
         /// Get absolute path to this assembly
         /// </summary>
         static string path = Assembly.GetExecutingAssembly().Location;
+        static string contentPath = Path.GetDirectoryName(Path.GetDirectoryName(path)) + "/";
+        static string helpFile = contentPath + "Family Editor Interface _ Revit _ Autodesk App Store.html";
+        static string largeIcon = contentPath + "familyeditorinterface32.png";
+        static string smallIcon = contentPath + "familyeditorinterface16.png";
         #region Ribbon
         /// <summary>
         /// Use embedded image to load as an icon for the ribbon
@@ -68,21 +72,24 @@ namespace FamilyEditorInterface
         /// <param name="a"></param>
         private void AddRibbonPanel(UIControlledApplication a)
         {
-            Autodesk.Revit.UI.RibbonPanel rvtRibbonPanel = a.CreateRibbonPanel("Archilizer test");
-            PulldownButtonData data = new PulldownButtonData("Options", "Archilizer test");
+            Autodesk.Revit.UI.RibbonPanel rvtRibbonPanel = a.CreateRibbonPanel("Archilizer FEI");
+            PulldownButtonData data = new PulldownButtonData("Options", "Family Editor" + Environment.NewLine + "Interface");
 
-            BitmapSource img32 = GetEmbeddedImage("FamilyEditorInterface.archilizer-06 copy.png");
+            BitmapSource img32 = new BitmapImage (new Uri (@largeIcon));
+            BitmapSource img16 = new BitmapImage (new Uri (@smallIcon));
 
-            data.Image = img32;
-            data.LargeImage = img32;
-            data.ToolTip = Message;
+            //RibbonItem item = rvtRibbonPanel.AddItem(data);
+            //PushButton optionsBtn = item as PushButton;
+            //ContextualHelp ch = new ContextualHelp(ContextualHelpType.Url, "file:///C:/Users/adicted/AppData/Roaming/Autodesk/Revit/Addins/2015/Family Editor Interface _ AutoCAD _ Autodesk App Store.html");
+            ContextualHelp ch = new ContextualHelp(ContextualHelpType.Url, @helpFile);
+            
+            PushButton familyEI = rvtRibbonPanel.AddItem(new PushButtonData("Family Editor", "Family Editor" + Environment.NewLine +  "Interface", path,
+                "FamilyEditorInterface.Command")) as PushButton;
 
-            RibbonItem item = rvtRibbonPanel.AddItem(data);
-            PulldownButton optionsBtn = item as PulldownButton;
-            ContextualHelp ch = new ContextualHelp(ContextualHelpType.Url, "file:///C:/Users/adicted/AppData/Roaming/Autodesk/Revit/Addins/2015/help.htm");
-            optionsBtn.SetContextualHelp(ch);
-            optionsBtn.AddPushButton(new PushButtonData("Family Editor", "Family Editor Interface", path,
-                "FamilyEditorInterface.Command"));
+            familyEI.Image = img16;
+            familyEI.LargeImage = img32;
+            familyEI.ToolTip = Message;
+            familyEI.SetContextualHelp(ch);
             //optionsBtn.AddPushButton(new PushButtonData("Automatic Dimensions", "AutoDim", path,
             //    "AutomaticDimensions.AutoDim"));
             //optionsBtn.AddPushButton(new PushButtonData("CAD|BIM", "CAD|BIM", path,

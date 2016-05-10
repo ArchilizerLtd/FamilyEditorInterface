@@ -72,6 +72,8 @@ namespace FamilyEditorInterface
         /// <returns></returns>
         private Boolean famEdit(FamilyParameter fp, FamilyType ft)
         {
+            //double valueDouble;
+            //int valueInt;
             if (!fp.StorageType.ToString().Equals("Double") && !fp.StorageType.ToString().Equals("Integer"))
             {
                 return false;
@@ -80,7 +82,7 @@ namespace FamilyEditorInterface
             {
                 return false;
             }
-            else if (fp.IsDeterminedByFormula)
+            else if (fp.IsDeterminedByFormula || fp.Formula != null)
             {
                 return false;
             }
@@ -88,10 +90,14 @@ namespace FamilyEditorInterface
             {
                 return false;
             }
-            else if (ft.AsDouble(fp) == null)
+            else if (ft.AsDouble(fp) == null && ft.AsInteger(fp) == null)
             {
                 return false;
             }
+            //else if (!double.TryParse(ft.AsDouble(fp).ToString(), out valueDouble) && !int.TryParse(ft.AsInteger(fp).ToString(), out valueInt))
+            //{
+            //    return false;
+            //}
             else if (fp.IsReporting)
             {
                 return false;
@@ -170,6 +176,7 @@ namespace FamilyEditorInterface
                     label[index].AutoSize = true;
                     label[index].MaximumSize = new Size(100, 0);
                     label[index].Font = new Font("Arial", 8);
+                    //label[index].ForeColor = (fp.AssociatedParameters.IsEmpty) ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
                     label[index].Location = new System.Drawing.Point(200, 15 + index * vOffset);
                     //label[index].Text =  String.Format("{0}: 0 to {1}", fp.Definition.Name, track[index].Maximum);
                     label[index].Text = fp.Definition.Name;

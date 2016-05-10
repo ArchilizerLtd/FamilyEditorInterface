@@ -24,7 +24,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\Debug\FamilyEditorInterface.bundle\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -44,7 +44,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>bear.png.ico</ApplicationIcon>
+    <ApplicationIcon>archilizer.png.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build" />
@@ -90,13 +93,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="archilizer-06 copy.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="archilizer-06 copy.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="bear.png.ico" />
+    <Content Include="archilizer.png.ico" />
+    <Content Include="FEI icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterClean">
@@ -104,9 +102,8 @@
     <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2015\AutodeskRibbonTemplate.dll" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(ProjectDir)FamilyEditorInterface.addin" "$(AppData)\Autodesk\REVIT\Addins\2015"
-copy "$(ProjectDir)bin\debug\FamilyEditorInterface.dll" "$(AppData)\Autodesk\REVIT\Addins\2015"
-copy "$(ProjectDir)FamilyEditorInterface.addin" "$(AppData)\Autodesk\REVIT\Addins\2016"
-copy "$(ProjectDir)bin\debug\FamilyEditorInterface.dll" "$(AppData)\Autodesk\REVIT\Addins\2016"</PostBuildEvent>
+    <PostBuildEvent>copy "$(ProjectDir)FamilyEditorInterface.addin" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"
+copy "$(ProjectDir)bin\debug\FamilyEditorInterface.bundle\FamilyEditorInterface.dll" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"
+</PostBuildEvent>
   </PropertyGroup>
 </Project>
