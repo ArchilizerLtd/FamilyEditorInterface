@@ -44,7 +44,7 @@ namespace FamilyEditorInterface
         /// </summary>
         static string path = Assembly.GetExecutingAssembly().Location;
         static string contentPath = Path.GetDirectoryName(Path.GetDirectoryName(path)) + "/";
-        static string helpFile = contentPath + "Family Editor Interface _ Revit _ Autodesk App Store.html";
+        static string helpFile = "file:///C:/ProgramData/Autodesk/ApplicationPlugins/FamilyEditorInterface.bundle/Content/Family%20Editor%20Interface%20_%20Revit%20_%20Autodesk%20App%20Store.html";
         static string largeIcon = contentPath + "familyeditorinterface32.png";
         static string smallIcon = contentPath + "familyeditorinterface16.png";
         #region Ribbon
