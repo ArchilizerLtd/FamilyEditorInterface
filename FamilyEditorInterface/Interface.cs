@@ -78,10 +78,10 @@ namespace FamilyEditorInterface
             {
                 return false;
             }
-            else if (fp.UserModifiable)
-            {
-                return false;
-            }
+            //else if (fp.UserModifiable)
+            //{
+            //    return false;
+            //}
             else if (fp.IsDeterminedByFormula || fp.Formula != null)
             {
                 return false;
@@ -128,9 +128,11 @@ namespace FamilyEditorInterface
             this.panel1.Controls.Clear();
 
             int index = 0;
+            int indexChk= 0;
             double value = 0.0;
 
             TrackBar[] track = new TrackBar[familyManager.Parameters.Size];
+            CheckBox[] check = new CheckBox[familyManager.Parameters.Size];
             Label[] label = new Label[familyManager.Parameters.Size];
 
             famParam.Clear();
@@ -154,7 +156,29 @@ namespace FamilyEditorInterface
             {
                 //if (fp.StorageType == StorageType.Double) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsDouble(fp)), DisplayUnitType.DUT_MILLIMETERS);
                 //else if (fp.StorageType == StorageType.Integer) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsInteger(fp)), DisplayUnitType.DUT_MILLIMETERS);
-                
+                if(fp.Definition.ParameterType.Equals(ParameterType.YesNo))
+                {
+                    if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
+                    eId.Add(fp.Id);                    
+                    check[indexChk] = new CheckBox();
+                    check[indexChk].Name = fp.Definition.Name;
+                    check[indexChk].Text = fp.Definition.Name;
+                    check[indexChk].Location = new System.Drawing.Point(14, 15 + index * vOffset + indexChk * vOffset);
+                    check[indexChk].Checked = Convert.ToInt32(value) == 1 ? true : false;
+                    check[indexChk].MouseUp += new System.Windows.Forms.MouseEventHandler(checkBox_MouseUp);
+                    check[indexChk].Click += new EventHandler(trackBar_ValueChanged);
+                    check[indexChk].Tag = indexChk;
+                    label[index + indexChk] = new Label();
+                    label[index + indexChk].AutoSize = true;
+                    label[index + indexChk].MaximumSize = new Size(100, 0);
+                    label[index + indexChk].Font = new Font("Arial", 8);
+                    label[index + indexChk].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
+                    label[index + indexChk].Text = fp.Definition.Name;
+                    label[index + indexChk].Name = fp.Definition.Name;
+                    label[index + indexChk].Visible = true;
+                    indexChk++;
+                    continue;
+                }
                 if (fp.StorageType == StorageType.Double) value = Convert.ToDouble(familyType.AsDouble(fp));
                 else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
                 eId.Add(fp.Id);
@@ -163,7 +187,7 @@ namespace FamilyEditorInterface
                     track[index] = new TrackBar();
                     track[index].Name = fp.Definition.Name;
                     track[index].Text = fp.Definition.Name;
-                    track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset);
+                    track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset + indexChk * vOffset);
                     track[index].Size = new Size(180, 10);
                     track[index].Maximum = Convert.ToInt32(value * 100) * 2;
                     track[index].Minimum = 1;
@@ -172,17 +196,17 @@ namespace FamilyEditorInterface
                     track[index].MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
                     track[index].ValueChanged += new EventHandler(trackBar_ValueChanged);
                     track[index].Tag = index;
-                    label[index] = new Label();
-                    label[index].AutoSize = true;
-                    label[index].MaximumSize = new Size(100, 0);
-                    label[index].Font = new Font("Arial", 8);
+                    label[index + indexChk] = new Label();
+                    label[index + indexChk].AutoSize = true;
+                    label[index + indexChk].MaximumSize = new Size(100, 0);
+                    label[index + indexChk].Font = new Font("Arial", 8);
                     //label[index].ForeColor = (fp.AssociatedParameters.IsEmpty) ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
-                    label[index].Location = new System.Drawing.Point(200, 15 + index * vOffset);
+                    label[index + indexChk].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
                     //label[index].Text =  String.Format("{0}: 0 to {1}", fp.Definition.Name, track[index].Maximum);
-                    label[index].Text = fp.Definition.Name;
-                    label[index].Name = fp.Definition.Name;
+                    label[index + indexChk].Text = fp.Definition.Name;
+                    label[index + indexChk].Name = fp.Definition.Name;
                     //label[index].ForeColor = System.Drawing.Color.LightGray;
-                    label[index].Visible = true;
+                    label[index + indexChk].Visible = true;
                     index++;
                 }
                 else
@@ -190,25 +214,25 @@ namespace FamilyEditorInterface
                     track[index] = new TrackBar();
                     track[index].Name = fp.Definition.Name;
                     track[index].Text = fp.Definition.Name;
-                    track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset);
+                    track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset + indexChk * vOffset);
                     track[index].Size = new Size(180, 10);
                     track[index].Tag = index;
                     track[index].Enabled = false;
-                    label[index] = new Label();
-                    label[index].AutoSize = true;
-                    label[index].MaximumSize = new Size(100, 0);
-                    label[index].Font = new Font("Arial", 8);
-                    label[index].ForeColor = System.Drawing.Color.LightGray;
-                    label[index].Location = new System.Drawing.Point(200, 15 + index * vOffset);
-                    label[index].Text = fp.Definition.Name;
-                    label[index].Name = fp.Definition.Name;
-                    label[index].Visible = true;
-
+                    label[index + indexChk] = new Label();
+                    label[index + indexChk].AutoSize = true;
+                    label[index + indexChk].MaximumSize = new Size(100, 0);
+                    label[index + indexChk].Font = new Font("Arial", 8);
+                    label[index + indexChk].ForeColor = System.Drawing.Color.LightGray;
+                    label[index + indexChk].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
+                    label[index + indexChk].Text = fp.Definition.Name;
+                    label[index + indexChk].Name = fp.Definition.Name;
+                    label[index + indexChk].Visible = true;
                     index++;
                 }
             }
 
             if (track.Length > 0) this.panel1.Controls.AddRange(track);
+            if (check.Length > 0) this.panel1.Controls.AddRange(check);
             if (label.Length > 0) this.panel1.Controls.AddRange(label);
         }
         /// <summary>
@@ -238,10 +262,24 @@ namespace FamilyEditorInterface
             if (user_done_updating)
             {
                 user_done_updating = false;
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double> (tbar.Text, (double)tbar.Value));
+                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbar.Text, (double)tbar.Value * 0.01));
             }
         }
+        /// <summary>
+        /// On update for checkbox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void checkBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            CheckBox cbox = sender as CheckBox;
 
+            if (user_done_updating)
+            {
+                user_done_updating = false;
+                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(cbox.Text, (double)(cbox.Checked ? 1.0 : 0.0)));
+            }
+        }
         /// <summary>
         /// Form closed event handler
         /// </summary>

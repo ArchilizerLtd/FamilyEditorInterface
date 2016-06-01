@@ -7,6 +7,7 @@
 *.sln.docstates
 *.addin
 
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

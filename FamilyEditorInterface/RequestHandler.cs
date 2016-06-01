@@ -101,7 +101,7 @@ namespace FamilyEditorInterface
 
                     if (trans.Start(text) == TransactionStatus.Started)
                     {
-                        mgr.Set(fp, value.Item2*0.01);
+                        mgr.Set(fp, value.Item2);
                         //operation(mgr, fp);
                         doc.Regenerate();
                         trans.Commit();
