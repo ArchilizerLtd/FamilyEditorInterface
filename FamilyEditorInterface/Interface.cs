@@ -125,15 +125,17 @@ namespace FamilyEditorInterface
             FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
             
-            this.panel1.Controls.Clear();
-
+            //this.panel1.Controls.Clear();
+            this.flowLayoutPanel1.Controls.Clear();
+            this.flowLayoutPanel2.Controls.Clear();
             int index = 0;
             int indexChk= 0;
             double value = 0.0;
 
             TrackBar[] track = new TrackBar[familyManager.Parameters.Size];
             CheckBox[] check = new CheckBox[familyManager.Parameters.Size];
-            Label[] label = new Label[familyManager.Parameters.Size];
+            Label[] label1 = new Label[familyManager.Parameters.Size];
+            Label[] label2 = new Label[familyManager.Parameters.Size];
 
             famParam.Clear();
 
@@ -151,7 +153,7 @@ namespace FamilyEditorInterface
             {
                 panel1.Controls.Add(WarningLabel("No active parameters"));
             }
-
+            //yes-no parameters
             foreach(FamilyParameter fp in famParam.Values)
             {
                 //if (fp.StorageType == StorageType.Double) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsDouble(fp)), DisplayUnitType.DUT_MILLIMETERS);
@@ -163,22 +165,25 @@ namespace FamilyEditorInterface
                     check[indexChk] = new CheckBox();
                     check[indexChk].Name = fp.Definition.Name;
                     check[indexChk].Text = fp.Definition.Name;
-                    check[indexChk].Location = new System.Drawing.Point(14, 15 + index * vOffset + indexChk * vOffset);
+                    //check[indexChk].Location = new System.Drawing.Point(14, 15 + index * vOffset + indexChk * vOffset);
                     check[indexChk].Checked = Convert.ToInt32(value) == 1 ? true : false;
                     check[indexChk].MouseUp += new System.Windows.Forms.MouseEventHandler(checkBox_MouseUp);
                     check[indexChk].Click += new EventHandler(trackBar_ValueChanged);
                     check[indexChk].Tag = indexChk;
-                    label[index + indexChk] = new Label();
-                    label[index + indexChk].AutoSize = true;
-                    label[index + indexChk].MaximumSize = new Size(100, 0);
-                    label[index + indexChk].Font = new Font("Arial", 8);
-                    label[index + indexChk].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
-                    label[index + indexChk].Text = fp.Definition.Name;
-                    label[index + indexChk].Name = fp.Definition.Name;
-                    label[index + indexChk].Visible = true;
+                    label2[indexChk] = new Label();
+                    label2[indexChk].AutoSize = true;
+                    label2[indexChk].MaximumSize = new Size(100, 0);
+                    label2[indexChk].Font = new Font("Arial", 8);
+                    //label[indexChk].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
+                    label2[indexChk].Text = fp.Definition.Name;
+                    label2[indexChk].Name = fp.Definition.Name;
+                    label2[indexChk].Visible = true;
+                    this.flowLayoutPanel2.Controls.Add(check[indexChk]);
+                    this.flowLayoutPanel2.Controls.Add(label2[indexChk]);
                     indexChk++;
                     continue;
                 }
+                //slider parameters
                 if (fp.StorageType == StorageType.Double) value = Convert.ToDouble(familyType.AsDouble(fp));
                 else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
                 eId.Add(fp.Id);
@@ -187,7 +192,7 @@ namespace FamilyEditorInterface
                     track[index] = new TrackBar();
                     track[index].Name = fp.Definition.Name;
                     track[index].Text = fp.Definition.Name;
-                    track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset + indexChk * vOffset);
+                    //track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset + indexChk * vOffset);
                     track[index].Size = new Size(180, 10);
                     track[index].Maximum = Convert.ToInt32(value * 100) * 2;
                     track[index].Minimum = 1;
@@ -196,17 +201,19 @@ namespace FamilyEditorInterface
                     track[index].MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
                     track[index].ValueChanged += new EventHandler(trackBar_ValueChanged);
                     track[index].Tag = index;
-                    label[index + indexChk] = new Label();
-                    label[index + indexChk].AutoSize = true;
-                    label[index + indexChk].MaximumSize = new Size(100, 0);
-                    label[index + indexChk].Font = new Font("Arial", 8);
+                    label1[index] = new Label();
+                    label1[index].AutoSize = true;
+                    label1[index].MaximumSize = new Size(100, 0);
+                    label1[index].Font = new Font("Arial", 8);
                     //label[index].ForeColor = (fp.AssociatedParameters.IsEmpty) ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
-                    label[index + indexChk].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
+                    //label1[index].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
                     //label[index].Text =  String.Format("{0}: 0 to {1}", fp.Definition.Name, track[index].Maximum);
-                    label[index + indexChk].Text = fp.Definition.Name;
-                    label[index + indexChk].Name = fp.Definition.Name;
+                    label1[index].Text = fp.Definition.Name;
+                    label1[index].Name = fp.Definition.Name;
                     //label[index].ForeColor = System.Drawing.Color.LightGray;
-                    label[index + indexChk].Visible = true;
+                    label1[index].Visible = true;
+                    this.flowLayoutPanel1.Controls.Add(track[index]);
+                    this.flowLayoutPanel1.Controls.Add(label1[index]);
                     index++;
                 }
                 else
@@ -214,26 +221,29 @@ namespace FamilyEditorInterface
                     track[index] = new TrackBar();
                     track[index].Name = fp.Definition.Name;
                     track[index].Text = fp.Definition.Name;
-                    track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset + indexChk * vOffset);
+                    //track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset + indexChk * vOffset);
                     track[index].Size = new Size(180, 10);
                     track[index].Tag = index;
                     track[index].Enabled = false;
-                    label[index + indexChk] = new Label();
-                    label[index + indexChk].AutoSize = true;
-                    label[index + indexChk].MaximumSize = new Size(100, 0);
-                    label[index + indexChk].Font = new Font("Arial", 8);
-                    label[index + indexChk].ForeColor = System.Drawing.Color.LightGray;
-                    label[index + indexChk].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
-                    label[index + indexChk].Text = fp.Definition.Name;
-                    label[index + indexChk].Name = fp.Definition.Name;
-                    label[index + indexChk].Visible = true;
+                    label1[index] = new Label();
+                    label1[index].AutoSize = true;
+                    label1[index].MaximumSize = new Size(100, 0);
+                    label1[index].Font = new Font("Arial", 8);
+                    label1[index].ForeColor = System.Drawing.Color.LightGray;
+                    //label1[index].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
+                    label1[index].Text = fp.Definition.Name;
+                    label1[index].Name = fp.Definition.Name;
+                    label1[index].Visible = true;
+                    this.flowLayoutPanel1.Controls.Add(track[index]);
+                    this.flowLayoutPanel1.Controls.Add(label1[index]);
                     index++;
                 }
             }
 
-            if (track.Length > 0) this.panel1.Controls.AddRange(track);
-            if (check.Length > 0) this.panel1.Controls.AddRange(check);
-            if (label.Length > 0) this.panel1.Controls.AddRange(label);
+            //if (track.Length > 0) this.flowLayoutPanel1.Controls.AddRange(track);
+            //if (check.Length > 0) this.flowLayoutPanel2.Controls.AddRange(check);
+            //if (label1.Length > 0) this.flowLayoutPanel1.Controls.AddRange(label1);
+            //if (label2.Length > 0) this.flowLayoutPanel2.Controls.AddRange(label2);
         }
         /// <summary>
         /// Helper method to assign label to an empty panel
@@ -433,6 +443,15 @@ namespace FamilyEditorInterface
         {
             this.panel1.Controls.Clear();
             this.panel1.Controls.Add(WarningLabel("Please, run in a Family Document"));
+        }
+        /// <summary>
+        /// minimize yes no panel
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            splitContainer1.Panel2Collapsed = !splitContainer1.Panel2Collapsed;
         }
     }
 }
