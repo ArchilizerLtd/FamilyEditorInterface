@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
+using System.Reflection;
 
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
@@ -20,9 +22,13 @@ namespace FamilyEditorInterface
         private UIApplication uiapp;
         private UIDocument uidoc;
         private Autodesk.Revit.DB.Document doc;
-        private int vOffset = 50;
         private SortedList<string, FamilyParameter> famParam;
-
+        private Assembly _assembly;
+        private Stream _imageStream;
+        private Bitmap _imageMini;
+        private Bitmap _imageMaxi;
+        private bool messageTriggered;
+        private bool minimizedState;
 
         /// <summary>
         /// Constructor
@@ -45,6 +51,18 @@ namespace FamilyEditorInterface
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new System.Drawing.Point(Screen.PrimaryScreen.WorkingArea.Width - 400, Convert.ToInt32(Screen.PrimaryScreen.WorkingArea.Height * 0.5 - this.Height * 0.5));
             CollectData();
+            ImageLoad();
+        }
+        /// <summary>
+        /// Prepare the minimize and maximize icons
+        /// </summary>
+        private void ImageLoad()
+        {
+            _assembly = Assembly.GetExecutingAssembly();
+            _imageStream = _assembly.GetManifestResourceStream("FamilyEditorInterface.minimize.png");
+            _imageMini = new Bitmap(_imageStream);
+            _imageStream = _assembly.GetManifestResourceStream("FamilyEditorInterface.maximize.png");
+            _imageMaxi = new Bitmap(_imageStream);
         }
         internal Autodesk.Revit.DB.Document Document()
         {
@@ -135,7 +153,6 @@ namespace FamilyEditorInterface
             TrackBar[] track = new TrackBar[familyManager.Parameters.Size];
             CheckBox[] check = new CheckBox[familyManager.Parameters.Size];
             Label[] label1 = new Label[familyManager.Parameters.Size];
-            Label[] label2 = new Label[familyManager.Parameters.Size];
 
             famParam.Clear();
 
@@ -151,39 +168,39 @@ namespace FamilyEditorInterface
             List<ElementId> eId = new List<ElementId>();
             if (famParam.Count == 0)
             {
-                panel1.Controls.Add(WarningLabel("No active parameters"));
+                splitContainer1.Panel1.Controls.Add(WarningLabel("No active parameters"));
             }
-            //yes-no parameters
+            ///yes-no parameters
             foreach(FamilyParameter fp in famParam.Values)
             {
-                //if (fp.StorageType == StorageType.Double) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsDouble(fp)), DisplayUnitType.DUT_MILLIMETERS);
-                //else if (fp.StorageType == StorageType.Integer) value = UnitUtils.ConvertFromInternalUnits(Convert.ToDouble(familyType.AsInteger(fp)), DisplayUnitType.DUT_MILLIMETERS);
                 if(fp.Definition.ParameterType.Equals(ParameterType.YesNo))
                 {
                     if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
                     eId.Add(fp.Id);                    
                     check[indexChk] = new CheckBox();
                     check[indexChk].Name = fp.Definition.Name;
-                    check[indexChk].Text = fp.Definition.Name;
-                    //check[indexChk].Location = new System.Drawing.Point(14, 15 + index * vOffset + indexChk * vOffset);
+                    check[indexChk].Text = Truncate(fp.Definition.Name, 10);
                     check[indexChk].Checked = Convert.ToInt32(value) == 1 ? true : false;
                     check[indexChk].MouseUp += new System.Windows.Forms.MouseEventHandler(checkBox_MouseUp);
                     check[indexChk].Click += new EventHandler(trackBar_ValueChanged);
                     check[indexChk].Tag = indexChk;
-                    label2[indexChk] = new Label();
-                    label2[indexChk].AutoSize = true;
-                    label2[indexChk].MaximumSize = new Size(100, 0);
-                    label2[indexChk].Font = new Font("Arial", 8);
-                    //label[indexChk].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
-                    label2[indexChk].Text = fp.Definition.Name;
-                    label2[indexChk].Name = fp.Definition.Name;
-                    label2[indexChk].Visible = true;
+                    check[indexChk].Padding = new Padding(3,3,3,3);
+                    check[indexChk].Margin = new Padding(0,0,50,5);
                     this.flowLayoutPanel2.Controls.Add(check[indexChk]);
-                    this.flowLayoutPanel2.Controls.Add(label2[indexChk]);
                     indexChk++;
                     continue;
                 }
-                //slider parameters
+                if (this.flowLayoutPanel2.Controls.Count == 0)
+                {
+                    Label error = new Label();
+                    error.Text = "This family has no Yes/No parameters.";
+                    error.TextAlign = ContentAlignment.MiddleCenter;
+                    error.AutoSize = true;
+                    error.Padding = new Padding(55, 35, 0, 0);
+                    error.ForeColor = System.Drawing.Color.DarkGray;
+                    this.flowLayoutPanel2.Controls.Add(error);
+                };
+                ///slider parameters
                 if (fp.StorageType == StorageType.Double) value = Convert.ToDouble(familyType.AsDouble(fp));
                 else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
                 eId.Add(fp.Id);
@@ -192,7 +209,6 @@ namespace FamilyEditorInterface
                     track[index] = new TrackBar();
                     track[index].Name = fp.Definition.Name;
                     track[index].Text = fp.Definition.Name;
-                    //track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset + indexChk * vOffset);
                     track[index].Size = new Size(180, 10);
                     track[index].Maximum = Convert.ToInt32(value * 100) * 2;
                     track[index].Minimum = 1;
@@ -201,17 +217,15 @@ namespace FamilyEditorInterface
                     track[index].MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
                     track[index].ValueChanged += new EventHandler(trackBar_ValueChanged);
                     track[index].Tag = index;
+                    track[index].Padding = new Padding(3, 3, 3, 3);
                     label1[index] = new Label();
                     label1[index].AutoSize = true;
-                    label1[index].MaximumSize = new Size(100, 0);
+                    label1[index].MaximumSize = new Size(70, 0);
                     label1[index].Font = new Font("Arial", 8);
-                    //label[index].ForeColor = (fp.AssociatedParameters.IsEmpty) ? System.Drawing.Color.LightGray : System.Drawing.Color.Black;
-                    //label1[index].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
-                    //label[index].Text =  String.Format("{0}: 0 to {1}", fp.Definition.Name, track[index].Maximum);
-                    label1[index].Text = fp.Definition.Name;
+                    label1[index].Text = Truncate(fp.Definition.Name, 15);
                     label1[index].Name = fp.Definition.Name;
-                    //label[index].ForeColor = System.Drawing.Color.LightGray;
                     label1[index].Visible = true;
+                    label1[index].Padding = new Padding(3, 4, 3, 3);
                     this.flowLayoutPanel1.Controls.Add(track[index]);
                     this.flowLayoutPanel1.Controls.Add(label1[index]);
                     index++;
@@ -221,29 +235,42 @@ namespace FamilyEditorInterface
                     track[index] = new TrackBar();
                     track[index].Name = fp.Definition.Name;
                     track[index].Text = fp.Definition.Name;
-                    //track[index].Location = new System.Drawing.Point(5, 15 + index * vOffset + indexChk * vOffset);
                     track[index].Size = new Size(180, 10);
                     track[index].Tag = index;
                     track[index].Enabled = false;
+                    track[index].Padding = new Padding(3, 3, 3, 3);
                     label1[index] = new Label();
                     label1[index].AutoSize = true;
-                    label1[index].MaximumSize = new Size(100, 0);
+                    label1[index].MaximumSize = new Size(70, 0);
                     label1[index].Font = new Font("Arial", 8);
                     label1[index].ForeColor = System.Drawing.Color.LightGray;
-                    //label1[index].Location = new System.Drawing.Point(200, 15 + index * vOffset + indexChk * vOffset);
-                    label1[index].Text = fp.Definition.Name;
+                    label1[index].Text = Truncate(fp.Definition.Name, 15);
                     label1[index].Name = fp.Definition.Name;
                     label1[index].Visible = true;
+                    label1[index].Padding = new Padding(3, 4, 3, 3);
                     this.flowLayoutPanel1.Controls.Add(track[index]);
                     this.flowLayoutPanel1.Controls.Add(label1[index]);
                     index++;
                 }
             }
-
-            //if (track.Length > 0) this.flowLayoutPanel1.Controls.AddRange(track);
-            //if (check.Length > 0) this.flowLayoutPanel2.Controls.AddRange(check);
-            //if (label1.Length > 0) this.flowLayoutPanel1.Controls.AddRange(label1);
-            //if (label2.Length > 0) this.flowLayoutPanel2.Controls.AddRange(label2);
+        }
+        /// <summary>
+        /// truncate string and add '..' at the end
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private string Truncate(string source, int length)
+        {
+            if (source.Length > length)
+            {
+                source = source.Substring(0, length);
+                return source + "..";
+            }
+            else
+            {
+                return source;
+            }
+            
         }
         /// <summary>
         /// Helper method to assign label to an empty panel
@@ -255,7 +282,7 @@ namespace FamilyEditorInterface
             Label l = new Label();
             l.AutoSize = true;
             l.MaximumSize = new Size(90, 0);
-            l.Location = new System.Drawing.Point(Convert.ToInt32(panel1.Width * 0.5 - l.Size.Width * 0.5), Convert.ToInt32(panel1.Height * 0.5 - l.Size.Height * 0.5));
+            l.Location = new System.Drawing.Point(Convert.ToInt32(splitContainer1.Width * 0.5 - l.Size.Width * 0.5), Convert.ToInt32(splitContainer1.Height * 0.5 - l.Size.Height * 0.5));
             l.Font = new Font("Arial", 8, FontStyle.Italic);
             l.Text = p;
             return l;
@@ -416,19 +443,15 @@ namespace FamilyEditorInterface
             {
                 Autodesk.Revit.DB.Document doc = uiapp.ActiveUIDocument.Document;
 
-                if (this.Document() != null && !doc.Equals(this.Document()))
-                {
-                    this.Document(doc);
-                    this.DocumentChanged();
-                }
-                else if (this.Document() == null && doc.IsValidObject && doc.IsFamilyDocument)
+                if (!this.messageTriggered)
                 {
                     this.Document(doc);
                     this.DocumentChanged();
                 }
                 else
                 {
-                    this.DocumentChanged();
+                    this.Document(doc);
+                    this.FamilyDocumentChanged();
                 }
             }
             catch (Exception ex)
@@ -437,12 +460,27 @@ namespace FamilyEditorInterface
             }
         }
         /// <summary>
+        /// Trigers if no valid Family Document is available on Refresh Document after Message
+        /// </summary>
+        private void FamilyDocumentChanged()
+        {
+            this.splitContainer1.Panel1.Controls.Clear();
+            this.splitContainer1.Panel1.Controls.Add(this.flowLayoutPanel1);
+            this.splitContainer1.Panel1.Controls.Add(this.pictureBox1);
+            if (!this.minimizedState) minimizeToggle();
+            this.messageTriggered = false;
+            this.DocumentChanged();
+        }
+        /// <summary>
         /// Trigers if no valid Family Document is available on Refresh Document
         /// </summary>
         private void InvalidDocument(Exception ex)
         {
-            this.panel1.Controls.Clear();
-            this.panel1.Controls.Add(WarningLabel("Please, run in a Family Document"));
+            this.minimizedState = this.splitContainer1.Panel2Collapsed;
+            if (!this.splitContainer1.Panel2Collapsed) minimizeToggle();
+            this.splitContainer1.Panel1.Controls.Clear();
+            this.splitContainer1.Panel1.Controls.Add(WarningLabel("Please, run in a Family Document"));
+            this.messageTriggered = true;
         }
         /// <summary>
         /// minimize yes no panel
@@ -451,7 +489,15 @@ namespace FamilyEditorInterface
         /// <param name="e"></param>
         private void pictureBox1_Click(object sender, EventArgs e)
         {
+            minimizeToggle();
+        }    
+        /// <summary>
+        /// minimizes second split panel
+        /// </summary>
+        private void minimizeToggle()
+        {
             splitContainer1.Panel2Collapsed = !splitContainer1.Panel2Collapsed;
+            pictureBox1.Image = (splitContainer1.Panel2Collapsed) ? _imageMaxi : _imageMini;
         }
     }
 }
