@@ -29,6 +29,12 @@ namespace FamilyEditorInterface
         private Bitmap _imageMaxi;
         private bool messageTriggered;
         private bool minimizedState;
+        private DisplayUnitType dut;
+        public const double METERS_IN_FEET = 0.3048;
+        private TrackBar[] track;
+        private CheckBox[] check; 
+        private Label[] labels;
+        private System.Windows.Forms.TextBox[] input;
 
         /// <summary>
         /// Constructor
@@ -81,7 +87,7 @@ namespace FamilyEditorInterface
                 cp.ExStyle |= 0x02000000;
                 return cp;
             }
-        } 
+        }
         /// <summary>
         /// Check parameter conditions
         /// </summary>
@@ -139,20 +145,22 @@ namespace FamilyEditorInterface
 
                 //TaskDialog.Show("Message", Command.global_message);
             }
-            
+
             FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
-            
+
             //this.panel1.Controls.Clear();
             this.flowLayoutPanel1.Controls.Clear();
             this.flowLayoutPanel2.Controls.Clear();
             int index = 0;
-            int indexChk= 0;
+            int indexChk = 0;
             double value = 0.0;
 
-            TrackBar[] track = new TrackBar[familyManager.Parameters.Size];
-            CheckBox[] check = new CheckBox[familyManager.Parameters.Size];
-            Label[] label1 = new Label[familyManager.Parameters.Size];
+            track = new TrackBar[familyManager.Parameters.Size];
+            check = new CheckBox[familyManager.Parameters.Size];
+            labels = new Label[familyManager.Parameters.Size];
+            input = new System.Windows.Forms.TextBox[familyManager.Parameters.Size];
+
 
             famParam.Clear();
 
@@ -160,7 +168,7 @@ namespace FamilyEditorInterface
             {
                 if (!famEdit(fp, familyType)) continue;
                 else famParam.Add(fp.Definition.Name, fp);
-                
+
             }
             //sort by name
 
@@ -171,12 +179,12 @@ namespace FamilyEditorInterface
                 splitContainer1.Panel1.Controls.Add(WarningLabel("No active parameters"));
             }
             ///yes-no parameters
-            foreach(FamilyParameter fp in famParam.Values)
+            foreach (FamilyParameter fp in famParam.Values)
             {
-                if(fp.Definition.ParameterType.Equals(ParameterType.YesNo))
+                if (fp.Definition.ParameterType.Equals(ParameterType.YesNo))
                 {
                     if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
-                    eId.Add(fp.Id);                    
+                    eId.Add(fp.Id);
                     check[indexChk] = new CheckBox();
                     check[indexChk].Name = fp.Definition.Name;
                     check[indexChk].Text = Truncate(fp.Definition.Name, 10);
@@ -184,8 +192,8 @@ namespace FamilyEditorInterface
                     check[indexChk].MouseUp += new System.Windows.Forms.MouseEventHandler(checkBox_MouseUp);
                     check[indexChk].Click += new EventHandler(trackBar_ValueChanged);
                     check[indexChk].Tag = indexChk;
-                    check[indexChk].Padding = new Padding(3,3,3,3);
-                    check[indexChk].Margin = new Padding(0,0,50,5);
+                    check[indexChk].Padding = new Padding(3, 3, 3, 3);
+                    check[indexChk].Margin = new Padding(0, 0, 50, 5);
                     this.flowLayoutPanel2.Controls.Add(check[indexChk]);
                     indexChk++;
                     continue;
@@ -204,6 +212,33 @@ namespace FamilyEditorInterface
                 if (fp.StorageType == StorageType.Double) value = Convert.ToDouble(familyType.AsDouble(fp));
                 else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
                 eId.Add(fp.Id);
+                double trueValue = 0.0;
+                //DisplayUnitType dut = this.doc.GetUnits().GetDisplayUnitType();
+                dut = this.doc.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits;
+                if (fp.Definition.ParameterType == ParameterType.Length)
+                {
+                    switch (dut)
+                    {
+                        case DisplayUnitType.DUT_METERS:
+                            trueValue = value * METERS_IN_FEET;
+                            break;
+                        case DisplayUnitType.DUT_CENTIMETERS:
+                            trueValue = value * METERS_IN_FEET * 100;
+                            break;
+                        case DisplayUnitType.DUT_DECIMAL_FEET:
+                            trueValue = value;
+                            break;
+                        case DisplayUnitType.DUT_DECIMAL_INCHES:
+                            trueValue = value * 12;
+                            break;
+                        case DisplayUnitType.DUT_METERS_CENTIMETERS:
+                            trueValue = value * METERS_IN_FEET;
+                            break;
+                        case DisplayUnitType.DUT_MILLIMETERS:
+                            trueValue = value * METERS_IN_FEET * 1000;
+                            break;
+                    }
+                }
                 if (value != 0)
                 {
                     track[index] = new TrackBar();
@@ -218,16 +253,26 @@ namespace FamilyEditorInterface
                     track[index].ValueChanged += new EventHandler(trackBar_ValueChanged);
                     track[index].Tag = index;
                     track[index].Padding = new Padding(3, 3, 3, 3);
-                    label1[index] = new Label();
-                    label1[index].AutoSize = true;
-                    label1[index].MaximumSize = new Size(70, 0);
-                    label1[index].Font = new Font("Arial", 8);
-                    label1[index].Text = Truncate(fp.Definition.Name, 15);
-                    label1[index].Name = fp.Definition.Name;
-                    label1[index].Visible = true;
-                    label1[index].Padding = new Padding(3, 4, 3, 3);
+                    labels[index] = new Label();
+                    labels[index].AutoSize = true;
+                    labels[index].MaximumSize = new Size(70, 0);
+                    labels[index].Font = new Font("Arial", 8);
+                    labels[index].Text = Truncate(fp.Definition.Name, 15);
+                    labels[index].Name = fp.Definition.Name;
+                    labels[index].Visible = true;
+                    labels[index].Padding = new Padding(3, 4, 3, 3);
+                    input[index] = new System.Windows.Forms.TextBox();
+                    input[index].Size = new Size(34, 10);
+                    input[index].KeyDown += new KeyEventHandler(textBox_KeyDown);
+                    input[index].Name = fp.Definition.Name;
+                    input[index].Text = Math.Round(trueValue, 2).ToString();
+                    input[index].BackColor = System.Drawing.SystemColors.Control;
+                    input[index].BorderStyle = BorderStyle.None;
+                    input[index].Margin = new Padding(0, 5, 0, 0);
+                    input[index].ForeColor = System.Drawing.Color.FromArgb(50, 50, 50);
                     this.flowLayoutPanel1.Controls.Add(track[index]);
-                    this.flowLayoutPanel1.Controls.Add(label1[index]);
+                    this.flowLayoutPanel1.Controls.Add(input[index]);
+                    this.flowLayoutPanel1.Controls.Add(labels[index]);
                     index++;
                 }
                 else
@@ -239,17 +284,17 @@ namespace FamilyEditorInterface
                     track[index].Tag = index;
                     track[index].Enabled = false;
                     track[index].Padding = new Padding(3, 3, 3, 3);
-                    label1[index] = new Label();
-                    label1[index].AutoSize = true;
-                    label1[index].MaximumSize = new Size(70, 0);
-                    label1[index].Font = new Font("Arial", 8);
-                    label1[index].ForeColor = System.Drawing.Color.LightGray;
-                    label1[index].Text = Truncate(fp.Definition.Name, 15);
-                    label1[index].Name = fp.Definition.Name;
-                    label1[index].Visible = true;
-                    label1[index].Padding = new Padding(3, 4, 3, 3);
+                    labels[index] = new Label();
+                    labels[index].AutoSize = true;
+                    labels[index].MaximumSize = new Size(70, 0);
+                    labels[index].Font = new Font("Arial", 8);
+                    labels[index].ForeColor = System.Drawing.Color.LightGray;
+                    labels[index].Text = Truncate(fp.Definition.Name, 15);
+                    labels[index].Name = fp.Definition.Name;
+                    labels[index].Visible = true;
+                    labels[index].Padding = new Padding(3, 4, 3, 3);
                     this.flowLayoutPanel1.Controls.Add(track[index]);
-                    this.flowLayoutPanel1.Controls.Add(label1[index]);
+                    this.flowLayoutPanel1.Controls.Add(labels[index]);
                     index++;
                 }
             }
@@ -270,7 +315,7 @@ namespace FamilyEditorInterface
             {
                 return source;
             }
-            
+
         }
         /// <summary>
         /// Helper method to assign label to an empty panel
@@ -299,6 +344,8 @@ namespace FamilyEditorInterface
             if (user_done_updating)
             {
                 user_done_updating = false;
+                double first = convertValueTO((double)tbar.Value * 0.01);
+                input[Array.IndexOf(track,tbar)].Text = Math.Round(first, 2).ToString();   //trackbar to textbox value
                 MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbar.Text, (double)tbar.Value * 0.01));
             }
         }
@@ -314,9 +361,80 @@ namespace FamilyEditorInterface
             if (user_done_updating)
             {
                 user_done_updating = false;
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(cbox.Text, (double)(cbox.Checked ? 1.0 : 0.0)));
+                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(cbox.Name, (double)(cbox.Checked ? 1.0 : 0.0)));
             }
         }
+        /// <summary>
+        /// On update for textbox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void textBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            System.Windows.Forms.TextBox tbox = sender as System.Windows.Forms.TextBox;
+            if (e.KeyCode == Keys.Enter)
+            {
+                int first = Convert.ToInt32(tbox.Text);
+                int second = Convert.ToInt32(convertValueFROM(first * 100));
+                TrackBar tbar = track[Array.IndexOf(input, tbox)];
+                if (second < tbar.Maximum) tbar.Value = second;  //textbox to trackbar value
+                else
+                {
+                    tbar.Maximum = second * 2;
+                    tbar.Value = second;
+                }
+                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbox.Name, (double)(convertValueFROM(Convert.ToInt16(tbox.Text)))));
+            }
+        }
+        /// <summary>
+        /// forward conversion of project to unit values
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private double convertValueTO(double p)
+        {
+            switch (dut)
+            {
+                case DisplayUnitType.DUT_METERS:
+                    return p * METERS_IN_FEET;
+                case DisplayUnitType.DUT_CENTIMETERS:
+                    return p * METERS_IN_FEET * 100;
+                case DisplayUnitType.DUT_DECIMAL_FEET:
+                    return p;
+                case DisplayUnitType.DUT_DECIMAL_INCHES:
+                    return p * 12;
+                case DisplayUnitType.DUT_METERS_CENTIMETERS:
+                    return p * METERS_IN_FEET;
+                case DisplayUnitType.DUT_MILLIMETERS:
+                    return p * METERS_IN_FEET * 1000;
+            }
+            return p;
+        }
+        /// <summary>
+        /// reverse the unit transformation to project units
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private double convertValueFROM(int p)
+        {
+            switch (dut)
+            {
+                case DisplayUnitType.DUT_METERS:
+                    return p / METERS_IN_FEET;                    
+                case DisplayUnitType.DUT_CENTIMETERS:
+                    return p / METERS_IN_FEET / 100;
+                case DisplayUnitType.DUT_DECIMAL_FEET:
+                    return p;
+                case DisplayUnitType.DUT_DECIMAL_INCHES:
+                    return p / 12;
+                case DisplayUnitType.DUT_METERS_CENTIMETERS:
+                    return p / METERS_IN_FEET;
+                case DisplayUnitType.DUT_MILLIMETERS:
+                    return p / METERS_IN_FEET / 1000;
+            }
+            return p;
+        }
+
         /// <summary>
         /// Form closed event handler
         /// </summary>
@@ -400,7 +518,11 @@ namespace FamilyEditorInterface
         }
 
         Boolean user_done_updating = false;
-
+        /// <summary>
+        /// track slider changed event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void trackBar_ValueChanged(object sender, EventArgs e)
         {
             user_done_updating = true;
@@ -422,7 +544,7 @@ namespace FamilyEditorInterface
             if (famParam != null)
             {
                 List<String> elements = new List<string>();
-                foreach(ElementId eId in changedId)
+                foreach (ElementId eId in changedId)
                 {
                     elements.Add(doc.GetElement(eId).Name);
                 }
@@ -438,7 +560,7 @@ namespace FamilyEditorInterface
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
-        {          
+        {
             try
             {
                 Autodesk.Revit.DB.Document doc = uiapp.ActiveUIDocument.Document;
@@ -490,7 +612,7 @@ namespace FamilyEditorInterface
         private void pictureBox1_Click(object sender, EventArgs e)
         {
             minimizeToggle();
-        }    
+        }
         /// <summary>
         /// minimizes second split panel
         /// </summary>
