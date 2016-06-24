@@ -29,12 +29,15 @@ namespace FamilyEditorInterface
         private Bitmap _imageMaxi;
         private bool messageTriggered;
         private bool minimizedState;
+        private bool saved = false;
         private DisplayUnitType dut;
+        private bool goUnits;
         public const double METERS_IN_FEET = 0.3048;
         private TrackBar[] track;
         private CheckBox[] check; 
         private Label[] labels;
         private System.Windows.Forms.TextBox[] input;
+        private List<System.Windows.Forms.Control> DefaultValues;
 
         /// <summary>
         /// Constructor
@@ -49,6 +52,7 @@ namespace FamilyEditorInterface
             this.exEvent = exEvent;
             this.handler = handler;
             this.famParam = new SortedList<string, FamilyParameter>();
+            this.DefaultValues = new List<System.Windows.Forms.Control>();
             InitializeComponent();
             this.SetStyle(
                 ControlStyles.AllPaintingInWmPaint |
@@ -174,6 +178,7 @@ namespace FamilyEditorInterface
 
             //add controlls
             List<ElementId> eId = new List<ElementId>();
+
             if (famParam.Count == 0)
             {
                 splitContainer1.Panel1.Controls.Add(WarningLabel("No active parameters"));
@@ -215,6 +220,7 @@ namespace FamilyEditorInterface
                 double trueValue = 0.0;
                 //DisplayUnitType dut = this.doc.GetUnits().GetDisplayUnitType();
                 dut = this.doc.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits;
+                goUnits = _goUnits();
                 if (fp.Definition.ParameterType == ParameterType.Length)
                 {
                     switch (dut)
@@ -261,15 +267,19 @@ namespace FamilyEditorInterface
                     labels[index].Name = fp.Definition.Name;
                     labels[index].Visible = true;
                     labels[index].Padding = new Padding(3, 4, 3, 3);
-                    input[index] = new System.Windows.Forms.TextBox();
-                    input[index].Size = new Size(34, 10);
-                    input[index].KeyDown += new KeyEventHandler(textBox_KeyDown);
-                    input[index].Name = fp.Definition.Name;
-                    input[index].Text = Math.Round(trueValue, 2).ToString();
-                    input[index].BackColor = System.Drawing.SystemColors.Control;
-                    input[index].BorderStyle = BorderStyle.None;
-                    input[index].Margin = new Padding(0, 5, 0, 0);
-                    input[index].ForeColor = System.Drawing.Color.FromArgb(50, 50, 50);
+                    //some units are not supported yet
+                    if(goUnits)
+                    {
+                        input[index] = new System.Windows.Forms.TextBox();
+                        input[index].Size = new Size(34, 10);
+                        input[index].KeyDown += new KeyEventHandler(textBox_KeyDown);
+                        input[index].Name = fp.Definition.Name;
+                        input[index].Text = Math.Round(trueValue, 2).ToString();
+                        input[index].BackColor = System.Drawing.SystemColors.Control;
+                        input[index].BorderStyle = BorderStyle.None;
+                        input[index].Margin = new Padding(0, 5, 0, 0);
+                        input[index].ForeColor = System.Drawing.Color.FromArgb(50, 50, 50);
+                    }
                     this.flowLayoutPanel1.Controls.Add(track[index]);
                     this.flowLayoutPanel1.Controls.Add(input[index]);
                     this.flowLayoutPanel1.Controls.Add(labels[index]);
@@ -298,6 +308,119 @@ namespace FamilyEditorInterface
                     index++;
                 }
             }
+            if (!saved)
+            {
+                saved = true;
+                saveDefaults();
+            }
+        }
+        /// <summary>
+        /// create or update default settings
+        /// </summary>
+        void saveDefaults()
+        {
+            foreach (System.Windows.Forms.Control control in this.flowLayoutPanel1.Controls.OfType<System.Windows.Forms.Control>())
+            {
+                if (control.GetType() == typeof(System.Windows.Forms.CheckBox) ||
+                    control.GetType() == typeof(System.Windows.Forms.TrackBar) ||
+                    control.GetType() == typeof(System.Windows.Forms.TextBox))
+                {
+                    DefaultValues.Add(control);
+                }
+            }
+            foreach (System.Windows.Forms.Control control in this.flowLayoutPanel2.Controls.OfType<System.Windows.Forms.Control>())
+            {
+                if (control.GetType() == typeof(System.Windows.Forms.CheckBox) ||
+                    control.GetType() == typeof(System.Windows.Forms.TrackBar) ||
+                    control.GetType() == typeof(System.Windows.Forms.TextBox))
+                {
+                    DefaultValues.Add(control);
+                }
+            }
+        }
+        /// <summary>
+        /// create or update default settings
+        /// </summary>
+        void loadDefaults()
+        {
+            foreach (System.Windows.Forms.Control dcon in DefaultValues)
+            {
+                foreach (System.Windows.Forms.Control con in this.flowLayoutPanel1.Controls.OfType<System.Windows.Forms.Control>())
+                {
+                    if (dcon.GetType() == con.GetType() && dcon.Name == con.Name)
+                    {                        
+                        if (con is CheckBox) 
+                        {
+                            //(con as CheckBox).Checked = (dcon as CheckBox).Checked;
+                            MakeRequest(RequestId.SlideParam, new Tuple<string, double>((dcon as CheckBox).Name, (double)((dcon as CheckBox).Checked ? 1.0 : 0.0)));
+                        }
+                        else if (con is TrackBar) 
+                        {
+                            //(con as TrackBar).Value = (dcon as TrackBar).Value;
+                            MakeRequest(RequestId.SlideParam, new Tuple<string, double>((dcon as TrackBar).Text, (double)(dcon as TrackBar).Value * 0.01));
+                        }
+                        else if (con is System.Windows.Forms.TextBox)
+                        {
+                            //(con as System.Windows.Forms.TextBox).Text = (dcon as System.Windows.Forms.TextBox).Text;
+                            //MakeRequest(RequestId.SlideParam, new Tuple<string, double>((dcon as System.Windows.Forms.TextBox).Name, (double)(convertValueFROM(Convert.ToDouble((dcon as System.Windows.Forms.TextBox).Text)))));
+                        }
+                    }
+                }
+                foreach (System.Windows.Forms.Control con in this.flowLayoutPanel2.Controls.OfType<System.Windows.Forms.Control>())
+                {
+                    if (dcon.GetType() == con.GetType() && dcon.Name == con.Name)
+                    {
+                        if (con is CheckBox)
+                        {
+                            //(con as CheckBox).Checked = (dcon as CheckBox).Checked;
+                            MakeRequest(RequestId.SlideParam, new Tuple<string, double>((dcon as CheckBox).Name, (double)((dcon as CheckBox).Checked ? 1.0 : 0.0)));
+                        }
+                        else if (con is TrackBar)
+                        {
+                            //(con as TrackBar).Value = (dcon as TrackBar).Value;
+                            MakeRequest(RequestId.SlideParam, new Tuple<string, double>((dcon as TrackBar).Text, (double)(dcon as TrackBar).Value * 0.01));
+                        }
+                        else if (con is System.Windows.Forms.TextBox)
+                        {
+                            //(con as System.Windows.Forms.TextBox).Text = (dcon as System.Windows.Forms.TextBox).Text;
+                            //MakeRequest(RequestId.SlideParam, new Tuple<string, double>((dcon as System.Windows.Forms.TextBox).Name, (double)(convertValueFROM(Convert.ToDouble((dcon as System.Windows.Forms.TextBox).Text)))));
+                        }
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// control value
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
+        private double controlValue(System.Windows.Forms.Control control) 
+        {
+            if (control.GetType() == typeof(System.Windows.Forms.CheckBox))
+            {
+                System.Windows.Forms.CheckBox cbox = control as System.Windows.Forms.CheckBox;
+                return cbox.Checked ? 1.0 : 0.0;
+            }
+            else if (control.GetType() == typeof(System.Windows.Forms.TrackBar))
+            {
+                System.Windows.Forms.TrackBar tbar = control as System.Windows.Forms.TrackBar;
+                return tbar.Value;
+            }
+            else if (control.GetType() == typeof(System.Windows.Forms.TextBox))
+            {
+                System.Windows.Forms.TextBox tbox = control as System.Windows.Forms.TextBox;
+                return Convert.ToDouble(tbox.Text);
+            }
+            return 0.0;
+        }
+        /// <summary>
+        /// control name
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
+        private string controlName(System.Windows.Forms.Control control)
+        {
+             return control.Name;
         }
         /// <summary>
         /// truncate string and add '..' at the end
@@ -345,7 +468,7 @@ namespace FamilyEditorInterface
             {
                 user_done_updating = false;
                 double first = convertValueTO((double)tbar.Value * 0.01);
-                input[Array.IndexOf(track,tbar)].Text = Math.Round(first, 2).ToString();   //trackbar to textbox value
+                if(goUnits) input[Array.IndexOf(track,tbar)].Text = Math.Round(first, 2).ToString();   //trackbar to textbox value
                 MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbar.Text, (double)tbar.Value * 0.01));
             }
         }
@@ -374,7 +497,7 @@ namespace FamilyEditorInterface
             System.Windows.Forms.TextBox tbox = sender as System.Windows.Forms.TextBox;
             if (e.KeyCode == Keys.Enter)
             {
-                int first = Convert.ToInt32(tbox.Text);
+                double first = Convert.ToDouble(tbox.Text);
                 int second = Convert.ToInt32(convertValueFROM(first * 100));
                 TrackBar tbar = track[Array.IndexOf(input, tbox)];
                 if (second < tbar.Maximum) tbar.Value = second;  //textbox to trackbar value
@@ -383,7 +506,7 @@ namespace FamilyEditorInterface
                     tbar.Maximum = second * 2;
                     tbar.Value = second;
                 }
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbox.Name, (double)(convertValueFROM(Convert.ToInt16(tbox.Text)))));
+                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbox.Name, (double)(convertValueFROM(Convert.ToDouble(tbox.Text)))));
             }
         }
         /// <summary>
@@ -407,6 +530,8 @@ namespace FamilyEditorInterface
                     return p * METERS_IN_FEET;
                 case DisplayUnitType.DUT_MILLIMETERS:
                     return p * METERS_IN_FEET * 1000;
+                case DisplayUnitType.DUT_DECIMETERS:
+                    return p * METERS_IN_FEET * 10;
             }
             return p;
         }
@@ -415,7 +540,7 @@ namespace FamilyEditorInterface
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        private double convertValueFROM(int p)
+        private double convertValueFROM(double p)
         {
             switch (dut)
             {
@@ -431,10 +556,21 @@ namespace FamilyEditorInterface
                     return p / METERS_IN_FEET;
                 case DisplayUnitType.DUT_MILLIMETERS:
                     return p / METERS_IN_FEET / 1000;
+                case DisplayUnitType.DUT_DECIMETERS:
+                    return p / METERS_IN_FEET / 10;
             }
             return p;
         }
-
+        /// <summary>
+        /// check if we support user units
+        /// </summary>
+        /// <returns></returns>
+        private Boolean _goUnits()
+        {
+            if (dut.Equals(DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES)) return false;
+            if (dut.Equals(DisplayUnitType.DUT_FRACTIONAL_INCHES)) return false;
+            return true;
+        }
         /// <summary>
         /// Form closed event handler
         /// </summary>
@@ -620,6 +756,17 @@ namespace FamilyEditorInterface
         {
             splitContainer1.Panel2Collapsed = !splitContainer1.Panel2Collapsed;
             pictureBox1.Image = (splitContainer1.Panel2Collapsed) ? _imageMaxi : _imageMini;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //saveDefaults();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //loadDefaults();
+            //CollectData();
         }
     }
 }
