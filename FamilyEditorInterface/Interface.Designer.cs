@@ -5,6 +5,15 @@ namespace FamilyEditorInterface
 {
     partial class Interface
     {
+        private System.Windows.Forms.Button btnExit;
+        private Button refreshButtom;
+        private FlowLayoutPanel mainPanel;
+        private SplitContainer mainContainer;
+        private PictureBox maximizeIcon;
+        private FlowLayoutPanel offPanel;
+        private Label splitLine;
+        private Button defaultButton;
+
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -33,19 +42,18 @@ namespace FamilyEditorInterface
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Interface));
             this.btnExit = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.label1 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.refreshButtom = new System.Windows.Forms.Button();
+            this.mainPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.mainContainer = new System.Windows.Forms.SplitContainer();
+            this.splitLine = new System.Windows.Forms.Label();
+            this.maximizeIcon = new System.Windows.Forms.PictureBox();
+            this.offPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.defaultButton = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).BeginInit();
+            this.mainContainer.Panel1.SuspendLayout();
+            this.mainContainer.Panel2.SuspendLayout();
+            this.mainContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.maximizeIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // btnExit
@@ -59,109 +67,98 @@ namespace FamilyEditorInterface
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
-            // button1
+            // refreshButtom
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.Location = new System.Drawing.Point(15, 513);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(100, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Refresh ";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.refreshButtom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.refreshButtom.Location = new System.Drawing.Point(15, 513);
+            this.refreshButtom.Name = "refreshButtom";
+            this.refreshButtom.Size = new System.Drawing.Size(100, 23);
+            this.refreshButtom.TabIndex = 2;
+            this.refreshButtom.Text = "Refresh ";
+            this.refreshButtom.UseVisualStyleBackColor = true;
+            this.refreshButtom.Click += new System.EventHandler(this.button1_Click);
             // 
-            // flowLayoutPanel1
+            // mainPanel
             // 
-            this.flowLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.mainPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.flowLayoutPanel1.AutoScroll = true;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 3);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(315, 432);
-            this.flowLayoutPanel1.TabIndex = 0;
+            this.mainPanel.AutoScroll = true;
+            this.mainPanel.Location = new System.Drawing.Point(3, 3);
+            this.mainPanel.Name = "mainPanel";
+            this.mainPanel.Size = new System.Drawing.Size(315, 432);
+            this.mainPanel.TabIndex = 0;
             // 
-            // splitContainer1
+            // mainContainer
             // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.mainContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.IsSplitterFixed = true;
-            this.splitContainer1.Location = new System.Drawing.Point(12, 20);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.mainContainer.IsSplitterFixed = true;
+            this.mainContainer.Location = new System.Drawing.Point(12, 20);
+            this.mainContainer.Name = "mainContainer";
+            this.mainContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
-            // splitContainer1.Panel1
+            // mainContainer.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.label1);
-            this.splitContainer1.Panel1.Controls.Add(this.flowLayoutPanel1);
-            this.splitContainer1.Panel1.Controls.Add(this.pictureBox1);
+            this.mainContainer.Panel1.Controls.Add(this.splitLine);
+            this.mainContainer.Panel1.Controls.Add(this.mainPanel);
+            this.mainContainer.Panel1.Controls.Add(this.maximizeIcon);
             // 
-            // splitContainer1.Panel2
+            // mainContainer.Panel2
             // 
-            this.splitContainer1.Panel2.AutoScroll = true;
-            this.splitContainer1.Panel2.Controls.Add(this.flowLayoutPanel2);
-            this.splitContainer1.Panel2Collapsed = true;
-            this.splitContainer1.Size = new System.Drawing.Size(320, 474);
-            this.splitContainer1.SplitterDistance = 330;
-            this.splitContainer1.TabIndex = 0;
+            this.mainContainer.Panel2.AutoScroll = true;
+            this.mainContainer.Panel2.Controls.Add(this.offPanel);
+            this.mainContainer.Panel2Collapsed = true;
+            this.mainContainer.Size = new System.Drawing.Size(320, 474);
+            this.mainContainer.SplitterDistance = 330;
+            this.mainContainer.TabIndex = 0;
             // 
-            // label1
+            // splitLine
             // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.splitLine.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label1.Location = new System.Drawing.Point(2, 472);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(315, 1);
-            this.label1.TabIndex = 1;
+            this.splitLine.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.splitLine.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.splitLine.Location = new System.Drawing.Point(2, 472);
+            this.splitLine.Name = "splitLine";
+            this.splitLine.Size = new System.Drawing.Size(315, 1);
+            this.splitLine.TabIndex = 1;
             // 
-            // pictureBox1
+            // maximizeIcon
             // 
-            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox1.Image = global::FamilyEditorInterface.Properties.Resources.maximize;
-            this.pictureBox1.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.InitialImage")));
-            this.pictureBox1.Location = new System.Drawing.Point(296, 439);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(30, 30);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
+            this.maximizeIcon.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.maximizeIcon.Image = global::FamilyEditorInterface.Properties.Resources.maximize;
+            this.maximizeIcon.InitialImage = ((System.Drawing.Image)(resources.GetObject("maximizeIcon.InitialImage")));
+            this.maximizeIcon.Location = new System.Drawing.Point(296, 439);
+            this.maximizeIcon.Name = "maximizeIcon";
+            this.maximizeIcon.Size = new System.Drawing.Size(30, 30);
+            this.maximizeIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.maximizeIcon.TabIndex = 1;
+            this.maximizeIcon.TabStop = false;
+            this.maximizeIcon.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
-            // flowLayoutPanel2
+            // offPanel
             // 
-            this.flowLayoutPanel2.AutoScroll = true;
-            this.flowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(0, 0);
-            this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
-            this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(150, 46);
-            this.flowLayoutPanel2.TabIndex = 1;
+            this.offPanel.AutoScroll = true;
+            this.offPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.offPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.offPanel.Location = new System.Drawing.Point(0, 0);
+            this.offPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.offPanel.Name = "offPanel";
+            this.offPanel.Size = new System.Drawing.Size(150, 46);
+            this.offPanel.TabIndex = 1;
             // 
-            // button2
+            // defaultButton
             // 
-            this.button2.Location = new System.Drawing.Point(121, 513);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(50, 23);
-            this.button2.TabIndex = 0;
-            this.button2.Text = "Save";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Visible = false;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(173, 513);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(50, 23);
-            this.button3.TabIndex = 3;
-            this.button3.Text = "Load";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Visible = false;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.defaultButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.defaultButton.Location = new System.Drawing.Point(121, 513);
+            this.defaultButton.Name = "defaultButton";
+            this.defaultButton.Size = new System.Drawing.Size(102, 23);
+            this.defaultButton.TabIndex = 0;
+            this.defaultButton.Text = "Default";
+            this.defaultButton.UseVisualStyleBackColor = true;
+            this.defaultButton.Click += new System.EventHandler(this.button2_Click);
             // 
             // Interface
             // 
@@ -169,37 +166,26 @@ namespace FamilyEditorInterface
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(344, 551);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.defaultButton);
+            this.Controls.Add(this.mainContainer);
+            this.Controls.Add(this.refreshButtom);
             this.Controls.Add(this.btnExit);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(360, 1440);
             this.MinimumSize = new System.Drawing.Size(360, 360);
             this.Name = "Interface";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Family Parameters";
+            this.Text = "Family Parameters - v1.4 (debug)";
             this.GotFocus += new System.EventHandler(this.Control1_GotFocus);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.mainContainer.Panel1.ResumeLayout(false);
+            this.mainContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).EndInit();
+            this.mainContainer.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.maximizeIcon)).EndInit();
             this.ResumeLayout(false);
 
         }
 
-        #endregion
-
-        private System.Windows.Forms.Button btnExit;
-        private Button button1;
-        private FlowLayoutPanel flowLayoutPanel1;
-        private SplitContainer splitContainer1;
-        private PictureBox pictureBox1;
-        private FlowLayoutPanel flowLayoutPanel2;
-        private Label label1;
-        private Button button2;
-        private Button button3;
+        #endregion        
     }
 }

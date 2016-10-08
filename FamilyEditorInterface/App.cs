@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 using System.Windows.Media.Imaging;
+using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
@@ -72,7 +73,16 @@ namespace FamilyEditorInterface
         /// <param name="a"></param>
         private void AddRibbonPanel(UIControlledApplication a)
         {
-            Autodesk.Revit.UI.RibbonPanel rvtRibbonPanel = a.CreateRibbonPanel("Archilizer FEI");
+            List<RibbonPanel> panels = a.GetRibbonPanels();
+            Autodesk.Revit.UI.RibbonPanel rvtRibbonPanel = null;
+            if (panels.FirstOrDefault(x => x.Name.Equals("Archilizer", StringComparison.OrdinalIgnoreCase)) == null)
+            {
+                rvtRibbonPanel = a.CreateRibbonPanel("Archilizer"); 
+            }
+            else
+            {
+                rvtRibbonPanel = panels.FirstOrDefault(x => x.Name.Equals("Archilizer", StringComparison.OrdinalIgnoreCase)) as RibbonPanel;
+            }
             PulldownButtonData data = new PulldownButtonData("Options", "Family Editor" + Environment.NewLine + "Interface");
 
             BitmapSource img32 = new BitmapImage (new Uri (@largeIcon));
