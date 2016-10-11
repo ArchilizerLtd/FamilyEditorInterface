@@ -30,7 +30,7 @@ namespace FamilyEditorInterface
         private bool messageTriggered;
         private bool minimizedState;
         private List<System.Windows.Forms.Control> DefaultValues;
-        private List<FamilyEditorItem> result;
+        private List<FamilyEditorItem> result, backup;
 
         /// <summary>
         /// Constructor
@@ -55,14 +55,34 @@ namespace FamilyEditorInterface
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new System.Drawing.Point(Screen.PrimaryScreen.WorkingArea.Width - 400, Convert.ToInt32(Screen.PrimaryScreen.WorkingArea.Height * 0.5 - this.Height * 0.5));
             this.result = this.projectParameters.CollectData();
+            this.backup = this.projectParameters.CollectData(); ;
             ImageLoad();
-            CollectData();
+            DisplayData();
         }
 
-        private void CollectData()
+        private void RecollectData()
+        {
+            result = projectParameters.CollectData();
+            projectParameters.syncDefaults(result, backup);
+            DisplayData();
+        }
+
+        private void Reset()
+        {
+            result = backup;
+            DisplayData();
+        }
+
+        private void SaveDefaults()
+        {
+            result = projectParameters.CollectData();
+            backup = result;
+        }
+        #region Form Settup
+        private void DisplayData()
         {
             this.mainPanel.Controls.Clear();
-            this.mainPanel.Controls.Clear();
+            this.offPanel.Controls.Clear();
             
             if (result.Count == 0)
             {
@@ -108,16 +128,21 @@ namespace FamilyEditorInterface
 
             if(!check)
             {
-                Label error = new Label();
-                error.Text = "This family has no Yes/No parameters.";
-                error.TextAlign = ContentAlignment.MiddleCenter;
-                error.AutoSize = true;
-                error.Padding = new Padding(55, 35, 0, 0);
-                error.ForeColor = System.Drawing.Color.DarkGray;
-                this.offPanel.Controls.Add(error);
+                this.offPanel.Controls.Add(error("This family has no Yes/No parameters."));
             }
         }
 
+        private Label error(string message)
+        {
+            Label error = new Label();
+            error.Text = message;
+            error.TextAlign = ContentAlignment.MiddleCenter;
+            error.AutoSize = true;
+            error.Padding = new Padding(55, 35, 0, 0);
+            error.ForeColor = System.Drawing.Color.DarkGray;
+
+            return error;
+        }
         private System.Windows.Forms.TextBox createTextbox(FamilyEditorItem item)
         {
             System.Windows.Forms.TextBox txt = new System.Windows.Forms.TextBox();
@@ -228,6 +253,9 @@ namespace FamilyEditorInterface
             _imageStream = _assembly.GetManifestResourceStream("FamilyEditorInterface.maximize.png");
             _imageMaxi = new Bitmap(_imageStream);
         }
+        #endregion
+
+
         internal Autodesk.Revit.DB.Document Document()
         {
             if (this.doc.IsValidObject) return this.doc;
@@ -351,10 +379,23 @@ namespace FamilyEditorInterface
         private void MakeRequest(RequestId request, Tuple<string, double> value)
         {
             //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.Value(value);
+            handler.Request.Value(new List<Tuple<string, double>>() {value});
             handler.Request.Make(request);
             exEvent.Raise();
         }
+        /// <summary>
+        /// Similar to the MakeRequest method taking a single tuplet, 
+        /// this one provides the whole List
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <param name="value">The value.</param>
+        private void MakeRequest(RequestId request, List<Tuple<string, double>> value)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.Value(value);
+            handler.Request.Make(request);
+            exEvent.Raise();
+        }        
         /// <summary>
         ///  Exit - closing the dialog
         /// </summary>
@@ -386,7 +427,7 @@ namespace FamilyEditorInterface
         internal void DocumentChanged()
         {
             //MessageBox.Show("You are in the Control.Document Changed event.");
-            this.projectParameters.CollectData();
+            RecollectData();
         }
         /// <summary>
         /// "Refresh Document" - Push update new document
@@ -456,14 +497,40 @@ namespace FamilyEditorInterface
             maximizeIcon.Image = (mainContainer.Panel2Collapsed) ? _imageMaxi : _imageMini;
         }
         /// <summary>
-        /// Loads Defaults78
+        /// Loads Defaults
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void button2_Click(object sender, EventArgs e)
+        private void defaultButton_Click(object sender, EventArgs e)
+        {            
+            if ((System.Windows.Forms.Control.ModifierKeys & Keys.Shift) != 0)
+            {
+                SaveDefaults();
+            }
+            else
+            {
+                List<Tuple<string, double>> value = projectParameters.GetValues(backup);
+                MakeRequest(RequestId.SlideParam, value);
+                Reset();
+            }
+        }
+        private void defaultButton_KeyDown(object sender, KeyEventArgs e)
         {
-            this.projectParameters.load = true;
-            this.projectParameters.CollectData();
+            if ((System.Windows.Forms.Control.ModifierKeys & Keys.Shift) != 0)
+            {
+                defaultButton.ForeColor = System.Drawing.Color.DarkGray;
+                defaultButton.Text = "Save";
+            }
+            else
+            {
+                defaultButton.ForeColor = System.Drawing.Color.Black;
+                defaultButton.Text = "Default";
+            }
+        }
+        private void defaultButton_KeyUp(object sender, KeyEventArgs e)
+        {
+            defaultButton.ForeColor = System.Drawing.Color.Black;
+            defaultButton.Text = "Default";
         }
         /// <summary>
         ///   WakeUp -> enable all controls
@@ -473,6 +540,13 @@ namespace FamilyEditorInterface
         {
             //MessageBox.Show("You are in the Control.Wake up event.");
             //EnableCommands(true);
+        }
+        private void Interface_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if ((Keys.Shift) != 0)
+            {
+                MessageBox.Show("Shift is pressed");
+            }
         }
     }
 }

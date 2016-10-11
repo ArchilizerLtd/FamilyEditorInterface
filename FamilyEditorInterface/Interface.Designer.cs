@@ -158,7 +158,9 @@ namespace FamilyEditorInterface
             this.defaultButton.TabIndex = 0;
             this.defaultButton.Text = "Default";
             this.defaultButton.UseVisualStyleBackColor = true;
-            this.defaultButton.Click += new System.EventHandler(this.button2_Click);
+            this.defaultButton.Click += new System.EventHandler(this.defaultButton_Click);
+            this.defaultButton.KeyDown += new System.Windows.Forms.KeyEventHandler(this.defaultButton_KeyDown);
+            this.defaultButton.KeyUp += new System.Windows.Forms.KeyEventHandler(this.defaultButton_KeyUp);
             // 
             // Interface
             // 
@@ -177,6 +179,7 @@ namespace FamilyEditorInterface
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Family Parameters - v1.4 (debug)";
             this.GotFocus += new System.EventHandler(this.Control1_GotFocus);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Interface_KeyPress);
             this.mainContainer.Panel1.ResumeLayout(false);
             this.mainContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).EndInit();

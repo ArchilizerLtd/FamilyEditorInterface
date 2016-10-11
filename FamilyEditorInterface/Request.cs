@@ -21,6 +21,7 @@
 // (Rights in Technical Data and Computer Software), as applicable.
 //
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace FamilyEditorInterface
@@ -43,6 +44,10 @@ namespace FamilyEditorInterface
         /// "Regenerate Document" request
         /// </summary>
         DeleteId = 2,
+        /// <summary>
+        /// "Regenerate Document" request
+        /// </summary>
+        RestoreAll = 3,
     }
 
    /// <summary>
@@ -58,7 +63,7 @@ namespace FamilyEditorInterface
       // Storing the value as a plain Int makes using the interlocking mechanism simpler
       private int m_request = (int)RequestId.None;
       // try tp tramsport information
-      private Tuple<string, double> value;
+      private List<Tuple<string, double>> value;
       /// <summary>
       ///   Take - The Idling handler calls this to obtain the latest request. 
       /// </summary>
@@ -84,12 +89,12 @@ namespace FamilyEditorInterface
          Interlocked.Exchange(ref m_request, (int)request);
       }
       // try to trasport the message
-      internal void Value(Tuple<string, double> value)
+      internal void Value(List<Tuple<string, double>> value)
       {
           this.value = value;
       }
       // try to transport the message
-      internal Tuple<string, double> GetValue()
+      internal List<Tuple<string, double>> GetValue()
       {
           return this.value;
       }

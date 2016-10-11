@@ -77,7 +77,7 @@ namespace FamilyEditorInterface
         /// <param name="text">Caption of the transaction for the operation.</param>
         /// <param name="operation">A delegate to perform the operation on an instance of a door.</param>
         /// 
-        private void ExecuteParameterChange(UIApplication uiapp, String text, Tuple<string,double> value)
+        private void ExecuteParameterChange(UIApplication uiapp, String text, List<Tuple<string,double>> values)
         {
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uidoc.Document;
@@ -91,23 +91,26 @@ namespace FamilyEditorInterface
 
             if ((uidoc != null))
             {
-                FamilyManager mgr = doc.FamilyManager;
-                FamilyParameter fp = mgr.get_Parameter(value.Item1);
-                // Since we'll modify the document, we need a transaction
-                // It's best if a transaction is scoped by a 'using' block
-                using (Transaction trans = new Transaction(uidoc.Document))
+                foreach(var value in values)
                 {
-                    // The name of the transaction was given as an argument
-
-                    if (trans.Start(text) == TransactionStatus.Started)
+                    using (Transaction trans = new Transaction(uidoc.Document))
                     {
-                        mgr.Set(fp, value.Item2);
-                        //operation(mgr, fp);
-                        doc.Regenerate();
-                        trans.Commit();
-                        uidoc.RefreshActiveView();
+                        FamilyManager mgr = doc.FamilyManager;
+                        FamilyParameter fp = mgr.get_Parameter(value.Item1);
+                        // Since we'll modify the document, we need a transaction
+                        // It's best if a transaction is scoped by a 'using' block
+                        // The name of the transaction was given as an argument
+
+                        if (trans.Start(text) == TransactionStatus.Started)
+                        {
+                            mgr.Set(fp, value.Item2);
+                            //operation(mgr, fp);
+                            doc.Regenerate();
+                            trans.Commit();
+                            uidoc.RefreshActiveView();
+                        }
                     }
-                }
+                }                
             }
         }
     }
