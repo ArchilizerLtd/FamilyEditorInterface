@@ -502,35 +502,10 @@ namespace FamilyEditorInterface
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void defaultButton_Click(object sender, EventArgs e)
-        {            
-            if ((System.Windows.Forms.Control.ModifierKeys & Keys.Shift) != 0)
-            {
-                SaveDefaults();
-            }
-            else
-            {
-                List<Tuple<string, double>> value = projectParameters.GetValues(backup);
-                MakeRequest(RequestId.SlideParam, value);
-                Reset();
-            }
-        }
-        private void defaultButton_KeyDown(object sender, KeyEventArgs e)
         {
-            if ((System.Windows.Forms.Control.ModifierKeys & Keys.Shift) != 0)
-            {
-                defaultButton.ForeColor = System.Drawing.Color.DarkGray;
-                defaultButton.Text = "Save";
-            }
-            else
-            {
-                defaultButton.ForeColor = System.Drawing.Color.Black;
-                defaultButton.Text = "Default";
-            }
-        }
-        private void defaultButton_KeyUp(object sender, KeyEventArgs e)
-        {
-            defaultButton.ForeColor = System.Drawing.Color.Black;
-            defaultButton.Text = "Default";
+            List<Tuple<string, double>> value = projectParameters.GetValues(backup);
+            MakeRequest(RequestId.SlideParam, value);
+            Reset();   
         }
         /// <summary>
         ///   WakeUp -> enable all controls
@@ -541,12 +516,9 @@ namespace FamilyEditorInterface
             //MessageBox.Show("You are in the Control.Wake up event.");
             //EnableCommands(true);
         }
-        private void Interface_KeyPress(object sender, KeyPressEventArgs e)
+        private void saveButton_Click(object sender, EventArgs e)
         {
-            if ((Keys.Shift) != 0)
-            {
-                MessageBox.Show("Shift is pressed");
-            }
+            SaveDefaults();
         }
     }
 }

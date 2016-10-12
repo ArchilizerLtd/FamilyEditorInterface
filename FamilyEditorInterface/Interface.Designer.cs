@@ -49,6 +49,7 @@ namespace FamilyEditorInterface
             this.maximizeIcon = new System.Windows.Forms.PictureBox();
             this.offPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.defaultButton = new System.Windows.Forms.Button();
+            this.saveButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).BeginInit();
             this.mainContainer.Panel1.SuspendLayout();
             this.mainContainer.Panel2.SuspendLayout();
@@ -59,9 +60,9 @@ namespace FamilyEditorInterface
             // btnExit
             // 
             this.btnExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExit.Location = new System.Drawing.Point(229, 513);
+            this.btnExit.Location = new System.Drawing.Point(252, 513);
             this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(100, 23);
+            this.btnExit.Size = new System.Drawing.Size(72, 21);
             this.btnExit.TabIndex = 0;
             this.btnExit.Text = "Exit";
             this.btnExit.UseVisualStyleBackColor = true;
@@ -72,7 +73,7 @@ namespace FamilyEditorInterface
             this.refreshButtom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.refreshButtom.Location = new System.Drawing.Point(15, 513);
             this.refreshButtom.Name = "refreshButtom";
-            this.refreshButtom.Size = new System.Drawing.Size(100, 23);
+            this.refreshButtom.Size = new System.Drawing.Size(72, 21);
             this.refreshButtom.TabIndex = 2;
             this.refreshButtom.Text = "Refresh ";
             this.refreshButtom.UseVisualStyleBackColor = true;
@@ -152,15 +153,25 @@ namespace FamilyEditorInterface
             // defaultButton
             // 
             this.defaultButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.defaultButton.Location = new System.Drawing.Point(121, 513);
+            this.defaultButton.Location = new System.Drawing.Point(94, 513);
             this.defaultButton.Name = "defaultButton";
-            this.defaultButton.Size = new System.Drawing.Size(102, 23);
+            this.defaultButton.Size = new System.Drawing.Size(72, 21);
             this.defaultButton.TabIndex = 0;
-            this.defaultButton.Text = "Default";
+            this.defaultButton.Text = "Restore";
             this.defaultButton.UseVisualStyleBackColor = true;
             this.defaultButton.Click += new System.EventHandler(this.defaultButton_Click);
-            this.defaultButton.KeyDown += new System.Windows.Forms.KeyEventHandler(this.defaultButton_KeyDown);
-            this.defaultButton.KeyUp += new System.Windows.Forms.KeyEventHandler(this.defaultButton_KeyUp);
+            // 
+            // saveButton
+            // 
+            this.saveButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.saveButton.Location = new System.Drawing.Point(173, 513);
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(72, 21);
+            this.saveButton.TabIndex = 3;
+            this.saveButton.Text = "Save";
+            this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
             // Interface
             // 
@@ -168,6 +179,7 @@ namespace FamilyEditorInterface
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(344, 551);
+            this.Controls.Add(this.saveButton);
             this.Controls.Add(this.defaultButton);
             this.Controls.Add(this.mainContainer);
             this.Controls.Add(this.refreshButtom);
@@ -177,9 +189,8 @@ namespace FamilyEditorInterface
             this.MinimumSize = new System.Drawing.Size(360, 360);
             this.Name = "Interface";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Family Parameters - v1.4 (debug)";
+            this.Text = "Family Parameters ";
             this.GotFocus += new System.EventHandler(this.Control1_GotFocus);
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Interface_KeyPress);
             this.mainContainer.Panel1.ResumeLayout(false);
             this.mainContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).EndInit();
@@ -190,5 +201,7 @@ namespace FamilyEditorInterface
         }
 
         #endregion        
+
+        private Button saveButton;
     }
 }
