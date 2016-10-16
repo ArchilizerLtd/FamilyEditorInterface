@@ -17,6 +17,7 @@ namespace FamilyEditorInterface
 {
     public partial class Interface : System.Windows.Forms.Form
     {
+        private readonly string title = "Family Parameters";
         private Autodesk.Revit.UI.ExternalEvent exEvent;
         private RequestHandler handler;
         private UIApplication uiapp;
@@ -27,9 +28,6 @@ namespace FamilyEditorInterface
         private Stream _imageStream;
         private Bitmap _imageMini;
         private Bitmap _imageMaxi;
-        private bool messageTriggered;
-        private bool minimizedState;
-        private List<System.Windows.Forms.Control> DefaultValues;
         private List<FamilyEditorItem> result, backup;
 
         /// <summary>
@@ -39,25 +37,44 @@ namespace FamilyEditorInterface
         /// <param name="handler"></param>
         public Interface(UIApplication uiapp, Autodesk.Revit.UI.ExternalEvent exEvent, RequestHandler handler)
         {
-            this.uiapp = uiapp;
-            this.uidoc = uiapp.ActiveUIDocument;
-            this.doc = uidoc.Document;
-            this.exEvent = exEvent;
-            this.handler = handler;
-            this.projectParameters = new ProjectParameters(doc);
-            this.DefaultValues = new List<System.Windows.Forms.Control>();
             InitializeComponent();
-            Utils.Init(doc);
+            ImageLoad();
+
             this.SetStyle(
                 ControlStyles.AllPaintingInWmPaint |
                 ControlStyles.UserPaint |
                 ControlStyles.DoubleBuffer, true);
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new System.Drawing.Point(Screen.PrimaryScreen.WorkingArea.Width - 400, Convert.ToInt32(Screen.PrimaryScreen.WorkingArea.Height * 0.5 - this.Height * 0.5));
+            this.exEvent = exEvent;
+            this.handler = handler;
+            this.uiapp = uiapp;
+            this.uidoc = uiapp.ActiveUIDocument;
+            this.doc = checkDoc(uidoc.Document);
+            if (doc == null)
+            {
+                this.InvalidDocument();
+                return;
+            }
+            Utils.Init(this.doc);
+            this.projectParameters = new ProjectParameters(doc);            
+            this.Text = title + String.Format(" - {0}", Utils.Truncate(doc.Title, 10));
             this.result = this.projectParameters.CollectData();
-            this.backup = this.projectParameters.CollectData(); ;
-            ImageLoad();
+            this.backup = this.projectParameters.CollectData();
+
             DisplayData();
+        }
+
+        private Autodesk.Revit.DB.Document checkDoc(Autodesk.Revit.DB.Document document)
+        {
+            if (document.IsFamilyDocument)
+            {
+                return document;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private void RecollectData()
@@ -66,7 +83,24 @@ namespace FamilyEditorInterface
             projectParameters.syncDefaults(result, backup);
             DisplayData();
         }
+        internal void ThisDocumentChanged()
+        {
+            this.doc = uiapp.ActiveUIDocument.Document;
+            Utils.Init(this.doc);
+            this.projectParameters = new ProjectParameters(doc);
+            this.Text = title + String.Format(" - {0}", Utils.Truncate(doc.Title, 10));
+            this.result = this.projectParameters.CollectData();
+            this.backup = this.projectParameters.CollectData();
 
+            RecollectData();
+        }
+        /// <summary>
+        /// Document Changed triggered event
+        /// </summary>
+        internal void DocumentChanged()
+        {
+            RecollectData();
+        }
         private void Reset()
         {
             result = backup;
@@ -283,7 +317,7 @@ namespace FamilyEditorInterface
         private System.Windows.Forms.Label WarningLabel(string p)
         {
             Label l = new Label();
-            l.AutoSize = true;
+            l.TextAlign = ContentAlignment.MiddleCenter;
             l.MaximumSize = new Size(90, 0);
             l.Location = new System.Drawing.Point(Convert.ToInt32(mainContainer.Width * 0.5 - l.Size.Width * 0.5), Convert.ToInt32(mainContainer.Height * 0.5 - l.Size.Height * 0.5));
             l.Font = new Font("Arial", 8, FontStyle.Italic);
@@ -422,62 +456,68 @@ namespace FamilyEditorInterface
             user_done_updating = true;
         }
         /// <summary>
-        /// Document Changed triggered event
-        /// </summary>
-        internal void DocumentChanged()
-        {
-            //MessageBox.Show("You are in the Control.Document Changed event.");
-            RecollectData();
-        }
-        /// <summary>
         /// "Refresh Document" - Push update new document
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
+        private void refreshButton_Click(object sender, EventArgs e)
         {
+            DocumentRefresh();
+        }
+        private void DocumentRefresh()
+        {
+            if (!validDocument()) return;
             try
             {
-                Autodesk.Revit.DB.Document doc = uiapp.ActiveUIDocument.Document;
-
-                if (!this.messageTriggered)
+                if(sameDocument())
                 {
-                    this.Document(doc);
                     this.DocumentChanged();
-                }
-                else
-                {
-                    this.Document(doc);
-                    this.FamilyDocumentChanged();
                 }
             }
             catch (Exception ex)
             {
-                this.InvalidDocument(ex);
+                this.InvalidDocument();
+            }
+        }
+        private bool validDocument()
+        {
+            Autodesk.Revit.DB.Document doc = uiapp.ActiveUIDocument.Document;
+
+            if (!doc.IsFamilyDocument)
+            {
+                this.InvalidDocument();
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
         /// <summary>
-        /// Trigers if no valid Family Document is available on Refresh Document after Message
+        /// Check if we are still in the same document.
         /// </summary>
-        private void FamilyDocumentChanged()
+        /// <param name="doc">The document.</param>
+        /// <returns></returns>
+        private bool sameDocument()
         {
-            this.mainContainer.Panel1.Controls.Clear();
-            this.mainContainer.Panel1.Controls.Add(this.mainPanel);
-            this.mainContainer.Panel1.Controls.Add(this.maximizeIcon);
-            if (!this.minimizedState) minimizeToggle();
-            this.messageTriggered = false;
-            this.DocumentChanged();
+            Autodesk.Revit.DB.Document doc = uiapp.ActiveUIDocument.Document;
+
+            if (this.doc == null || !doc.Title.Equals(this.doc.Title))
+            {
+                this.ThisDocumentChanged();
+                return false;
+            }
+            else return true;
         }
         /// <summary>
         /// Trigers if no valid Family Document is available on Refresh Document
         /// </summary>
-        private void InvalidDocument(Exception ex)
+        private void InvalidDocument()
         {
-            this.minimizedState = this.mainContainer.Panel2Collapsed;
             if (!this.mainContainer.Panel2Collapsed) minimizeToggle();
-            this.mainContainer.Panel1.Controls.Clear();
-            this.mainContainer.Panel1.Controls.Add(WarningLabel("Please, run in a Family Document"));
-            this.messageTriggered = true;
+            this.mainPanel.Controls.Clear();
+            this.mainPanel.Controls.Add(error("Please, run in a Family Document"));
+            this.doc = null;
         }
         /// <summary>
         /// minimize yes no panel
@@ -503,9 +543,26 @@ namespace FamilyEditorInterface
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void defaultButton_Click(object sender, EventArgs e)
         {
-            List<Tuple<string, double>> value = projectParameters.GetValues(backup);
-            MakeRequest(RequestId.SlideParam, value);
-            Reset();   
+            if (!validDocument()) return;
+            if(sameDocument())
+            {
+                List<Tuple<string, double>> value = projectParameters.GetValues(backup);
+                MakeRequest(RequestId.SlideParam, value);
+                Reset();   
+            }
+        }
+        /// <summary>
+        /// Save Defaults
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            if (!validDocument()) return;
+            if (sameDocument())
+            {
+                SaveDefaults();
+            }
         }
         /// <summary>
         ///   WakeUp -> enable all controls
@@ -515,10 +572,6 @@ namespace FamilyEditorInterface
         {
             //MessageBox.Show("You are in the Control.Wake up event.");
             //EnableCommands(true);
-        }
-        private void saveButton_Click(object sender, EventArgs e)
-        {
-            SaveDefaults();
         }
     }
 }

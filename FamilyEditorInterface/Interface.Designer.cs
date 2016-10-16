@@ -77,7 +77,7 @@ namespace FamilyEditorInterface
             this.refreshButtom.TabIndex = 2;
             this.refreshButtom.Text = "Refresh ";
             this.refreshButtom.UseVisualStyleBackColor = true;
-            this.refreshButtom.Click += new System.EventHandler(this.button1_Click);
+            this.refreshButtom.Click += new System.EventHandler(this.refreshButton_Click);
             // 
             // mainPanel
             // 

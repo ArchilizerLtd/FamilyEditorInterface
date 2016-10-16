@@ -31,34 +31,14 @@ namespace FamilyEditorInterface
         /// <returns></returns>
         private Boolean famEdit(FamilyParameter fp, FamilyType ft)
         {
-            //double valueDouble;
-            //int valueInt;
             if (!fp.StorageType.ToString().Equals("Double") && !fp.StorageType.ToString().Equals("Integer"))
             {
                 return false;
             }
-            //else if (fp.UserModifiable)
-            //{
-            //    return false;
-            //}
             else if (fp.IsDeterminedByFormula || fp.Formula != null)
             {
                 return false;
             }
-            /*
-        else if (!ft.HasValue(fp))
-        {
-            return false;
-        }
-        else if (ft.AsDouble(fp) == null && ft.AsInteger(fp) == null)
-        {
-            return false;
-        }
-             * */
-            //else if (!double.TryParse(ft.AsDouble(fp).ToString(), out valueDouble) && !int.TryParse(ft.AsInteger(fp).ToString(), out valueInt))
-            //{
-            //    return false;
-            //}
             else if (fp.IsReporting)
             {
                 return false;
@@ -75,20 +55,15 @@ namespace FamilyEditorInterface
         internal List<FamilyEditorItem> CollectData()
         {
             List<FamilyEditorItem> result = new List<FamilyEditorItem>();
-
-            if (!doc.IsFamilyDocument)
-            {
-                //Command.global_message =
-                //  "Please run this command in a family document.";
-
-                //TaskDialog.Show("Message", Command.global_message);
-            }
-
-            // TO DO: fiugre out how to get family parameter value without existing family type
-
+            
             FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
                      
+            if (familyType == null)
+            {
+                familyType = CreateDefaultFamilyType(familyManager);
+            }
+
             int indexChk = 0;
             double value = 0.0;
             
@@ -121,46 +96,11 @@ namespace FamilyEditorInterface
                     indexChk++;
                     continue;
                 }
-                try
-                {
-                    ///slider parameters
-                    if (fp.StorageType == StorageType.Double) value = Convert.ToDouble(familyType.AsDouble(fp));
-                    else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
-                    eId.Add(fp.Id);
-                }
-                catch
-                {
-                    TaskDialog td = new TaskDialog("No Family Type");
-                    td.MainInstruction = "Create Default Family Type.";
-                    string s = "This might be a new Family with no existing Parameters or Family Types." + Environment.NewLine + Environment.NewLine + 
-                    "In order to use this plugin, you can either create a new Parameter/Family Type from the Family Types Dialog" +
-                        " and restart the plugin or create a Default Family Type by accepting this message." + Environment.NewLine + Environment.NewLine +  
-                            "You can always delete the Default Family Parameter later.";
-                    td.MainContent = s;
-                    td.CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
-
-                    TaskDialogResult tResult = td.Show();
-
-                    if (TaskDialogResult.Yes == tResult)
-                    {
-                        if (familyType == null)
-                        {
-
-                            using (Transaction t = new Transaction(doc, "Create Family Type"))
-                            {
-                                t.Start();
-                                familyManager.NewType("Default");
-                                t.Commit();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        throw new Exception("Aborted by user.");
-                    }
-                }
-                
-
+                ///slider parameters
+                if (fp.StorageType == StorageType.Double) value = Convert.ToDouble(familyType.AsDouble(fp));
+                else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
+                eId.Add(fp.Id);
+                              
                 //DisplayUnitType dut = this.doc.GetUnits().GetDisplayUnitType();
                 goUnits = Utils._goUnits();
 
@@ -193,6 +133,43 @@ namespace FamilyEditorInterface
             }
             sort(result);
             return result;
+        }
+        /// <summary>
+        /// Creates default family type.
+        /// </summary>
+        /// <param name="familyManager">The family manager.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception">Aborted by user.</exception>
+        private FamilyType CreateDefaultFamilyType(FamilyManager familyManager)
+        {
+            FamilyType familyType = null;
+
+            TaskDialog td = new TaskDialog("No Family Type");
+            td.MainInstruction = "Create Default Family Type.";
+            string s = "This might be a new Family with no existing Parameters or Family Types." + Environment.NewLine + Environment.NewLine +
+            "In order to use this plugin, you can either create a new Parameter/Family Type from the Family Types Dialog" +
+                " and restart the plugin or create a Default Family Type by accepting this message." + Environment.NewLine + Environment.NewLine +
+                    "You can always delete the Default Family Parameter later.";
+            td.MainContent = s;
+            td.CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
+
+            TaskDialogResult tResult = td.Show();
+
+            if (TaskDialogResult.Yes == tResult)
+            {
+                using (Transaction t = new Transaction(doc, "Create Family Type"))
+                {
+                    t.Start();
+                    familyType = familyManager.NewType("Default");
+                    t.Commit();
+                }
+            }
+            else
+            {
+                throw new Exception("Aborted by user.");
+            }
+
+            return familyType;
         }
         /// <summary>
         /// Synchronizes the default values.

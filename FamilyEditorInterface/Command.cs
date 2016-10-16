@@ -28,8 +28,6 @@ namespace FamilyEditorInterface
         {            
             try
             {
-                // why do we need the form to be shown in the application? 
-                // is it because we want to dispose of it on ShutDown?
                 Application.thisApp.ShowForm(commandData.Application);
                 return Result.Succeeded;
             }
