@@ -29,7 +29,7 @@ namespace FamilyEditorInterface
         private Bitmap _imageMini;
         private Bitmap _imageMaxi;
         private List<FamilyEditorItem> result, backup;
-
+        private float scale_x, scale_y;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -57,10 +57,14 @@ namespace FamilyEditorInterface
                 return;
             }
             Utils.Init(this.doc);
-            this.projectParameters = new ProjectParameters(doc);            
+            this.projectParameters = new ProjectParameters(doc);
             this.Text = title + String.Format(" - {0}", Utils.Truncate(doc.Title, 10));
             this.result = this.projectParameters.CollectData();
             this.backup = this.projectParameters.CollectData();
+            this.scale_x = this.CreateGraphics().DpiX / 100;
+            this.scale_y = this.CreateGraphics().DpiY / 100;
+            //this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            //this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 
             DisplayData();
         }
@@ -117,7 +121,7 @@ namespace FamilyEditorInterface
         {
             this.mainPanel.Controls.Clear();
             this.offPanel.Controls.Clear();
-            
+
             if (result.Count == 0)
             {
                 this.mainContainer.Panel1.Controls.Add(WarningLabel("No active parameters"));
@@ -151,16 +155,23 @@ namespace FamilyEditorInterface
                     System.Windows.Forms.TextBox txt = createTextbox(item);
                     items.Add(txt);
                 }
-
-                this.mainPanel.Controls.AddRange(items.ToArray());
-                this.offPanel.Controls.AddRange(checks.ToArray());
+                if (items.Count > 0)
+                {
+                    this.mainPanel.Controls.AddRange(items.ToArray());
+                    this.mainPanel.SetFlowBreak(items.ToArray()[items.Count - 1], true);
+                }
+                if (checks.Count > 0)
+                {
+                    this.offPanel.Controls.AddRange(checks.ToArray());
+                    this.offPanel.SetFlowBreak(checks.ToArray()[0], true);
+                }
 
                 items.Clear();
                 checks.Clear();
             }
 
 
-            if(!check)
+            if (!check)
             {
                 this.offPanel.Controls.Add(error("This family has no Yes/No parameters."));
             }
@@ -172,7 +183,7 @@ namespace FamilyEditorInterface
             error.Text = message;
             error.TextAlign = ContentAlignment.MiddleCenter;
             error.AutoSize = true;
-            error.Padding = new Padding(55, 35, 0, 0);
+            error.Padding = new Padding(Convert.ToInt32(scale_x * 55), 35, 0, 0); //check if it works
             error.ForeColor = System.Drawing.Color.DarkGray;
 
             return error;
@@ -180,12 +191,12 @@ namespace FamilyEditorInterface
         private System.Windows.Forms.TextBox createTextbox(FamilyEditorItem item)
         {
             System.Windows.Forms.TextBox txt = new System.Windows.Forms.TextBox();
-            
+
             string s = item.getTextbox().Keys.First();
             double d = item.getTextbox().Values.First();
 
             txt = new System.Windows.Forms.TextBox();
-            txt.Size = new Size(34, 10);
+            txt.Size = new Size(Convert.ToInt32(scale_x * 34), 10);
             txt.KeyDown += new KeyEventHandler(textBox_KeyDown);
             txt.Name = s;
             txt.Text = Math.Round(Utils.trueValue(d), 2).ToString();
@@ -208,7 +219,7 @@ namespace FamilyEditorInterface
 
             lbl = new Label();
             lbl.AutoSize = true;
-            lbl.MaximumSize = new Size(70, 0);
+            lbl.MaximumSize = new Size(Convert.ToInt32(scale_x * 70), 0);
             lbl.Font = new Font("Arial", 8);
             lbl.Text = Utils.Truncate(s, 15);
             lbl.Name = s;
@@ -234,7 +245,7 @@ namespace FamilyEditorInterface
             trk = new TrackBar();
             trk.Name = s;
             trk.Text = s;
-            trk.Size = new Size(180, 10);
+            trk.Size = new Size(Convert.ToInt32(scale_x * 180), 10);
             trk.Padding = new Padding(3, 3, 3, 3);
             trk.Tag = item;
 
@@ -264,13 +275,13 @@ namespace FamilyEditorInterface
             double d = item.getCheckbox().Values.First();
 
             chk.Name = s;
-            chk.Text = Utils.Truncate(s, 10);
+            chk.Text = Utils.Truncate(s, 18);
 
             chk.Checked = Convert.ToInt32(d) == 1 ? true : false;
             chk.MouseUp += new System.Windows.Forms.MouseEventHandler(checkBox_MouseUp);
-            chk.Click += new EventHandler(trackBar_ValueChanged);            
+            chk.Click += new EventHandler(trackBar_ValueChanged);
             chk.Padding = new Padding(3, 3, 3, 3);
-            chk.Margin = new Padding(0, 0, 50, 5);
+            chk.Margin = new Padding(0, 0, Convert.ToInt32(scale_x * 50), Convert.ToInt32(scale_y * 5));
             chk.Tag = item;
 
             return chk;
@@ -308,7 +319,7 @@ namespace FamilyEditorInterface
                 return cp;
             }
         }
-        
+
         /// <summary>
         /// Helper method to assign label to an empty panel
         /// </summary>
@@ -338,7 +349,7 @@ namespace FamilyEditorInterface
                 user_done_updating = false;
                 double first = Utils.convertValueTO((double)tbar.Value * 0.01);
                 if (projectParameters.goUnits)
-                {                    
+                {
                     System.Windows.Forms.TextBox box = mainPanel.Controls.OfType<System.Windows.Forms.TextBox>().Where(x => x.Tag.Equals(tbar.Tag)).Single();
 
                     box.Text = Math.Round(first, 2).ToString();   //trackbar to textbox value
@@ -375,7 +386,7 @@ namespace FamilyEditorInterface
                 int second = Convert.ToInt32(Utils.convertValueFROM(first * 100));
 
                 TrackBar tbar = mainPanel.Controls.OfType<TrackBar>().Where(x => x.Tag.Equals(tbox.Tag)).Single();
-                
+
                 if (second < tbar.Maximum) tbar.Value = second;  //textbox to trackbar value
                 else
                 {
@@ -384,7 +395,7 @@ namespace FamilyEditorInterface
                 }
                 MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbox.Name, (double)(Utils.convertValueFROM(Convert.ToDouble(tbox.Text)))));
             }
-        }  
+        }
         /// <summary>
         /// Form closed event handler
         /// </summary>
@@ -413,7 +424,7 @@ namespace FamilyEditorInterface
         private void MakeRequest(RequestId request, Tuple<string, double> value)
         {
             //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.Value(new List<Tuple<string, double>>() {value});
+            handler.Request.Value(new List<Tuple<string, double>>() { value });
             handler.Request.Make(request);
             exEvent.Raise();
         }
@@ -429,7 +440,7 @@ namespace FamilyEditorInterface
             handler.Request.Value(value);
             handler.Request.Make(request);
             exEvent.Raise();
-        }        
+        }
         /// <summary>
         ///  Exit - closing the dialog
         /// </summary>
@@ -469,12 +480,12 @@ namespace FamilyEditorInterface
             if (!validDocument()) return;
             try
             {
-                if(sameDocument())
+                if (sameDocument())
                 {
                     this.DocumentChanged();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 this.InvalidDocument();
             }
@@ -544,11 +555,11 @@ namespace FamilyEditorInterface
         private void defaultButton_Click(object sender, EventArgs e)
         {
             if (!validDocument()) return;
-            if(sameDocument())
+            if (sameDocument())
             {
                 List<Tuple<string, double>> value = projectParameters.GetValues(backup);
                 MakeRequest(RequestId.SlideParam, value);
-                Reset();   
+                Reset();
             }
         }
         /// <summary>
