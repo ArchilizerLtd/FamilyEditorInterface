@@ -3,35 +3,63 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace FamilyEditorInterface
 {
     public class FamilyEditorItem
     {
-        private Dictionary<string, double> checkBox;
-        private Dictionary<string, double> textBox;
-        private Dictionary<string, double> trackBar;
-        private Dictionary<string, double> label;
+        private Tuple<string, double> checkBox = null;
+        private Tuple<string, double> textBox = null;
+        private Tuple<string, double> trackBar = null;
+        private Tuple<string, double> label = null;
+        public CheckBox chk;
+        public TextBox txt;
+        public TrackBar tbar;
+        public Label lbl;
         private string name;
         private double value;
 
         public FamilyEditorItem()
         {
-            checkBox = new Dictionary<string, double>();
-            textBox = new Dictionary<string, double>();
-            trackBar = new Dictionary<string, double>();
-            label = new Dictionary<string, double>();
+            chk = new CheckBox();
+            txt = new TextBox();
+            tbar = new TrackBar();
+            lbl = new Label();
             name = "";
             value = 0.0;
-        }    
-
-        public string Name()
-        {
-            return name;
         }
-        private void Name(string s)
+
+        public string Name
         {
-            name = s;
+            get
+            {
+                return name;
+            }
+            internal set
+            {
+                name = value;
+                if (checkBox != null)
+                {
+                    checkBox = new Tuple<string, double>(value, checkBox.Item2);
+                    chk.Name = value;
+                }
+                if (textBox != null)
+                {
+                    textBox = new Tuple<string, double>(value, textBox.Item2);
+                    txt.Name = value;
+                }
+                if (trackBar != null) 
+                {
+                    trackBar = new Tuple<string, double>(value, trackBar.Item2);
+                    tbar.Name = value;
+                }
+                if (label != null)
+                {
+                    label = new Tuple<string, double>(value, label.Item2);
+                    lbl.Name = value;
+                }
+            }
         }
         public double Value()
         {
@@ -43,48 +71,48 @@ namespace FamilyEditorInterface
         }
         public void addCheckbox(string s, double d)
         {
-            checkBox.Add(s, d);
-            if (name == "") Name(s);
+            checkBox = new Tuple<string, double>(s, d);
+            if (name == "") Name = s;
             if (value == 0.0) Value(d);
         }
 
-        public Dictionary<string, double> getCheckbox()
+        public Tuple<string, double> getCheckbox()
         {
             return checkBox;
         }
 
         public void addTextbox(string s, double d)
         {
-            textBox.Add(s, d);
-            if (name == "") Name(s);
+            textBox = new Tuple< string, double> (s, d);
+            if (name == "") Name = s;
             if (value == 0.0) Value(d);
         }
 
-        public Dictionary<string, double> getTextbox()
+        public Tuple<string, double> getTextbox()
         {
             return textBox;
         }
 
         public void addTrackbar(string s, double d)
         {
-            trackBar.Add(s, d);
-            if (name == "") Name(s);
+            trackBar = new Tuple<string, double>(s, d);
+            if (name == "") Name = s;
             if (value == 0.0) Value(d);
         }
 
-        public Dictionary<string, double> getTrackbar()
+        public Tuple<string, double> getTrackbar()
         {
             return trackBar;
         }
 
         public void addLabel(string s, double d)
         {
-            label.Add(s, d);
-            if (name == "") Name(s);
+            label = new Tuple<string, double>(s, d);
+            if (name == "") Name = s;
             if (value == 0.0) Value(d);
         }
 
-        public Dictionary<string, double> getLabel()
+        public Tuple<string, double> getLabel()
         {
             return label;
         }

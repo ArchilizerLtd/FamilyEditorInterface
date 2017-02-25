@@ -30,6 +30,13 @@ namespace FamilyEditorInterface
         private Bitmap _imageMaxi;
         private List<FamilyEditorItem> result, backup;
         private float scale_x, scale_y;
+
+        // change label text fields
+        Label labelBeingEdited = new Label();
+        System.Windows.Forms.TextBox editWindow = new System.Windows.Forms.TextBox();
+        bool editWindowActive = false;
+        string storeOldLabelValue;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -63,11 +70,215 @@ namespace FamilyEditorInterface
             this.backup = this.projectParameters.CollectData();
             this.scale_x = this.CreateGraphics().DpiX / 100;
             this.scale_y = this.CreateGraphics().DpiY / 100;
-            //this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            //this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 
             DisplayData();
         }
+
+        #region Form Settup
+        private void DisplayData()
+        {
+            this.mainPanel.Controls.Clear();
+            this.offPanel.Controls.Clear();
+
+            if (result.Count == 0)
+            {
+                this.mainContainer.Panel1.Controls.Add(WarningLabel("No active parameters"));
+            }
+
+            bool check = false;
+
+            List<System.Windows.Forms.Control> items = new List<System.Windows.Forms.Control>();
+            List<System.Windows.Forms.Control> checks = new List<System.Windows.Forms.Control>();
+
+            foreach (FamilyEditorItem item in result)
+            {
+                if (item.getCheckbox() != null)
+                {
+                    CheckBox chk = createCheckBox(item);
+                    checks.Add(chk);
+                    check = true;
+                }
+                if (item.getTrackbar() != null)
+                {
+                    TrackBar tkr = createTrackBar(item);
+                    items.Add(tkr);
+                }
+                if (item.getLabel() != null)
+                {
+                    Label lbl = createLabel(item);
+                    items.Add(lbl);
+                }
+                if (item.getTextbox() != null)
+                {
+                    System.Windows.Forms.TextBox txt = createTextbox(item);
+                    items.Add(txt);
+                }
+                if (items.Count > 0)
+                {
+                    this.mainPanel.Controls.AddRange(items.ToArray());
+                    this.mainPanel.SetFlowBreak(items.ToArray()[items.Count - 1], true);
+                }
+                if (checks.Count > 0)
+                {
+                    this.offPanel.Controls.AddRange(checks.ToArray());
+                    this.offPanel.SetFlowBreak(checks.ToArray()[0], true);
+                }
+
+                items.Clear();
+                checks.Clear();
+            }
+
+
+            if (!check)
+            {
+                this.offPanel.Controls.Add(error("This family has no Yes/No parameters."));
+            }
+        }
+
+        private Label error(string message)
+        {
+            Label error = new Label();
+            error.Text = message;
+            error.TextAlign = ContentAlignment.MiddleCenter;
+            error.AutoSize = true;
+            error.Padding = new Padding(Convert.ToInt32(scale_x * 55), 35, 0, 0); //check if it works
+            error.ForeColor = System.Drawing.Color.DarkGray;
+
+            return error;
+        }
+        private System.Windows.Forms.TextBox createTextbox(FamilyEditorItem item)
+        {
+            System.Windows.Forms.TextBox txt = new System.Windows.Forms.TextBox();
+
+            item.txt = txt;
+
+            string s = item.getTextbox().Item1;
+            double d = item.getTextbox().Item2;
+
+            txt = new System.Windows.Forms.TextBox();
+            txt.Size = new Size(Convert.ToInt32(scale_x * 34), 10);
+            txt.KeyDown += new KeyEventHandler(textBox_KeyDown);
+            txt.Name = s;
+            txt.Text = Math.Round(Utils.trueValue(d), 2).ToString();
+            txt.BackColor = System.Drawing.SystemColors.Control;
+            txt.BorderStyle = BorderStyle.None;
+            txt.Margin = new Padding(0, 5, 0, 0);
+            txt.ForeColor = System.Drawing.Color.FromArgb(50, 50, 50);
+            txt.Tag = item;
+
+            return txt;
+        }
+
+
+        private Label createLabel(FamilyEditorItem item)
+        {
+            Label lbl = new Label();
+
+            item.lbl = lbl;
+
+            string s = item.getLabel().Item1;
+            double d = item.getLabel().Item2;
+
+            lbl = new Label();
+            lbl.AutoSize = true;
+            lbl.MaximumSize = new Size(Convert.ToInt32(scale_x * 70), 0);
+            lbl.Font = new Font("Arial", 8);
+            lbl.Text = Utils.Truncate(s, 15);
+            lbl.Name = s;
+            lbl.Visible = true;
+            lbl.Padding = new Padding(3, 4, 3, 3);
+            lbl.Tag = item;
+            lbl.Click += labelChange;
+            lbl.TextChanged += paramNameChanged;
+
+            if (d == 0)
+            {
+                lbl.ForeColor = System.Drawing.Color.LightGray;
+            }
+
+            return lbl;
+        }
+
+        private void paramNameChanged(object sender, EventArgs e)
+        {
+            Label lbl = (Label)sender;
+            MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(lbl.Name, lbl.Text));
+            result.First(x => x.Name.Equals(lbl.Name)).Name = lbl.Text;
+            //backup.First(x => x.Name.Equals(lbl.Name)).Name = lbl.Text;
+            //lbl.Name = lbl.Text;
+            //lbl.Text = Utils.Truncate(lbl.Text, 15);
+        }
+
+        private TrackBar createTrackBar(FamilyEditorItem item)
+        {
+            TrackBar trk = new TrackBar();
+
+            item.tbar = trk;
+
+            string s = item.getTrackbar().Item1;
+            double d = item.getTrackbar().Item2;
+
+            trk = new TrackBar();
+            trk.Name = s;
+            trk.Text = s;
+            trk.Size = new Size(Convert.ToInt32(scale_x * 180), 10);
+            trk.Padding = new Padding(3, 3, 3, 3);
+            trk.Tag = item;
+
+            if (d != 0)
+            {
+                trk.Maximum = Convert.ToInt32(d * 100) * 2;
+                trk.Minimum = 1;
+                trk.Value = Convert.ToInt32(d * 100);
+                trk.TickFrequency = Convert.ToInt32(trk.Maximum * 0.05);
+                trk.MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
+                trk.ValueChanged += new EventHandler(trackBar_ValueChanged);
+            }
+            else
+            {
+                trk.Enabled = false;
+            }
+
+            return trk;
+        }
+
+
+        private CheckBox createCheckBox(FamilyEditorItem item)
+        {
+            CheckBox chk = new CheckBox();
+
+            item.chk = chk;
+
+            string s = item.getCheckbox().Item1;
+            double d = item.getCheckbox().Item2;
+
+            chk.Name = s;
+            chk.Text = Utils.Truncate(s, 18);
+
+            chk.Checked = Convert.ToInt32(d) == 1 ? true : false;
+            chk.MouseUp += new System.Windows.Forms.MouseEventHandler(checkBox_MouseUp);
+            chk.Click += new EventHandler(trackBar_ValueChanged);
+            chk.Padding = new Padding(3, 3, 3, 3);
+            chk.Margin = new Padding(0, 0, Convert.ToInt32(scale_x * 50), Convert.ToInt32(scale_y * 5));
+            chk.Tag = item;
+
+            return chk;
+        }
+
+        /// <summary>
+        /// Prepare the minimize and maximize icons
+        /// </summary>
+        private void ImageLoad()
+        {
+            _assembly = Assembly.GetExecutingAssembly();
+            _imageStream = _assembly.GetManifestResourceStream("FamilyEditorInterface.minimize.png");
+            _imageMini = new Bitmap(_imageStream);
+            _imageStream = _assembly.GetManifestResourceStream("FamilyEditorInterface.maximize.png");
+            _imageMaxi = new Bitmap(_imageStream);
+        }
+        #endregion
+
+        #region Form Action
 
         private Autodesk.Revit.DB.Document checkDoc(Autodesk.Revit.DB.Document document)
         {
@@ -116,191 +327,6 @@ namespace FamilyEditorInterface
             result = projectParameters.CollectData();
             backup = result;
         }
-        #region Form Settup
-        private void DisplayData()
-        {
-            this.mainPanel.Controls.Clear();
-            this.offPanel.Controls.Clear();
-
-            if (result.Count == 0)
-            {
-                this.mainContainer.Panel1.Controls.Add(WarningLabel("No active parameters"));
-            }
-
-            bool check = false;
-
-            List<System.Windows.Forms.Control> items = new List<System.Windows.Forms.Control>();
-            List<System.Windows.Forms.Control> checks = new List<System.Windows.Forms.Control>();
-
-            foreach (FamilyEditorItem item in result)
-            {
-                if (item.getCheckbox().Count > 0)
-                {
-                    CheckBox chk = createCheckBox(item);
-                    checks.Add(chk);
-                    check = true;
-                }
-                if (item.getTrackbar().Count > 0)
-                {
-                    TrackBar tkr = createTrackBar(item);
-                    items.Add(tkr);
-                }
-                if (item.getLabel().Count > 0)
-                {
-                    Label lbl = createLabel(item);
-                    items.Add(lbl);
-                }
-                if (item.getTextbox().Count > 0)
-                {
-                    System.Windows.Forms.TextBox txt = createTextbox(item);
-                    items.Add(txt);
-                }
-                if (items.Count > 0)
-                {
-                    this.mainPanel.Controls.AddRange(items.ToArray());
-                    this.mainPanel.SetFlowBreak(items.ToArray()[items.Count - 1], true);
-                }
-                if (checks.Count > 0)
-                {
-                    this.offPanel.Controls.AddRange(checks.ToArray());
-                    this.offPanel.SetFlowBreak(checks.ToArray()[0], true);
-                }
-
-                items.Clear();
-                checks.Clear();
-            }
-
-
-            if (!check)
-            {
-                this.offPanel.Controls.Add(error("This family has no Yes/No parameters."));
-            }
-        }
-
-        private Label error(string message)
-        {
-            Label error = new Label();
-            error.Text = message;
-            error.TextAlign = ContentAlignment.MiddleCenter;
-            error.AutoSize = true;
-            error.Padding = new Padding(Convert.ToInt32(scale_x * 55), 35, 0, 0); //check if it works
-            error.ForeColor = System.Drawing.Color.DarkGray;
-
-            return error;
-        }
-        private System.Windows.Forms.TextBox createTextbox(FamilyEditorItem item)
-        {
-            System.Windows.Forms.TextBox txt = new System.Windows.Forms.TextBox();
-
-            string s = item.getTextbox().Keys.First();
-            double d = item.getTextbox().Values.First();
-
-            txt = new System.Windows.Forms.TextBox();
-            txt.Size = new Size(Convert.ToInt32(scale_x * 34), 10);
-            txt.KeyDown += new KeyEventHandler(textBox_KeyDown);
-            txt.Name = s;
-            txt.Text = Math.Round(Utils.trueValue(d), 2).ToString();
-            txt.BackColor = System.Drawing.SystemColors.Control;
-            txt.BorderStyle = BorderStyle.None;
-            txt.Margin = new Padding(0, 5, 0, 0);
-            txt.ForeColor = System.Drawing.Color.FromArgb(50, 50, 50);
-            txt.Tag = item;
-
-            return txt;
-        }
-
-
-        private Label createLabel(FamilyEditorItem item)
-        {
-            Label lbl = new Label();
-
-            string s = item.getLabel().Keys.First();
-            double d = item.getLabel().Values.First();
-
-            lbl = new Label();
-            lbl.AutoSize = true;
-            lbl.MaximumSize = new Size(Convert.ToInt32(scale_x * 70), 0);
-            lbl.Font = new Font("Arial", 8);
-            lbl.Text = Utils.Truncate(s, 15);
-            lbl.Name = s;
-            lbl.Visible = true;
-            lbl.Padding = new Padding(3, 4, 3, 3);
-            lbl.Tag = item;
-
-            if (d == 0)
-            {
-                lbl.ForeColor = System.Drawing.Color.LightGray;
-            }
-
-            return lbl;
-        }
-
-        private TrackBar createTrackBar(FamilyEditorItem item)
-        {
-            TrackBar trk = new TrackBar();
-
-            string s = item.getTrackbar().Keys.First();
-            double d = item.getTrackbar().Values.First();
-
-            trk = new TrackBar();
-            trk.Name = s;
-            trk.Text = s;
-            trk.Size = new Size(Convert.ToInt32(scale_x * 180), 10);
-            trk.Padding = new Padding(3, 3, 3, 3);
-            trk.Tag = item;
-
-            if (d != 0)
-            {
-                trk.Maximum = Convert.ToInt32(d * 100) * 2;
-                trk.Minimum = 1;
-                trk.Value = Convert.ToInt32(d * 100);
-                trk.TickFrequency = Convert.ToInt32(trk.Maximum * 0.05);
-                trk.MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
-                trk.ValueChanged += new EventHandler(trackBar_ValueChanged);
-            }
-            else
-            {
-                trk.Enabled = false;
-            }
-
-            return trk;
-        }
-
-
-        private CheckBox createCheckBox(FamilyEditorItem item)
-        {
-            CheckBox chk = new CheckBox();
-
-            string s = item.getCheckbox().Keys.First();
-            double d = item.getCheckbox().Values.First();
-
-            chk.Name = s;
-            chk.Text = Utils.Truncate(s, 18);
-
-            chk.Checked = Convert.ToInt32(d) == 1 ? true : false;
-            chk.MouseUp += new System.Windows.Forms.MouseEventHandler(checkBox_MouseUp);
-            chk.Click += new EventHandler(trackBar_ValueChanged);
-            chk.Padding = new Padding(3, 3, 3, 3);
-            chk.Margin = new Padding(0, 0, Convert.ToInt32(scale_x * 50), Convert.ToInt32(scale_y * 5));
-            chk.Tag = item;
-
-            return chk;
-        }
-
-        /// <summary>
-        /// Prepare the minimize and maximize icons
-        /// </summary>
-        private void ImageLoad()
-        {
-            _assembly = Assembly.GetExecutingAssembly();
-            _imageStream = _assembly.GetManifestResourceStream("FamilyEditorInterface.minimize.png");
-            _imageMini = new Bitmap(_imageStream);
-            _imageStream = _assembly.GetManifestResourceStream("FamilyEditorInterface.maximize.png");
-            _imageMaxi = new Bitmap(_imageStream);
-        }
-        #endregion
-
-
         internal Autodesk.Revit.DB.Document Document()
         {
             if (this.doc.IsValidObject) return this.doc;
@@ -412,6 +438,18 @@ namespace FamilyEditorInterface
             base.OnFormClosed(e);
         }
         /// <summary>
+        /// Change Parameter Name
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="value"></param>
+        private void MakeRequest(RequestId request, Tuple<string, string> value)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.Value(new List<Tuple<string, string>>() { value });
+            handler.Request.Make(request);
+            exEvent.Raise();
+        }
+        /// <summary>
         ///   A private helper method to make a request
         ///   and put the dialog to sleep at the same time.
         /// </summary>
@@ -420,7 +458,6 @@ namespace FamilyEditorInterface
         ///   (the Idling helper in this particular case) will also
         ///   wake the dialog up after finishing the execution.
         /// </remarks>
-        ///
         private void MakeRequest(RequestId request, Tuple<string, double> value)
         {
             //MessageBox.Show("You are in the Control.Request event.");
@@ -584,5 +621,62 @@ namespace FamilyEditorInterface
             //MessageBox.Show("You are in the Control.Wake up event.");
             //EnableCommands(true);
         }
+        #endregion
+
+        #region Text Edit
+        private void labelChange(object sender, EventArgs e)
+        {
+            Label label = sender as Label;
+            if (editWindowActive) FinalizeEdit();
+            PlaceEditWindowOverLabel(label);
+            AssociateEditorWithLabel(label);
+        }
+
+        private void AssociateEditorWithLabel(Label label)
+        {
+            storeOldLabelValue = label.Text;
+            editWindow.Text = label.Text;
+            labelBeingEdited = label;
+        }
+        private void PlaceEditWindowOverLabel(Label label)
+        {
+            editWindow.Location = new System.Drawing.Point(label.Location.X + mainContainer.Location.X + 5, label.Location.Y + mainContainer.Location.Y + 4);
+            editWindow.Size = label.Size ;
+            if (!Controls.Contains(editWindow)) Controls.Add(editWindow);
+            editWindow.Visible = true;
+            editWindow.BringToFront();
+            editWindow.Focus();
+            editWindowActive = true;
+            editWindow.KeyUp += TextBoxKeyUp;
+            editWindow.Leave += TextBoxLeave;
+        }
+        private void TextBoxLeave(object sender, EventArgs e)
+        {
+            FinalizeEdit();
+        }
+        private void FinalizeEdit()
+        {
+            labelBeingEdited.Text = editWindow.Text;
+            labelBeingEdited.Focus();
+
+            editWindow.Visible = false;
+            editWindow.SendToBack();
+            editWindowActive = false;
+        }
+        private void TextBoxKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                FinalizeEdit();
+                e.Handled = true;
+            }
+            if (e.KeyCode == Keys.Escape)
+            {
+                editWindow.Text = storeOldLabelValue;
+                FinalizeEdit();
+                e.Handled = true;
+            }
+        }
+        #endregion
     }
 }

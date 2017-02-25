@@ -48,6 +48,10 @@ namespace FamilyEditorInterface
         /// "Regenerate Document" request
         /// </summary>
         RestoreAll = 3,
+        /// <summary>
+        /// "Change Parameter Name" request
+        /// </summary>
+        ChangeParamName = 4,
     }
 
    /// <summary>
@@ -60,43 +64,53 @@ namespace FamilyEditorInterface
    /// 
    public class Request
    {
-      // Storing the value as a plain Int makes using the interlocking mechanism simpler
-      private int m_request = (int)RequestId.None;
-      // try tp tramsport information
-      private List<Tuple<string, double>> value;
-      /// <summary>
-      ///   Take - The Idling handler calls this to obtain the latest request. 
-      /// </summary>
-      /// <remarks>
-      ///   This is not a getter! It takes the request and replaces it
-      ///   with 'None' to indicate that the request has been "passed on".
-      /// </remarks>
-      /// 
-      public RequestId Take()
-      {
-         return (RequestId)Interlocked.Exchange(ref m_request, (int)RequestId.None);
-      }
+        // Storing the value as a plain Int makes using the interlocking mechanism simpler
+        private int m_request = (int)RequestId.None;
+        // try tp tramsport information
+        private List<Tuple<string, double>> value;
+        private List<Tuple<string, string>> renameValue;
+        /// <summary>
+        ///   Take - The Idling handler calls this to obtain the latest request. 
+        /// </summary>
+        /// <remarks>
+        ///   This is not a getter! It takes the request and replaces it
+        ///   with 'None' to indicate that the request has been "passed on".
+        /// </remarks>
+        /// 
+        public RequestId Take()
+        {
+            return (RequestId)Interlocked.Exchange(ref m_request, (int)RequestId.None);
+        }
 
-      /// <summary>
-      ///   Make - The Dialog calls this when the user presses a command button there. 
-      /// </summary>
-      /// <remarks>
-      ///   It replaces any older request previously made.
-      /// </remarks>
-      /// 
-      public void Make(RequestId request)
-      {
-         Interlocked.Exchange(ref m_request, (int)request);
-      }
-      // try to trasport the message
-      internal void Value(List<Tuple<string, double>> value)
-      {
-          this.value = value;
-      }
-      // try to transport the message
-      internal List<Tuple<string, double>> GetValue()
-      {
+        /// <summary>
+        ///   Make - The Dialog calls this when the user presses a command button there. 
+        /// </summary>
+        /// <remarks>
+        ///   It replaces any older request previously made.
+        /// </remarks>
+        /// 
+        public void Make(RequestId request)
+        {
+            Interlocked.Exchange(ref m_request, (int)request);
+        }
+        // try to trasport the message
+        internal void Value(List<Tuple<string, double>> value)
+        {
+            this.value = value;
+        }
+        internal void Value(List<Tuple<string, string>> value)
+        {
+            this.renameValue = value;
+        }
+        // try to transport the message
+        internal List<Tuple<string, double>> GetValue()
+        {
           return this.value;
-      }
-   }
+        }
+        // try to transport the message
+        internal List<Tuple<string, string>> GetRenameValue()
+        {
+            return this.renameValue;
+        }
+    }
 }

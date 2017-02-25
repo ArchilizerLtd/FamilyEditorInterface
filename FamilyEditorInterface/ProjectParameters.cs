@@ -180,11 +180,11 @@ namespace FamilyEditorInterface
         {
             foreach (FamilyEditorItem item in result)
             {
-                if (!backup.Any(x => x.Name().Equals(item.Name()))) backup.Add(item);
+                if (!backup.Any(x => x.Name.Equals(item.Name))) backup.Add(item);
             }
             foreach (var item in backup)
             {
-                if (!result.Any(x => x.Name().Equals(item.Name()))) backup.Remove(item);
+                if (!result.Any(x => x.Name.Equals(item.Name))) backup.Remove(item);
             }
             sort(backup);
         }
@@ -194,7 +194,7 @@ namespace FamilyEditorInterface
         /// <param name="backup"></param>
         private void sort(List<FamilyEditorItem> list)
         {
-            list = list.OrderBy(x => x.Name()).ToList();
+            list = list.OrderBy(x => x.Name).ToList();
         }
         /// <summary>
         /// Transforms list of items to list of tuplets
@@ -207,7 +207,7 @@ namespace FamilyEditorInterface
             List<Tuple<string, double>> value = new List<Tuple<string, double>>();
             foreach(var item in backup)
             {
-                value.Add(new Tuple<string, double>(item.Name(), item.Value()));
+                value.Add(new Tuple<string, double>(item.Name, item.Value()));
             }
             return value;
         }
