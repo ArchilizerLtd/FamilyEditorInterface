@@ -13,19 +13,11 @@ namespace FamilyEditorInterface
         private Tuple<string, double> textBox = null;
         private Tuple<string, double> trackBar = null;
         private Tuple<string, double> label = null;
-        public CheckBox chk;
-        public TextBox txt;
-        public TrackBar tbar;
-        public Label lbl;
         private string name;
         private double value;
 
         public FamilyEditorItem()
         {
-            chk = new CheckBox();
-            txt = new TextBox();
-            tbar = new TrackBar();
-            lbl = new Label();
             name = "";
             value = 0.0;
         }
@@ -42,22 +34,18 @@ namespace FamilyEditorInterface
                 if (checkBox != null)
                 {
                     checkBox = new Tuple<string, double>(value, checkBox.Item2);
-                    chk.Name = value;
                 }
                 if (textBox != null)
                 {
                     textBox = new Tuple<string, double>(value, textBox.Item2);
-                    txt.Name = value;
                 }
                 if (trackBar != null) 
                 {
                     trackBar = new Tuple<string, double>(value, trackBar.Item2);
-                    tbar.Name = value;
                 }
                 if (label != null)
                 {
                     label = new Tuple<string, double>(value, label.Item2);
-                    lbl.Name = value;
                 }
             }
         }

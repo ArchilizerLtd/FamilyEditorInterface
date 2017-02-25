@@ -12,6 +12,7 @@ using System.Reflection;
 
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
+using System.Text.RegularExpressions;
 
 namespace FamilyEditorInterface
 {
@@ -149,9 +150,7 @@ namespace FamilyEditorInterface
         private System.Windows.Forms.TextBox createTextbox(FamilyEditorItem item)
         {
             System.Windows.Forms.TextBox txt = new System.Windows.Forms.TextBox();
-
-            item.txt = txt;
-
+            
             string s = item.getTextbox().Item1;
             double d = item.getTextbox().Item2;
 
@@ -169,13 +168,10 @@ namespace FamilyEditorInterface
             return txt;
         }
 
-
         private Label createLabel(FamilyEditorItem item)
         {
             Label lbl = new Label();
-
-            item.lbl = lbl;
-
+            
             string s = item.getLabel().Item1;
             double d = item.getLabel().Item2;
 
@@ -198,23 +194,11 @@ namespace FamilyEditorInterface
 
             return lbl;
         }
-
-        private void paramNameChanged(object sender, EventArgs e)
-        {
-            Label lbl = (Label)sender;
-            MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(lbl.Name, lbl.Text));
-            result.First(x => x.Name.Equals(lbl.Name)).Name = lbl.Text;
-            //backup.First(x => x.Name.Equals(lbl.Name)).Name = lbl.Text;
-            //lbl.Name = lbl.Text;
-            //lbl.Text = Utils.Truncate(lbl.Text, 15);
-        }
-
+        
         private TrackBar createTrackBar(FamilyEditorItem item)
         {
             TrackBar trk = new TrackBar();
-
-            item.tbar = trk;
-
+            
             string s = item.getTrackbar().Item1;
             double d = item.getTrackbar().Item2;
 
@@ -242,13 +226,10 @@ namespace FamilyEditorInterface
             return trk;
         }
 
-
         private CheckBox createCheckBox(FamilyEditorItem item)
         {
             CheckBox chk = new CheckBox();
-
-            item.chk = chk;
-
+            
             string s = item.getCheckbox().Item1;
             double d = item.getCheckbox().Item2;
 
@@ -263,6 +244,16 @@ namespace FamilyEditorInterface
             chk.Tag = item;
 
             return chk;
+        }
+
+        private void paramNameChanged(object sender, EventArgs e)
+        {
+            Label lbl = (Label)sender;
+            string newName = lbl.Text;
+            MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(lbl.Name, newName));
+            FamilyEditorItem item = result.First(x => x.Name.Equals(lbl.Name));
+            item.Name = newName;
+            FamilyItemsToFormElements(item);
         }
 
         /// <summary>
@@ -380,7 +371,7 @@ namespace FamilyEditorInterface
 
                     box.Text = Math.Round(first, 2).ToString();   //trackbar to textbox value
                 }
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbar.Text, (double)tbar.Value * 0.01));
+                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbar.Name, (double)tbar.Value * 0.01));
             }
         }
         /// <summary>
@@ -595,8 +586,41 @@ namespace FamilyEditorInterface
             if (sameDocument())
             {
                 List<Tuple<string, double>> value = projectParameters.GetValues(backup);
+                RestoreValues(backup);
                 MakeRequest(RequestId.SlideParam, value);
                 Reset();
+            }
+        }
+
+        private void RestoreValues(List<FamilyEditorItem> backup)
+        {
+            foreach(var item in backup)
+            {
+                FamilyItemsToFormElements((FamilyEditorItem)item);
+            }
+        }
+        
+        private void FamilyItemsToFormElements(FamilyEditorItem item)
+        {
+            System.Windows.Forms.TextBox tbox = mainPanel.Controls.OfType<System.Windows.Forms.TextBox>().Where(x => x.Tag.Equals(item)).SingleOrDefault();
+            if(tbox != null) tbox.Name = item.Name;
+            System.Windows.Forms.TrackBar tbar = mainPanel.Controls.OfType<System.Windows.Forms.TrackBar>().Where(x => x.Tag.Equals(item)).SingleOrDefault();
+            if(tbar != null)
+            {
+                tbar.Name = item.Name;
+                tbar.Text = item.Name;
+            }
+            System.Windows.Forms.Label lbl = mainPanel.Controls.OfType<System.Windows.Forms.Label>().Where(x => x.Tag.Equals(item)).SingleOrDefault();
+            if (lbl != null)
+            {
+                lbl.Name = item.Name;
+                lbl.Text = Utils.Truncate(item.Name, 15);
+            }
+            System.Windows.Forms.CheckBox chk = mainPanel.Controls.OfType<System.Windows.Forms.CheckBox>().Where(x => x.Tag.Equals(item)).SingleOrDefault();
+            if (chk != null)
+            {
+                chk.Name = item.Name;
+                chk.Text = item.Name;
             }
         }
         /// <summary>
@@ -636,6 +660,7 @@ namespace FamilyEditorInterface
         {
             storeOldLabelValue = label.Text;
             editWindow.Text = label.Text;
+            label.ForeColor = SystemColors.Control;
             labelBeingEdited = label;
         }
         private void PlaceEditWindowOverLabel(Label label)
@@ -658,6 +683,7 @@ namespace FamilyEditorInterface
         {
             labelBeingEdited.Text = editWindow.Text;
             labelBeingEdited.Focus();
+            labelBeingEdited.ForeColor = SystemColors.ControlText;
 
             editWindow.Visible = false;
             editWindow.SendToBack();
