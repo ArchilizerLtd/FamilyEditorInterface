@@ -10,18 +10,31 @@ namespace FamilyEditorInterface
     public class FamilyEditorItem
     {
         private Tuple<string, double> checkBox = null;
-        private Tuple<string, double> textBox = null;
-        private Tuple<string, double> trackBar = null;
+        private Tuple<string, string> textBox = null;
+        private Tuple<string, int> trackBar = null;
         private Tuple<string, double> label = null;
         private string name;
         private double value;
+        private string type;
+        private int barValue;
+        private string boxValue;
 
         public FamilyEditorItem()
         {
             name = "";
             value = 0.0;
         }
-
+        public string Type
+        {
+            get
+            {
+                return type;
+            }
+            set
+            {
+                type = value;
+            }
+        }
         public string Name
         {
             get
@@ -37,11 +50,11 @@ namespace FamilyEditorInterface
                 }
                 if (textBox != null)
                 {
-                    textBox = new Tuple<string, double>(value, textBox.Item2);
+                    textBox = new Tuple<string, string>(value, textBox.Item2);
                 }
                 if (trackBar != null) 
                 {
-                    trackBar = new Tuple<string, double>(value, trackBar.Item2);
+                    trackBar = new Tuple<string, int>(value, trackBar.Item2);
                 }
                 if (label != null)
                 {
@@ -49,19 +62,101 @@ namespace FamilyEditorInterface
                 }
             }
         }
-        public double Value()
+        public string BoxValue
         {
-            return value;
+            get
+            {
+                return boxValue;
+            }
+            set
+            {
+                if (value == null) return;
+                this.value = Utils.convertValueFROM(Convert.ToDouble(value));
+                this.barValue = Convert.ToInt32(this.value * 100);
+                this.boxValue = value;
+                
+                if (checkBox != null)
+                {
+                    checkBox = new Tuple<string, double>(checkBox.Item1, this.value);
+                }
+                if (textBox != null)
+                {
+                    textBox = new Tuple<string, string>(textBox.Item1, this.boxValue);
+                }
+                if (trackBar != null)
+                {
+                    trackBar = new Tuple<string, int>(trackBar.Item1, this.barValue);
+                }
+                if (label != null)
+                {
+                    label = new Tuple<string, double>(label.Item1, this.value);
+                }
+            }
         }
-        private void Value(double d)
+        public int BarValue
         {
-            value = d;
+            get
+            {
+                return barValue;
+            }
+            internal set
+            {
+                this.value = value * 0.01;
+                this.barValue = value;
+                this.boxValue = Math.Round(Utils.convertValueTO(this.value), 2).ToString();
+
+                if (checkBox != null)
+                {
+                    checkBox = new Tuple<string, double>(checkBox.Item1, this.value);
+                }
+                if (textBox != null)
+                {
+                    textBox = new Tuple<string, string>(textBox.Item1, this.boxValue);
+                }
+                if (trackBar != null)
+                {
+                    trackBar = new Tuple<string, int>(trackBar.Item1, this.barValue);
+                }
+                if (label != null)
+                {
+                    label = new Tuple<string, double>(label.Item1, this.value);
+                }
+            }
         }
-        public void addCheckbox(string s, double d)
+        public double Value
         {
-            checkBox = new Tuple<string, double>(s, d);
-            if (name == "") Name = s;
-            if (value == 0.0) Value(d);
+            get
+            {
+                return value;
+            }
+            internal set
+            {
+                this.value = value;
+                this.barValue = Convert.ToInt32(value * 100);
+                this.boxValue = Math.Round(Utils.convertValueTO(this.value), 2).ToString();
+
+
+                if (checkBox != null)
+                {
+                    checkBox = new Tuple<string, double>(checkBox.Item1, value);
+                }
+                if (textBox != null)
+                {
+                    textBox = new Tuple<string, string>(textBox.Item1, this.boxValue);
+                }
+                if (trackBar != null)
+                {
+                    trackBar = new Tuple<string, int>(trackBar.Item1, this.barValue);
+                }
+                if (label != null)
+                {
+                    label = new Tuple<string, double>(label.Item1, value);
+                }
+            }
+        }
+        public void addCheckbox()
+        {
+            checkBox = new Tuple<string, double>(name, value);
         }
 
         public Tuple<string, double> getCheckbox()
@@ -69,35 +164,29 @@ namespace FamilyEditorInterface
             return checkBox;
         }
 
-        public void addTextbox(string s, double d)
+        public void addTextbox()
         {
-            textBox = new Tuple< string, double> (s, d);
-            if (name == "") Name = s;
-            if (value == 0.0) Value(d);
+            textBox = new Tuple<string, string> (name, boxValue);
         }
 
-        public Tuple<string, double> getTextbox()
+        public Tuple<string, string> getTextbox()
         {
             return textBox;
         }
 
-        public void addTrackbar(string s, double d)
+        public void addTrackbar()
         {
-            trackBar = new Tuple<string, double>(s, d);
-            if (name == "") Name = s;
-            if (value == 0.0) Value(d);
+            trackBar = new Tuple<string, int>(name, barValue);
         }
 
-        public Tuple<string, double> getTrackbar()
+        public Tuple<string, int> getTrackbar()
         {
             return trackBar;
         }
 
-        public void addLabel(string s, double d)
+        public void addLabel()
         {
-            label = new Tuple<string, double>(s, d);
-            if (name == "") Name = s;
-            if (value == 0.0) Value(d);
+            label = new Tuple<string, double>(name, value);
         }
 
         public Tuple<string, double> getLabel()

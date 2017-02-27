@@ -96,34 +96,5 @@ namespace FamilyEditorInterface
                 return source;
             }
         }
-
-        public static double trueValue(double value)
-        {
-            double trueValue = 0.0;
-
-            switch (dut)
-            {
-                case DisplayUnitType.DUT_METERS:
-                    trueValue = value * METERS_IN_FEET;
-                    break;
-                case DisplayUnitType.DUT_CENTIMETERS:
-                    trueValue = value * METERS_IN_FEET * 100;
-                    break;
-                case DisplayUnitType.DUT_DECIMAL_FEET:
-                    trueValue = value;
-                    break;
-                case DisplayUnitType.DUT_DECIMAL_INCHES:
-                    trueValue = value * 12;
-                    break;
-                case DisplayUnitType.DUT_METERS_CENTIMETERS:
-                    trueValue = value * METERS_IN_FEET;
-                    break;
-                case DisplayUnitType.DUT_MILLIMETERS:
-                    trueValue = value * METERS_IN_FEET * 1000;
-                    break;
-            }
-
-            return trueValue;
-        }
     }
 }

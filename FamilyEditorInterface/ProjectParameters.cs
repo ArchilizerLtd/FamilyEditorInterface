@@ -54,7 +54,7 @@ namespace FamilyEditorInterface
         /// </summary>
         internal List<FamilyEditorItem> CollectData()
         {
-            List<FamilyEditorItem> result = new List<FamilyEditorItem>();
+            List<FamilyEditorItem> collectList = new List<FamilyEditorItem>();
             
             FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
@@ -88,10 +88,13 @@ namespace FamilyEditorInterface
                     eId.Add(fp.Id);
 
                     FamilyEditorItem newItem = new FamilyEditorItem();
-                    newItem.addCheckbox(fp.Definition.Name, value);
+                    newItem.Name = fp.Definition.Name;
+                    newItem.Value = value;
+                    newItem.Type = fp.Definition.ParameterType.ToString();
 
-                    result.Add(newItem);
+                    newItem.addCheckbox();         
 
+                    collectList.Add(newItem);
                     
                     indexChk++;
                     continue;
@@ -103,36 +106,41 @@ namespace FamilyEditorInterface
                               
                 //DisplayUnitType dut = this.doc.GetUnits().GetDisplayUnitType();
                 goUnits = Utils._goUnits();
-
-                if (fp.Definition.ParameterType == ParameterType.Length)
-                {
-                    
-                }
+                
                 if (value != 0)
                 {
                     FamilyEditorItem newItem = new FamilyEditorItem();
-                    newItem.addTrackbar(fp.Definition.Name, value);
-                    newItem.addLabel(fp.Definition.Name, value);
+                    newItem.Name = fp.Definition.Name;
+                    newItem.Value = value;
+                    newItem.Type = fp.Definition.ParameterType.ToString();
+
+                    newItem.addTrackbar();
+                    newItem.addLabel();
 
                     //some units are not supported yet
+                    //only if units are supported, add a text box
                     if (goUnits)
                     {
-                        newItem.addTextbox(fp.Definition.Name, value);
+                        newItem.addTextbox();
                     }
 
-                    result.Add(newItem);
+                    collectList.Add(newItem);
                 }
                 else
                 {
                     FamilyEditorItem newItem = new FamilyEditorItem();
-                    newItem.addTrackbar(fp.Definition.Name, value);
-                    newItem.addLabel(fp.Definition.Name, value);
+                    newItem.Name = fp.Definition.Name;
+                    newItem.Value = value;
+                    newItem.Type = fp.Definition.ParameterType.ToString();
 
-                    result.Add(newItem);
+                    newItem.addTrackbar();
+                    newItem.addLabel();
+
+                    collectList.Add(newItem);
                 }
             }
-            sort(result);
-            return result;
+            sort(collectList);
+            return collectList;
         }
         /// <summary>
         /// Creates default family type.
@@ -207,7 +215,7 @@ namespace FamilyEditorInterface
             List<Tuple<string, double>> value = new List<Tuple<string, double>>();
             foreach(var item in backup)
             {
-                value.Add(new Tuple<string, double>(item.Name, item.Value()));
+                value.Add(new Tuple<string, double>(item.Name, item.Value));
             }
             return value;
         }

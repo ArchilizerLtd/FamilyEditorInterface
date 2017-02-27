@@ -152,13 +152,12 @@ namespace FamilyEditorInterface
             System.Windows.Forms.TextBox txt = new System.Windows.Forms.TextBox();
             
             string s = item.getTextbox().Item1;
-            double d = item.getTextbox().Item2;
-
-            txt = new System.Windows.Forms.TextBox();
+            string d = item.getTextbox().Item2;
+            
             txt.Size = new Size(Convert.ToInt32(scale_x * 34), 10);
             txt.KeyDown += new KeyEventHandler(textBox_KeyDown);
             txt.Name = s;
-            txt.Text = Math.Round(Utils.trueValue(d), 2).ToString();
+            txt.Text = d;
             txt.BackColor = System.Drawing.SystemColors.Control;
             txt.BorderStyle = BorderStyle.None;
             txt.Margin = new Padding(0, 5, 0, 0);
@@ -174,8 +173,7 @@ namespace FamilyEditorInterface
             
             string s = item.getLabel().Item1;
             double d = item.getLabel().Item2;
-
-            lbl = new Label();
+            
             lbl.AutoSize = true;
             lbl.MaximumSize = new Size(Convert.ToInt32(scale_x * 70), 0);
             lbl.Font = new Font("Arial", 8);
@@ -201,8 +199,7 @@ namespace FamilyEditorInterface
             
             string s = item.getTrackbar().Item1;
             double d = item.getTrackbar().Item2;
-
-            trk = new TrackBar();
+            
             trk.Name = s;
             trk.Text = s;
             trk.Size = new Size(Convert.ToInt32(scale_x * 180), 10);
@@ -211,9 +208,9 @@ namespace FamilyEditorInterface
 
             if (d != 0)
             {
-                trk.Maximum = Convert.ToInt32(d * 100) * 2;
+                trk.Maximum = item.BarValue * 2;
                 trk.Minimum = 1;
-                trk.Value = Convert.ToInt32(d * 100);
+                trk.Value = item.BarValue;
                 trk.TickFrequency = Convert.ToInt32(trk.Maximum * 0.05);
                 trk.MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
                 trk.ValueChanged += new EventHandler(trackBar_ValueChanged);
@@ -358,20 +355,23 @@ namespace FamilyEditorInterface
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void trackBar_MouseUp(object sender, MouseEventArgs e)
-        {
-            TrackBar tbar = sender as TrackBar;
-
+        {            
             if (user_done_updating)
             {
                 user_done_updating = false;
-                double first = Utils.convertValueTO((double)tbar.Value * 0.01);
+
+                TrackBar tbar = sender as TrackBar;
+                FamilyEditorItem item = tbar.Tag as FamilyEditorItem;
+
+                item.BarValue = tbar.Value;
+
                 if (projectParameters.goUnits)
                 {
                     System.Windows.Forms.TextBox box = mainPanel.Controls.OfType<System.Windows.Forms.TextBox>().Where(x => x.Tag.Equals(tbar.Tag)).Single();
 
-                    box.Text = Math.Round(first, 2).ToString();   //trackbar to textbox value
+                    box.Text = item.BoxValue;   //trackbar to textbox value
                 }
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbar.Name, (double)tbar.Value * 0.01));
+                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(item.Name, item.Value));
             }
         }
         /// <summary>
@@ -396,21 +396,22 @@ namespace FamilyEditorInterface
         /// <param name="e"></param>
         private void textBox_KeyDown(object sender, KeyEventArgs e)
         {
-            System.Windows.Forms.TextBox tbox = sender as System.Windows.Forms.TextBox;
             if (e.KeyCode == Keys.Enter)
             {
-                double first = Convert.ToDouble(tbox.Text);
-                int second = Convert.ToInt32(Utils.convertValueFROM(first * 100));
+                System.Windows.Forms.TextBox tbox = sender as System.Windows.Forms.TextBox;
+                FamilyEditorItem item = tbox.Tag as FamilyEditorItem;
+
+                item.BoxValue = tbox.Text;
 
                 TrackBar tbar = mainPanel.Controls.OfType<TrackBar>().Where(x => x.Tag.Equals(tbox.Tag)).Single();
 
-                if (second < tbar.Maximum) tbar.Value = second;  //textbox to trackbar value
+                if (item.BarValue < tbar.Maximum) tbar.Value = item.BarValue;  //textbox to trackbar value
                 else
                 {
-                    tbar.Maximum = second * 2;
-                    tbar.Value = second;
+                    tbar.Maximum = item.BarValue * 2;
+                    tbar.Value = item.BarValue;
                 }
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbox.Name, (double)(Utils.convertValueFROM(Convert.ToDouble(tbox.Text)))));
+                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(item.Name, item.Value));
             }
         }
         /// <summary>
