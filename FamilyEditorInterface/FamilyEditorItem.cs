@@ -13,27 +13,22 @@ namespace FamilyEditorInterface
         private Tuple<string, string> textBox = null;
         private Tuple<string, int> trackBar = null;
         private Tuple<string, double> label = null;
-        private string name;
-        private double value;
+        private Tuple<string, double> request = null;
+        private Tuple<string, string, double> restore = null;
+        private string name,oldName;
+        private double value, oldValue;
         private string type;
         private int barValue;
         private string boxValue;
+        private bool checkValue, initialName, initialValue;
 
         public FamilyEditorItem()
         {
             name = "";
             value = 0.0;
-        }
-        public string Type
-        {
-            get
-            {
-                return type;
-            }
-            set
-            {
-                type = value;
-            }
+            request = new Tuple<string, double>(name, value);
+            restore = new Tuple<string, string, double>(name, name, value);
+            initialName = initialValue = true;
         }
         public string Name
         {
@@ -44,53 +39,32 @@ namespace FamilyEditorInterface
             internal set
             {
                 name = value;
-                if (checkBox != null)
+                if(initialName)
                 {
-                    checkBox = new Tuple<string, double>(value, checkBox.Item2);
+                    oldName = value;
+                    initialName = false;
                 }
-                if (textBox != null)
-                {
-                    textBox = new Tuple<string, string>(value, textBox.Item2);
-                }
-                if (trackBar != null) 
-                {
-                    trackBar = new Tuple<string, int>(value, trackBar.Item2);
-                }
-                if (label != null)
-                {
-                    label = new Tuple<string, double>(value, label.Item2);
-                }
+                RefreshValues();
             }
         }
-        public string BoxValue
+        public double Value
         {
             get
             {
-                return boxValue;
+                return value;
             }
-            set
+            internal set
             {
-                if (value == null) return;
-                this.value = Utils.convertValueFROM(Convert.ToDouble(value));
-                this.barValue = Convert.ToInt32(this.value * 100);
-                this.boxValue = value;
-                
-                if (checkBox != null)
+                this.value = value;
+                if(initialValue)
                 {
-                    checkBox = new Tuple<string, double>(checkBox.Item1, this.value);
+                    oldValue = value;
+                    initialValue = false;
                 }
-                if (textBox != null)
-                {
-                    textBox = new Tuple<string, string>(textBox.Item1, this.boxValue);
-                }
-                if (trackBar != null)
-                {
-                    trackBar = new Tuple<string, int>(trackBar.Item1, this.barValue);
-                }
-                if (label != null)
-                {
-                    label = new Tuple<string, double>(label.Item1, this.value);
-                }
+                this.barValue = Convert.ToInt32(value * 100);
+                this.boxValue = Math.Round(Utils.convertValueTO(this.value), 2).ToString();
+
+                RefreshValues();
             }
         }
         public int BarValue
@@ -105,54 +79,96 @@ namespace FamilyEditorInterface
                 this.barValue = value;
                 this.boxValue = Math.Round(Utils.convertValueTO(this.value), 2).ToString();
 
-                if (checkBox != null)
-                {
-                    checkBox = new Tuple<string, double>(checkBox.Item1, this.value);
-                }
-                if (textBox != null)
-                {
-                    textBox = new Tuple<string, string>(textBox.Item1, this.boxValue);
-                }
-                if (trackBar != null)
-                {
-                    trackBar = new Tuple<string, int>(trackBar.Item1, this.barValue);
-                }
-                if (label != null)
-                {
-                    label = new Tuple<string, double>(label.Item1, this.value);
-                }
+                RefreshValues();
             }
         }
-        public double Value
+        public string BoxValue
         {
             get
             {
-                return value;
+                return boxValue;
             }
-            internal set
+            set
             {
-                this.value = value;
-                this.barValue = Convert.ToInt32(value * 100);
-                this.boxValue = Math.Round(Utils.convertValueTO(this.value), 2).ToString();
+                if (value == null) return;
+                this.value = Utils.convertValueFROM(Convert.ToDouble(value));
+                this.barValue = Convert.ToInt32(this.value * 100);
+                this.boxValue = value;
 
-
-                if (checkBox != null)
-                {
-                    checkBox = new Tuple<string, double>(checkBox.Item1, value);
-                }
-                if (textBox != null)
-                {
-                    textBox = new Tuple<string, string>(textBox.Item1, this.boxValue);
-                }
-                if (trackBar != null)
-                {
-                    trackBar = new Tuple<string, int>(trackBar.Item1, this.barValue);
-                }
-                if (label != null)
-                {
-                    label = new Tuple<string, double>(label.Item1, value);
-                }
+                RefreshValues();
             }
+        }
+        public bool CheckValue
+        {
+            get
+            {
+                return checkValue;
+            }
+            set
+            {
+                this.value = (double)(value ? 1.0 : 0.0);
+                this.checkValue = value;
+
+                RefreshValues();
+            }
+        }
+
+        public Tuple<string, double> Request
+        {
+            get
+            {
+                return request;
+            }
+        }
+        public Tuple<string, string, double> Restore
+        {
+            get
+            {
+                return restore;
+            }
+        }
+        public string Type
+        {
+            get
+            {
+                return type;
+            }
+            set
+            {
+                type = value;
+            }
+        }
+        public void RestoreDefaults()
+        {
+            this.name = this.oldName;
+            this.Value = this.oldValue;
+        }
+        public void SaveDefaults()
+        {
+            this.oldName = this.name;
+            this.oldValue = this.value;
+        }
+        private void RefreshValues()
+        {
+            if (checkBox != null)
+            {
+                checkBox = new Tuple<string, double>(this.name, this.value);
+            }
+            if (textBox != null)
+            {
+                textBox = new Tuple<string, string>(this.name, this.boxValue);
+            }
+            if (trackBar != null)
+            {
+                trackBar = new Tuple<string, int>(this.name, this.barValue);
+            }
+            if (label != null)
+            {
+                label = new Tuple<string, double>(this.name, this.value);
+            }
+
+            request = new Tuple<string, double>(this.name, this.value);
+            restore = new Tuple<string, string, double>(this.name, this.oldName, this.value);
         }
         public void addCheckbox()
         {

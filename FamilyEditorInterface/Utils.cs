@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FamilyEditorInterface
@@ -94,6 +95,33 @@ namespace FamilyEditorInterface
             else
             {
                 return source;
+            }
+        }
+        /// <summary>
+        /// Check if a string contains unallowed characters
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        internal static bool UnallowedChacarcters(string text)
+        {
+            var regexItem = new Regex("^[a-zA-Z0-9 _!-]+$");
+            bool result = regexItem.IsMatch(text);
+            return(result ?  true :  false);
+        }
+        /// <summary>
+        /// Check if it's a Family Document
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        internal static Autodesk.Revit.DB.Document checkDoc(Autodesk.Revit.DB.Document document)
+        {
+            if (document.IsFamilyDocument)
+            {
+                return document;
+            }
+            else
+            {
+                return null;
             }
         }
     }

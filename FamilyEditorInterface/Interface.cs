@@ -29,7 +29,7 @@ namespace FamilyEditorInterface
         private Stream _imageStream;
         private Bitmap _imageMini;
         private Bitmap _imageMaxi;
-        private List<FamilyEditorItem> result, backup;
+        private List<FamilyEditorItem> items;
         private float scale_x, scale_y;
 
         // change label text fields
@@ -57,8 +57,17 @@ namespace FamilyEditorInterface
             this.exEvent = exEvent;
             this.handler = handler;
             this.uiapp = uiapp;
+            
+            this.scale_x = this.CreateGraphics().DpiX / 100;
+            this.scale_y = this.CreateGraphics().DpiY / 100;
+
+            ThisDocumentCollect();
+            DisplayData();
+        }
+        internal void ThisDocumentCollect()
+        {
             this.uidoc = uiapp.ActiveUIDocument;
-            this.doc = checkDoc(uidoc.Document);
+            this.doc = Utils.checkDoc(uidoc.Document);
             if (doc == null)
             {
                 this.InvalidDocument();
@@ -67,21 +76,34 @@ namespace FamilyEditorInterface
             Utils.Init(this.doc);
             this.projectParameters = new ProjectParameters(doc);
             this.Text = title + String.Format(" - {0}", Utils.Truncate(doc.Title, 10));
-            this.result = this.projectParameters.CollectData();
-            this.backup = this.projectParameters.CollectData();
-            this.scale_x = this.CreateGraphics().DpiX / 100;
-            this.scale_y = this.CreateGraphics().DpiY / 100;
-
+            this.items = this.projectParameters.CollectData();
+        }
+        internal void ThisDocumentChanged()
+        {
+            ThisDocumentCollect();
+            DisplayData();
+        }        
+        /// <summary>
+        /// Save Default Parameter Values
+        /// </summary>
+        private void SaveDefaults()
+        {
+            //items = projectParameters.CollectData();
+            items.ForEach(x => x.SaveDefaults());
+        }
+        private void LoadDefaults()
+        {
+            MakeRequest(RequestId.RestoreAll, items.Select(x => x.Restore).ToList());
+            items.ForEach(x => x.RestoreDefaults());
             DisplayData();
         }
-
         #region Form Settup
         private void DisplayData()
         {
             this.mainPanel.Controls.Clear();
             this.offPanel.Controls.Clear();
 
-            if (result.Count == 0)
+            if (this.items.Count == 0)
             {
                 this.mainContainer.Panel1.Controls.Add(WarningLabel("No active parameters"));
             }
@@ -91,7 +113,7 @@ namespace FamilyEditorInterface
             List<System.Windows.Forms.Control> items = new List<System.Windows.Forms.Control>();
             List<System.Windows.Forms.Control> checks = new List<System.Windows.Forms.Control>();
 
-            foreach (FamilyEditorItem item in result)
+            foreach (FamilyEditorItem item in this.items)
             {
                 if (item.getCheckbox() != null)
                 {
@@ -242,17 +264,6 @@ namespace FamilyEditorInterface
 
             return chk;
         }
-
-        private void paramNameChanged(object sender, EventArgs e)
-        {
-            Label lbl = (Label)sender;
-            string newName = lbl.Text;
-            MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(lbl.Name, newName));
-            FamilyEditorItem item = result.First(x => x.Name.Equals(lbl.Name));
-            item.Name = newName;
-            FamilyItemsToFormElements(item);
-        }
-
         /// <summary>
         /// Prepare the minimize and maximize icons
         /// </summary>
@@ -268,62 +279,6 @@ namespace FamilyEditorInterface
 
         #region Form Action
 
-        private Autodesk.Revit.DB.Document checkDoc(Autodesk.Revit.DB.Document document)
-        {
-            if (document.IsFamilyDocument)
-            {
-                return document;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private void RecollectData()
-        {
-            result = projectParameters.CollectData();
-            projectParameters.syncDefaults(result, backup);
-            DisplayData();
-        }
-        internal void ThisDocumentChanged()
-        {
-            this.doc = uiapp.ActiveUIDocument.Document;
-            Utils.Init(this.doc);
-            this.projectParameters = new ProjectParameters(doc);
-            this.Text = title + String.Format(" - {0}", Utils.Truncate(doc.Title, 10));
-            this.result = this.projectParameters.CollectData();
-            this.backup = this.projectParameters.CollectData();
-
-            RecollectData();
-        }
-        /// <summary>
-        /// Document Changed triggered event
-        /// </summary>
-        internal void DocumentChanged()
-        {
-            RecollectData();
-        }
-        private void Reset()
-        {
-            result = backup;
-            DisplayData();
-        }
-
-        private void SaveDefaults()
-        {
-            result = projectParameters.CollectData();
-            backup = result;
-        }
-        internal Autodesk.Revit.DB.Document Document()
-        {
-            if (this.doc.IsValidObject) return this.doc;
-            else return null;
-        }
-        internal void Document(Autodesk.Revit.DB.Document doc)
-        {
-            this.doc = doc;
-        }
         protected override CreateParams CreateParams
         {
             get
@@ -350,6 +305,28 @@ namespace FamilyEditorInterface
             return l;
         }
         /// <summary>
+        /// On Parameter Name Change
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void paramNameChanged(object sender, EventArgs e)
+        {
+            Label lbl = sender as Label;
+            FamilyEditorItem item = lbl.Tag as FamilyEditorItem;
+            if (!Utils.UnallowedChacarcters(lbl.Name))
+            {
+                lbl.Name = storeOldLabelValue;
+                return;
+            }
+            string newName = lbl.Name;            
+            // First update the Revit Parameter name 
+            // Second update the item
+            // Third update all other controls connected with this paramter/familyeditoritem
+            MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(item.Name, newName));
+            item.Name = newName;
+            FamilyItemsToFormElements(item);
+        }
+        /// <summary>
         /// On update
         /// </summary>
         /// <param name="sender"></param>
@@ -371,7 +348,7 @@ namespace FamilyEditorInterface
 
                     box.Text = item.BoxValue;   //trackbar to textbox value
                 }
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(item.Name, item.Value));
+                MakeRequest(RequestId.SlideParam, item.Request);
             }
         }
         /// <summary>
@@ -381,12 +358,16 @@ namespace FamilyEditorInterface
         /// <param name="e"></param>
         private void checkBox_MouseUp(object sender, MouseEventArgs e)
         {
-            CheckBox cbox = sender as CheckBox;
-
             if (user_done_updating)
             {
                 user_done_updating = false;
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(cbox.Name, (double)(cbox.Checked ? 1.0 : 0.0)));
+
+                CheckBox cbox = sender as CheckBox;
+                FamilyEditorItem item = cbox.Tag as FamilyEditorItem;
+
+                item.CheckValue = cbox.Checked;
+
+                MakeRequest(RequestId.SlideParam, item.Request);
             }
         }
         /// <summary>
@@ -411,7 +392,7 @@ namespace FamilyEditorInterface
                     tbar.Maximum = item.BarValue * 2;
                     tbar.Value = item.BarValue;
                 }
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(item.Name, item.Value));
+                MakeRequest(RequestId.SlideParam, item.Request);
             }
         }
         /// <summary>
@@ -429,27 +410,20 @@ namespace FamilyEditorInterface
             // do not forget to call the base class
             base.OnFormClosed(e);
         }
-        /// <summary>
-        /// Change Parameter Name
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="value"></param>
-        private void MakeRequest(RequestId request, Tuple<string, string> value)
+        private void MakeRequest(RequestId request, Tuple<string, string> renameValue)
         {
             //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.Value(new List<Tuple<string, string>>() { value });
+            handler.Request.RenameValue(new List<Tuple<string, string>>() { renameValue });
             handler.Request.Make(request);
             exEvent.Raise();
         }
-        /// <summary>
-        ///   A private helper method to make a request
-        ///   and put the dialog to sleep at the same time.
-        /// </summary>
-        /// <remarks>
-        ///   It is expected that the process which executes the request 
-        ///   (the Idling helper in this particular case) will also
-        ///   wake the dialog up after finishing the execution.
-        /// </remarks>
+        private void MakeRequest(RequestId request, List<Tuple<string, string>> renameValue)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.RenameValue(renameValue);
+            handler.Request.Make(request);
+            exEvent.Raise();
+        }
         private void MakeRequest(RequestId request, Tuple<string, double> value)
         {
             //MessageBox.Show("You are in the Control.Request event.");
@@ -457,16 +431,24 @@ namespace FamilyEditorInterface
             handler.Request.Make(request);
             exEvent.Raise();
         }
-        /// <summary>
-        /// Similar to the MakeRequest method taking a single tuplet, 
-        /// this one provides the whole List
-        /// </summary>
-        /// <param name="request">The request.</param>
-        /// <param name="value">The value.</param>
         private void MakeRequest(RequestId request, List<Tuple<string, double>> value)
         {
             //MessageBox.Show("You are in the Control.Request event.");
             handler.Request.Value(value);
+            handler.Request.Make(request);
+            exEvent.Raise();
+        }
+        private void MakeRequest(RequestId request, Tuple<string, string, double> value)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.AllValues(new List<Tuple<string, string, double>>() { value });
+            handler.Request.Make(request);
+            exEvent.Raise();
+        }
+        private void MakeRequest(RequestId request, List<Tuple<string, string, double>> value)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.AllValues(value);
             handler.Request.Make(request);
             exEvent.Raise();
         }
@@ -511,7 +493,7 @@ namespace FamilyEditorInterface
             {
                 if (sameDocument())
                 {
-                    this.DocumentChanged();
+                    this.ThisDocumentChanged();
                 }
             }
             catch (Exception)
@@ -577,7 +559,7 @@ namespace FamilyEditorInterface
             maximizeIcon.Image = (mainContainer.Panel2Collapsed) ? _imageMaxi : _imageMini;
         }
         /// <summary>
-        /// Loads Defaults
+        /// Restore Defaults
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
@@ -586,25 +568,17 @@ namespace FamilyEditorInterface
             if (!validDocument()) return;
             if (sameDocument())
             {
-                List<Tuple<string, double>> value = projectParameters.GetValues(backup);
-                RestoreValues(backup);
-                MakeRequest(RequestId.SlideParam, value);
-                Reset();
+                LoadDefaults();
             }
-        }
-
-        private void RestoreValues(List<FamilyEditorItem> backup)
-        {
-            foreach(var item in backup)
-            {
-                FamilyItemsToFormElements((FamilyEditorItem)item);
-            }
-        }
+        }        
         
         private void FamilyItemsToFormElements(FamilyEditorItem item)
         {
             System.Windows.Forms.TextBox tbox = mainPanel.Controls.OfType<System.Windows.Forms.TextBox>().Where(x => x.Tag.Equals(item)).SingleOrDefault();
-            if(tbox != null) tbox.Name = item.Name;
+            if (tbox != null)
+            {
+                tbox.Name = item.Name;
+            }
             System.Windows.Forms.TrackBar tbar = mainPanel.Controls.OfType<System.Windows.Forms.TrackBar>().Where(x => x.Tag.Equals(item)).SingleOrDefault();
             if(tbar != null)
             {
@@ -635,6 +609,7 @@ namespace FamilyEditorInterface
             if (sameDocument())
             {
                 SaveDefaults();
+                DisplayData();
             }
         }
         /// <summary>
@@ -659,8 +634,8 @@ namespace FamilyEditorInterface
 
         private void AssociateEditorWithLabel(Label label)
         {
-            storeOldLabelValue = label.Text;
-            editWindow.Text = label.Text;
+            storeOldLabelValue = label.Name;
+            editWindow.Text = label.Name;
             label.ForeColor = SystemColors.Control;
             labelBeingEdited = label;
         }
@@ -682,7 +657,8 @@ namespace FamilyEditorInterface
         }
         private void FinalizeEdit()
         {
-            labelBeingEdited.Text = editWindow.Text;
+            labelBeingEdited.Name = editWindow.Text;
+            labelBeingEdited.Text = Utils.Truncate(editWindow.Text, 15);
             labelBeingEdited.Focus();
             labelBeingEdited.ForeColor = SystemColors.ControlText;
 

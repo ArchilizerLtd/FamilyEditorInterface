@@ -162,14 +162,14 @@ namespace FamilyEditorInterface
                 IList<String> operations = e.GetTransactionNames();
                 if (operations.Contains("Delete param") || operations.Contains("New param"))
                 {
-                    m_MyForm.DocumentChanged();
+                    m_MyForm.ThisDocumentChanged();
                 } 
                 else if (operations.Contains("Family Types"))
                 {
                     //not sure how to filter that
                     //ICollection<ElementId> changedId = e.GetModifiedElementIds();
                     //m_MyForm.ElementChanged(changedId);
-                    m_MyForm.DocumentChanged();
+                    m_MyForm.ThisDocumentChanged();
                 }
             }
         }

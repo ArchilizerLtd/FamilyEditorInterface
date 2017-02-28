@@ -204,20 +204,5 @@ namespace FamilyEditorInterface
         {
             list = list.OrderBy(x => x.Name).ToList();
         }
-        /// <summary>
-        /// Transforms list of items to list of tuplets
-        /// Used for returning default values to the project parameters
-        /// </summary>
-        /// <param name="backup"></param>
-        /// <returns></returns>
-        internal List<Tuple<string, double>> GetValues(List<FamilyEditorItem> backup)
-        {
-            List<Tuple<string, double>> value = new List<Tuple<string, double>>();
-            foreach(var item in backup)
-            {
-                value.Add(new Tuple<string, double>(item.Name, item.Value));
-            }
-            return value;
-        }
     }
 }
