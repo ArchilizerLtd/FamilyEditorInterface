@@ -21,6 +21,7 @@ namespace FamilyEditorInterface
         private int barValue;
         private string boxValue;
         private bool checkValue, initialName, initialValue;
+        private bool associated;
 
         public FamilyEditorItem()
         {
@@ -91,9 +92,16 @@ namespace FamilyEditorInterface
             set
             {
                 if (value == null) return;
-                this.value = Utils.convertValueFROM(Convert.ToDouble(value));
-                this.barValue = Convert.ToInt32(this.value * 100);
-                this.boxValue = value;
+                try
+                {
+                    this.value = Utils.convertValueFROM(Convert.ToDouble(value));
+                    this.barValue = Convert.ToInt32(this.value * 100);
+                    this.boxValue = value;
+                }
+                catch(Exception)
+                {
+                    return;
+                }
 
                 RefreshValues();
             }
@@ -138,6 +146,18 @@ namespace FamilyEditorInterface
                 type = value;
             }
         }
+
+        public bool Associated
+        {
+            get
+            {
+                return associated;
+            }
+            internal set
+            {
+                associated = value;
+            }
+        }
         public void RestoreDefaults()
         {
             this.name = this.oldName;
@@ -168,7 +188,7 @@ namespace FamilyEditorInterface
             }
 
             request = new Tuple<string, double>(this.name, this.value);
-            restore = new Tuple<string, string, double>(this.name, this.oldName, this.value);
+            restore = new Tuple<string, string, double>(this.name, this.oldName, this.oldValue);
         }
         public void addCheckbox()
         {

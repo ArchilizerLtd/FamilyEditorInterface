@@ -77,9 +77,31 @@ namespace FamilyEditorInterface
 
             //add controlls
             List<ElementId> eId = new List<ElementId>();
-            
+
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            List<Dimension> dimList = collector
+                .OfCategory(BuiltInCategory.OST_Dimensions)
+                .WhereElementIsNotElementType()
+                .Cast<Dimension>()
+                .ToList();
+
+            List<FamilyParameter> paramUsed = new List<FamilyParameter>();
+
+            foreach(Dimension dim in dimList)
+            {
+                try
+                {
+                    if (dim.FamilyLabel != null) paramUsed.Add(dim.FamilyLabel);
+                }
+                catch(Exception)
+                {
+
+                }
+            }
+
             foreach (FamilyParameter fp in famParam.Values)
             {
+                bool associated = !fp.AssociatedParameters.IsEmpty || paramUsed.Any(x => x.Definition.Name.Equals(fp.Definition.Name));
                 ///yes-no parameters
                 if (fp.Definition.ParameterType.Equals(ParameterType.YesNo))
                 {
@@ -87,10 +109,11 @@ namespace FamilyEditorInterface
                     
                     eId.Add(fp.Id);
 
-                    FamilyEditorItem newItem = new FamilyEditorItem();
+                    FamilyEditorItem newItem = new FamilyEditorItem(); // collect data yes-no
                     newItem.Name = fp.Definition.Name;
                     newItem.Value = value;
                     newItem.Type = fp.Definition.ParameterType.ToString();
+                    newItem.Associated = associated;
 
                     newItem.addCheckbox();         
 
@@ -109,10 +132,11 @@ namespace FamilyEditorInterface
                 
                 if (value != 0)
                 {
-                    FamilyEditorItem newItem = new FamilyEditorItem();
+                    FamilyEditorItem newItem = new FamilyEditorItem();  // collect data slider, value != 0
                     newItem.Name = fp.Definition.Name;
                     newItem.Value = value;
                     newItem.Type = fp.Definition.ParameterType.ToString();
+                    newItem.Associated = associated;
 
                     newItem.addTrackbar();
                     newItem.addLabel();
@@ -128,10 +152,11 @@ namespace FamilyEditorInterface
                 }
                 else
                 {
-                    FamilyEditorItem newItem = new FamilyEditorItem();
+                    FamilyEditorItem newItem = new FamilyEditorItem(); // collect data slider, value == 0
                     newItem.Name = fp.Definition.Name;
                     newItem.Value = value;
                     newItem.Type = fp.Definition.ParameterType.ToString();
+                    newItem.Associated = associated;
 
                     newItem.addTrackbar();
                     newItem.addLabel();

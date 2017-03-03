@@ -37,6 +37,9 @@ namespace FamilyEditorInterface
         System.Windows.Forms.TextBox editWindow = new System.Windows.Forms.TextBox();
         bool editWindowActive = false;
         string storeOldLabelValue;
+        // change text box field
+        System.Windows.Forms.TextBox textBoxBeingEdited = new System.Windows.Forms.TextBox();
+        bool editTextBoxActive = false;
 
         /// <summary>
         /// Constructor
@@ -113,6 +116,8 @@ namespace FamilyEditorInterface
             List<System.Windows.Forms.Control> items = new List<System.Windows.Forms.Control>();
             List<System.Windows.Forms.Control> checks = new List<System.Windows.Forms.Control>();
 
+            this.items = this.items.OrderBy(x => x.Name).ToList();
+
             foreach (FamilyEditorItem item in this.items)
             {
                 if (item.getCheckbox() != null)
@@ -178,6 +183,8 @@ namespace FamilyEditorInterface
             
             txt.Size = new Size(Convert.ToInt32(scale_x * 34), 10);
             txt.KeyDown += new KeyEventHandler(textBox_KeyDown);
+            txt.LostFocus += textBoxLostFocus;
+            txt.TextChanged += textBoxEdited;
             txt.Name = s;
             txt.Text = d;
             txt.BackColor = System.Drawing.SystemColors.Control;
@@ -189,6 +196,7 @@ namespace FamilyEditorInterface
             return txt;
         }
 
+
         private Label createLabel(FamilyEditorItem item)
         {
             Label lbl = new Label();
@@ -199,6 +207,7 @@ namespace FamilyEditorInterface
             lbl.AutoSize = true;
             lbl.MaximumSize = new Size(Convert.ToInt32(scale_x * 70), 0);
             lbl.Font = new Font("Arial", 8);
+            if (!item.Associated) lbl.ForeColor = System.Drawing.Color.FromArgb(20, 200, 60); 
             lbl.Text = Utils.Truncate(s, 15);
             lbl.Name = s;
             lbl.Visible = true;
@@ -370,6 +379,41 @@ namespace FamilyEditorInterface
                 MakeRequest(RequestId.SlideParam, item.Request);
             }
         }
+        private void textBoxEdited(object sender, EventArgs e)
+        {
+            if (!editTextBoxActive)
+            {
+                textBoxBeingEdited = sender as System.Windows.Forms.TextBox;
+                editTextBoxActive = true;
+            }
+        }
+
+        private void textBoxLostFocus(object sender, EventArgs e)
+        {
+            if (editTextBoxActive)
+            {
+                editTextBoxActive = false;
+                FinalizeTextBoxEdit();
+            }
+        }
+
+        private void FinalizeTextBoxEdit()
+        {
+            System.Windows.Forms.TextBox tbox = textBoxBeingEdited;
+            FamilyEditorItem item = tbox.Tag as FamilyEditorItem;
+
+            item.BoxValue = tbox.Text;
+
+            TrackBar tbar = mainPanel.Controls.OfType<TrackBar>().Where(x => x.Tag.Equals(tbox.Tag)).Single();
+
+            if (item.BarValue < tbar.Maximum) tbar.Value = item.BarValue;  //textbox to trackbar value
+            else
+            {
+                tbar.Maximum = item.BarValue * 2;
+                tbar.Value = item.BarValue;
+            }
+            MakeRequest(RequestId.SlideParam, item.Request);
+        }
         /// <summary>
         /// On update for textbox
         /// </summary>
@@ -379,20 +423,11 @@ namespace FamilyEditorInterface
         {
             if (e.KeyCode == Keys.Enter)
             {
-                System.Windows.Forms.TextBox tbox = sender as System.Windows.Forms.TextBox;
-                FamilyEditorItem item = tbox.Tag as FamilyEditorItem;
-
-                item.BoxValue = tbox.Text;
-
-                TrackBar tbar = mainPanel.Controls.OfType<TrackBar>().Where(x => x.Tag.Equals(tbox.Tag)).Single();
-
-                if (item.BarValue < tbar.Maximum) tbar.Value = item.BarValue;  //textbox to trackbar value
-                else
+                if(editTextBoxActive)
                 {
-                    tbar.Maximum = item.BarValue * 2;
-                    tbar.Value = item.BarValue;
+                    editTextBoxActive = false;
+                    FinalizeTextBoxEdit();
                 }
-                MakeRequest(RequestId.SlideParam, item.Request);
             }
         }
         /// <summary>
@@ -492,6 +527,10 @@ namespace FamilyEditorInterface
             try
             {
                 if (sameDocument())
+                {
+                    this.DisplayData();
+                }
+                else
                 {
                     this.ThisDocumentChanged();
                 }
@@ -650,33 +689,35 @@ namespace FamilyEditorInterface
             editWindowActive = true;
             editWindow.KeyUp += TextBoxKeyUp;
             editWindow.Leave += TextBoxLeave;
+            editWindow.LostFocus += TextBoxLeave;
         }
         private void TextBoxLeave(object sender, EventArgs e)
         {
-            FinalizeEdit();
+            if (editWindowActive) FinalizeEdit();
         }
         private void FinalizeEdit()
         {
-            labelBeingEdited.Name = editWindow.Text;
-            labelBeingEdited.Text = Utils.Truncate(editWindow.Text, 15);
+            editWindowActive = false;
+            labelBeingEdited.Name = items.Any(x => x.Name.Equals(editWindow.Text)) ? storeOldLabelValue : editWindow.Text;
+            labelBeingEdited.Text = Utils.Truncate(labelBeingEdited.Name, 15);
             labelBeingEdited.Focus();
             labelBeingEdited.ForeColor = SystemColors.ControlText;
 
             editWindow.Visible = false;
             editWindow.SendToBack();
-            editWindowActive = false;
+            this.DisplayData();
         }
         private void TextBoxKeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                FinalizeEdit();
+                if (editWindowActive) FinalizeEdit();
                 e.Handled = true;
             }
             if (e.KeyCode == Keys.Escape)
             {
                 editWindow.Text = storeOldLabelValue;
-                FinalizeEdit();
+                if (editWindowActive) FinalizeEdit();
                 e.Handled = true;
             }
         }

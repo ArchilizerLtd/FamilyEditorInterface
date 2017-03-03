@@ -111,17 +111,11 @@ namespace FamilyEditorInterface
                         if (trans.Start(text) == TransactionStatus.Started)
                         {
                             mgr.Set(fp, value.Item3);
+                            //operation(mgr, fp);
                             doc.Regenerate();
+                            if (!value.Item1.Equals(value.Item2)) mgr.RenameParameter(fp, value.Item2);
                             trans.Commit();
                             uidoc.RefreshActiveView();
-                        }
-                        if(trans.Start(text + "_1") == TransactionStatus.Started)
-                        {
-                            if (!value.Item1.Equals(value.Item2))
-                            {
-                                mgr.RenameParameter(fp, value.Item2);
-                            }
-                            trans.Commit();
                         }
                     }
                 }
