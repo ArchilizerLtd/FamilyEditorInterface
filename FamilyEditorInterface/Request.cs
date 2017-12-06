@@ -69,6 +69,7 @@ namespace FamilyEditorInterface
         // try tp tramsport information
         private List<Tuple<string, double>> value;
         private List<Tuple<string, string>> renameValue;
+        private List<string> deleteValue;
         private List<Tuple<string, string, double>> allValues;
         /// <summary>
         ///   Take - The Idling handler calls this to obtain the latest request. 
@@ -103,9 +104,18 @@ namespace FamilyEditorInterface
         {
             this.renameValue = renameValue;
         }
+        internal void DeleteValue(List<string> deleteValue)
+        {
+            this.deleteValue = deleteValue;
+        }
         internal void AllValues(List<Tuple<string, string, double>> allValues)
         {
             this.allValues = allValues;
+        }
+        // try to transport the message
+        internal List<string> GetDeleteValue()
+        {
+            return this.deleteValue;
         }
         // try to transport the message
         internal List<Tuple<string, double>> GetValue()

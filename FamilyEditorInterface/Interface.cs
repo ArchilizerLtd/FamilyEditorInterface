@@ -31,6 +31,8 @@ namespace FamilyEditorInterface
         private Bitmap _imageMaxi;
         private List<FamilyEditorItem> items;
         private float scale_x, scale_y;
+        private System.Drawing.Color inactiveColor = System.Drawing.Color.FromArgb(120, 100, 150);
+        private int precision;
 
         // change label text fields
         Label labelBeingEdited = new Label();
@@ -64,22 +66,27 @@ namespace FamilyEditorInterface
             this.scale_x = this.CreateGraphics().DpiX / 100;
             this.scale_y = this.CreateGraphics().DpiY / 100;
 
-            ThisDocumentCollect();
-            DisplayData();
+            this.doc = ThisDocumentCollect();
+            if(this.doc != null)
+            {
+                DisplayData();
+            }
         }
-        internal void ThisDocumentCollect()
+        internal Autodesk.Revit.DB.Document ThisDocumentCollect()
         {
+            Autodesk.Revit.DB.Document checkDoc = null;
             this.uidoc = uiapp.ActiveUIDocument;
-            this.doc = Utils.checkDoc(uidoc.Document);
-            if (doc == null)
+            checkDoc = Utils.checkDoc(uidoc.Document);
+            if (checkDoc == null)
             {
                 this.InvalidDocument();
-                return;
+                return checkDoc;
             }
-            Utils.Init(this.doc);
-            this.projectParameters = new ProjectParameters(doc);
-            this.Text = title + String.Format(" - {0}", Utils.Truncate(doc.Title, 10));
+            Utils.Init(checkDoc);
+            this.projectParameters = new ProjectParameters(checkDoc);
+            this.Text = title + String.Format(" - {0}", Utils.Truncate(checkDoc.Title, 10));
             this.items = this.projectParameters.CollectData();
+            return checkDoc;
         }
         internal void ThisDocumentChanged()
         {
@@ -169,7 +176,7 @@ namespace FamilyEditorInterface
             error.Text = message;
             error.TextAlign = ContentAlignment.MiddleCenter;
             error.AutoSize = true;
-            error.Padding = new Padding(Convert.ToInt32(scale_x * 55), 35, 0, 0); //check if it works
+            error.Padding = new Padding(Convert.ToInt32(scale_x * 55), 25, 0, 0); //check if it works
             error.ForeColor = System.Drawing.Color.DarkGray;
 
             return error;
@@ -207,7 +214,8 @@ namespace FamilyEditorInterface
             lbl.AutoSize = true;
             lbl.MaximumSize = new Size(Convert.ToInt32(scale_x * 70), 0);
             lbl.Font = new Font("Arial", 8);
-            if (!item.Associated) lbl.ForeColor = System.Drawing.Color.FromArgb(20, 200, 60); 
+            // Inactive parameter
+            if (!item.Associated) lbl.ForeColor = inactiveColor; 
             lbl.Text = Utils.Truncate(s, 15);
             lbl.Name = s;
             lbl.Visible = true;
@@ -265,6 +273,8 @@ namespace FamilyEditorInterface
             chk.Text = Utils.Truncate(s, 18);
 
             chk.Checked = Convert.ToInt32(d) == 1 ? true : false;
+            // Inactive parameter
+            if (!item.Associated) chk.ForeColor = inactiveColor;
             chk.MouseUp += new System.Windows.Forms.MouseEventHandler(checkBox_MouseUp);
             chk.Click += new EventHandler(trackBar_ValueChanged);
             chk.Padding = new Padding(3, 3, 3, 3);
@@ -403,16 +413,22 @@ namespace FamilyEditorInterface
             FamilyEditorItem item = tbox.Tag as FamilyEditorItem;
 
             item.BoxValue = tbox.Text;
-
-            TrackBar tbar = mainPanel.Controls.OfType<TrackBar>().Where(x => x.Tag.Equals(tbox.Tag)).Single();
-
-            if (item.BarValue < tbar.Maximum) tbar.Value = item.BarValue;  //textbox to trackbar value
-            else
+            try
             {
-                tbar.Maximum = item.BarValue * 2;
-                tbar.Value = item.BarValue;
+                TrackBar tbar = mainPanel.Controls.OfType<TrackBar>().Where(x => x.Tag.Equals(tbox.Tag)).Single();
+
+                if (item.BarValue < tbar.Maximum) tbar.Value = item.BarValue;  //textbox to trackbar value
+                else
+                {
+                    tbar.Maximum = item.BarValue * 2;
+                    tbar.Value = item.BarValue;
+                }
+                MakeRequest(RequestId.SlideParam, item.Request);
             }
-            MakeRequest(RequestId.SlideParam, item.Request);
+            catch(Exception)
+            {
+
+            }
         }
         /// <summary>
         /// On update for textbox
@@ -452,10 +468,10 @@ namespace FamilyEditorInterface
             handler.Request.Make(request);
             exEvent.Raise();
         }
-        private void MakeRequest(RequestId request, List<Tuple<string, string>> renameValue)
+        private void MakeRequest(RequestId request, string deleteValue)
         {
             //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.RenameValue(renameValue);
+            handler.Request.DeleteValue(new List<string>() { deleteValue });
             handler.Request.Make(request);
             exEvent.Raise();
         }
@@ -463,20 +479,6 @@ namespace FamilyEditorInterface
         {
             //MessageBox.Show("You are in the Control.Request event.");
             handler.Request.Value(new List<Tuple<string, double>>() { value });
-            handler.Request.Make(request);
-            exEvent.Raise();
-        }
-        private void MakeRequest(RequestId request, List<Tuple<string, double>> value)
-        {
-            //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.Value(value);
-            handler.Request.Make(request);
-            exEvent.Raise();
-        }
-        private void MakeRequest(RequestId request, Tuple<string, string, double> value)
-        {
-            //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.AllValues(new List<Tuple<string, string, double>>() { value });
             handler.Request.Make(request);
             exEvent.Raise();
         }
@@ -666,11 +668,29 @@ namespace FamilyEditorInterface
         private void labelChange(object sender, EventArgs e)
         {
             Label label = sender as Label;
-            if (editWindowActive) FinalizeEdit();
-            PlaceEditWindowOverLabel(label);
-            AssociateEditorWithLabel(label);
+            if (System.Windows.Forms.Control.ModifierKeys == Keys.Shift)
+            {
+                DeleteItem(label);
+            }
+            else
+            {
+                if (editWindowActive) FinalizeEdit();
+                PlaceEditWindowOverLabel(label);
+                AssociateEditorWithLabel(label);
+            }
         }
-
+        private void DeleteItem(Label lbl)
+        {
+            DialogResult dialogResult = MessageBox.Show(String.Format("Are you sure you want to delete {0} parameter?", lbl.Text), "Delete confirmation.", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                FamilyEditorItem item = lbl.Tag as FamilyEditorItem;
+                MakeRequest(RequestId.DeleteId, item.Name);
+                items.Remove(item);
+                //FamilyItemsToFormElements(item);
+            }
+            DocumentRefresh();
+        }
         private void AssociateEditorWithLabel(Label label)
         {
             storeOldLabelValue = label.Name;
@@ -680,7 +700,7 @@ namespace FamilyEditorInterface
         }
         private void PlaceEditWindowOverLabel(Label label)
         {
-            editWindow.Location = new System.Drawing.Point(label.Location.X + mainContainer.Location.X + 5, label.Location.Y + mainContainer.Location.Y + 4);
+            editWindow.Location = new System.Drawing.Point(label.Location.X + mainContainer.Location.X + 15, label.Location.Y + mainContainer.Location.Y + 17);
             editWindow.Size = label.Size ;
             if (!Controls.Contains(editWindow)) Controls.Add(editWindow);
             editWindow.Visible = true;
@@ -703,9 +723,38 @@ namespace FamilyEditorInterface
             labelBeingEdited.Focus();
             labelBeingEdited.ForeColor = SystemColors.ControlText;
 
-            editWindow.Visible = false;
+            //editWindow.Visible = false;
             editWindow.SendToBack();
             this.DisplayData();
+        }
+        /// <summary>
+        /// Opens the Settings Menu
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void setButton_Click(object sender, EventArgs e)
+        {
+            using (Settings.Settings set = new Settings.Settings())
+            {
+                set.Precision = this.precision;
+                var dialogResult = set.ShowDialog();
+                if(dialogResult == DialogResult.OK)
+                {
+                    ChangePrecision(set.Precision);
+                    this.precision = set.Precision;
+                }
+            }
+        }
+        /// <summary>
+        /// Sets the precision for each parameter value
+        /// </summary>
+        /// <param name="precision"></param>
+        private void ChangePrecision(int precision)
+        {
+            foreach(FamilyEditorItem item in this.items)
+            {
+                item.Precision = precision;
+            }
         }
         private void TextBoxKeyUp(object sender, KeyEventArgs e)
         {
@@ -720,6 +769,16 @@ namespace FamilyEditorInterface
                 if (editWindowActive) FinalizeEdit();
                 e.Handled = true;
             }
+        }
+        // Escape button
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Escape)
+            {
+                Close();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
         #endregion
     }

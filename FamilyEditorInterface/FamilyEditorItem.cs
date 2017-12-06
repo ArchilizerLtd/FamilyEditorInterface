@@ -22,6 +22,7 @@ namespace FamilyEditorInterface
         private string boxValue;
         private bool checkValue, initialName, initialValue;
         private bool associated;
+        private int precision;
 
         public FamilyEditorItem()
         {
@@ -63,9 +64,20 @@ namespace FamilyEditorInterface
                     initialValue = false;
                 }
                 this.barValue = Convert.ToInt32(value * 100);
-                this.boxValue = Math.Round(Utils.convertValueTO(this.value), 2).ToString();
+                this.boxValue = Math.Round(Utils.convertValueTO(this.value), this.precision).ToString();
 
                 RefreshValues();
+            }
+        }
+        public int Precision
+        {
+            get
+            {
+                return precision;
+            }
+            internal set
+            {
+                precision = value;
             }
         }
         public int BarValue
@@ -78,7 +90,7 @@ namespace FamilyEditorInterface
             {
                 this.value = value * 0.01;
                 this.barValue = value;
-                this.boxValue = Math.Round(Utils.convertValueTO(this.value), 2).ToString();
+                this.boxValue = Math.Round(Utils.convertValueTO(this.value), this.precision).ToString();
 
                 RefreshValues();
             }

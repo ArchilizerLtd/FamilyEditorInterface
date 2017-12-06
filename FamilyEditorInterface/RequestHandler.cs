@@ -52,6 +52,11 @@ namespace FamilyEditorInterface
                             ExecuteParameterChange(uiapp, "Slide First Parameter", Request.GetValue());
                             break;
                         }
+                    case RequestId.DeleteId:
+                        {
+                            ExecuteParameterChange(uiapp, "Delete Parameter", Request.GetDeleteValue());
+                            break;
+                        }
                     case RequestId.ChangeParamName:
                         {
                             ExecuteParameterChange(uiapp, "Change Parameter Name", Request.GetRenameValue());
@@ -168,7 +173,47 @@ namespace FamilyEditorInterface
             }
         }
         /// <summary>
-        /// Executes on parameter name change
+         /// Executes on parameter delete
+         /// </summary>
+         /// <param name="uiapp"></param>
+         /// <param name="text"></param>
+         /// <param name="values"></param>
+        private void ExecuteParameterChange(UIApplication uiapp, String text, List<string> values)
+        {
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Document doc = uidoc.Document;
+
+            if (!doc.IsFamilyDocument)
+            {
+                Command.global_message =
+                  "Please run this command in a family document.";
+                TaskDialog.Show("Message", Command.global_message);
+            }
+
+            if ((uidoc != null))
+            {
+                using (Transaction trans = new Transaction(uidoc.Document))
+                {
+                    // Since we'll modify the document, we need a transaction
+                    // It's best if a transaction is scoped by a 'using' block
+                    // The name of the transaction was given as an argument
+                    if (trans.Start(text) == TransactionStatus.Started)
+                    {
+                        FamilyManager mgr = doc.FamilyManager;
+                        foreach (var value in values)
+                        {
+                            FamilyParameter fp = mgr.get_Parameter(value);
+                            mgr.RemoveParameter(fp);
+                        }
+                    }
+                    doc.Regenerate();
+                    trans.Commit();
+                    uidoc.RefreshActiveView();
+                }
+            }
+        }
+        /// <summary>
+        /// Executes on parameter name change 
         /// </summary>
         /// <param name="uiapp"></param>
         /// <param name="text"></param>

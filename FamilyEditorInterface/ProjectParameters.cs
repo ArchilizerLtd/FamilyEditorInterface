@@ -110,6 +110,7 @@ namespace FamilyEditorInterface
                     eId.Add(fp.Id);
 
                     FamilyEditorItem newItem = new FamilyEditorItem(); // collect data yes-no
+                    newItem.Precision = Properties.Settings.Default.Precision;
                     newItem.Name = fp.Definition.Name;
                     newItem.Value = value;
                     newItem.Type = fp.Definition.ParameterType.ToString();
@@ -133,6 +134,7 @@ namespace FamilyEditorInterface
                 if (value != 0)
                 {
                     FamilyEditorItem newItem = new FamilyEditorItem();  // collect data slider, value != 0
+                    newItem.Precision = Properties.Settings.Default.Precision;
                     newItem.Name = fp.Definition.Name;
                     newItem.Value = value;
                     newItem.Type = fp.Definition.ParameterType.ToString();
@@ -153,6 +155,7 @@ namespace FamilyEditorInterface
                 else
                 {
                     FamilyEditorItem newItem = new FamilyEditorItem(); // collect data slider, value == 0
+                    newItem.Precision = Properties.Settings.Default.Precision;
                     newItem.Name = fp.Definition.Name;
                     newItem.Value = value;
                     newItem.Type = fp.Definition.ParameterType.ToString();
