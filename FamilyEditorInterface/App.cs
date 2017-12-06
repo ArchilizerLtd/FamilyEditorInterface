@@ -70,20 +70,29 @@ namespace FamilyEditorInterface
         /// <summary>
         /// Add ribbon panel 
         /// </summary>
-        /// <param name="a"></param>
-        private void AddRibbonPanel(UIControlledApplication a)
+        /// <param name="application"></param>
+        private void AddRibbonPanel(UIControlledApplication application)
         {
-            List<RibbonPanel> panels = a.GetRibbonPanels();
-            Autodesk.Revit.UI.RibbonPanel rvtRibbonPanel = null;
-            if (panels.FirstOrDefault(x => x.Name.Equals("Archilizer", StringComparison.OrdinalIgnoreCase)) == null)
+            // Create a custom ribbon panel or use the existing one
+            String tabName = "Archilizer";
+            String panelName = "Family Document";
+            try
             {
-                rvtRibbonPanel = a.CreateRibbonPanel("Archilizer"); 
+                application.CreateRibbonTab(tabName);
+            }
+            catch (Autodesk.Revit.Exceptions.ArgumentException) { }
+            List<RibbonPanel> panels = application.GetRibbonPanels();
+            RibbonPanel rvtRibbonPanel = null;
+            // Pick the correct panel
+            if (panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) == null)
+            {
+                rvtRibbonPanel = application.CreateRibbonPanel(tabName, panelName); 
             }
             else
             {
-                rvtRibbonPanel = panels.FirstOrDefault(x => x.Name.Equals("Archilizer", StringComparison.OrdinalIgnoreCase)) as RibbonPanel;
+                rvtRibbonPanel = panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) as RibbonPanel;
             }
-            PulldownButtonData data = new PulldownButtonData("Options", "Family Editor" + Environment.NewLine + "Interface");
+            //PulldownButtonData data = new PulldownButtonData("Options", "Family Editor" + Environment.NewLine + "Interface");
 
             BitmapSource img32 = new BitmapImage (new Uri (@largeIcon));
             BitmapSource img16 = new BitmapImage (new Uri (@smallIcon));
