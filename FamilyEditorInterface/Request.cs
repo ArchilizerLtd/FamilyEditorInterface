@@ -69,6 +69,7 @@ namespace FamilyEditorInterface
         // try tp tramsport information
         private List<Tuple<string, double>> value;
         private List<Tuple<string, string>> renameValue;
+        private List<Tuple<string, string, double>> allValues;
         /// <summary>
         ///   Take - The Idling handler calls this to obtain the latest request. 
         /// </summary>
@@ -98,9 +99,13 @@ namespace FamilyEditorInterface
         {
             this.value = value;
         }
-        internal void Value(List<Tuple<string, string>> value)
+        internal void RenameValue(List<Tuple<string, string>> renameValue)
         {
-            this.renameValue = value;
+            this.renameValue = renameValue;
+        }
+        internal void AllValues(List<Tuple<string, string, double>> allValues)
+        {
+            this.allValues = allValues;
         }
         // try to transport the message
         internal List<Tuple<string, double>> GetValue()
@@ -111,6 +116,11 @@ namespace FamilyEditorInterface
         internal List<Tuple<string, string>> GetRenameValue()
         {
             return this.renameValue;
+        }
+        // try to transport the message
+        internal List<Tuple<string, string, double>> GetAllValues()
+        {
+            return this.allValues;
         }
     }
 }

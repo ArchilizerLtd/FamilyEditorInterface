@@ -29,7 +29,7 @@ namespace FamilyEditorInterface
         private Stream _imageStream;
         private Bitmap _imageMini;
         private Bitmap _imageMaxi;
-        private List<FamilyEditorItem> result, backup;
+        private List<FamilyEditorItem> items;
         private float scale_x, scale_y;
 
         // change label text fields
@@ -37,6 +37,9 @@ namespace FamilyEditorInterface
         System.Windows.Forms.TextBox editWindow = new System.Windows.Forms.TextBox();
         bool editWindowActive = false;
         string storeOldLabelValue;
+        // change text box field
+        System.Windows.Forms.TextBox textBoxBeingEdited = new System.Windows.Forms.TextBox();
+        bool editTextBoxActive = false;
 
         /// <summary>
         /// Constructor
@@ -57,8 +60,17 @@ namespace FamilyEditorInterface
             this.exEvent = exEvent;
             this.handler = handler;
             this.uiapp = uiapp;
+            
+            this.scale_x = this.CreateGraphics().DpiX / 100;
+            this.scale_y = this.CreateGraphics().DpiY / 100;
+
+            ThisDocumentCollect();
+            DisplayData();
+        }
+        internal void ThisDocumentCollect()
+        {
             this.uidoc = uiapp.ActiveUIDocument;
-            this.doc = checkDoc(uidoc.Document);
+            this.doc = Utils.checkDoc(uidoc.Document);
             if (doc == null)
             {
                 this.InvalidDocument();
@@ -67,21 +79,34 @@ namespace FamilyEditorInterface
             Utils.Init(this.doc);
             this.projectParameters = new ProjectParameters(doc);
             this.Text = title + String.Format(" - {0}", Utils.Truncate(doc.Title, 10));
-            this.result = this.projectParameters.CollectData();
-            this.backup = this.projectParameters.CollectData();
-            this.scale_x = this.CreateGraphics().DpiX / 100;
-            this.scale_y = this.CreateGraphics().DpiY / 100;
-
+            this.items = this.projectParameters.CollectData();
+        }
+        internal void ThisDocumentChanged()
+        {
+            ThisDocumentCollect();
+            DisplayData();
+        }        
+        /// <summary>
+        /// Save Default Parameter Values
+        /// </summary>
+        private void SaveDefaults()
+        {
+            //items = projectParameters.CollectData();
+            items.ForEach(x => x.SaveDefaults());
+        }
+        private void LoadDefaults()
+        {
+            MakeRequest(RequestId.RestoreAll, items.Select(x => x.Restore).ToList());
+            items.ForEach(x => x.RestoreDefaults());
             DisplayData();
         }
-
         #region Form Settup
         private void DisplayData()
         {
             this.mainPanel.Controls.Clear();
             this.offPanel.Controls.Clear();
 
-            if (result.Count == 0)
+            if (this.items.Count == 0)
             {
                 this.mainContainer.Panel1.Controls.Add(WarningLabel("No active parameters"));
             }
@@ -91,7 +116,9 @@ namespace FamilyEditorInterface
             List<System.Windows.Forms.Control> items = new List<System.Windows.Forms.Control>();
             List<System.Windows.Forms.Control> checks = new List<System.Windows.Forms.Control>();
 
-            foreach (FamilyEditorItem item in result)
+            this.items = this.items.OrderBy(x => x.Name).ToList();
+
+            foreach (FamilyEditorItem item in this.items)
             {
                 if (item.getCheckbox() != null)
                 {
@@ -152,13 +179,14 @@ namespace FamilyEditorInterface
             System.Windows.Forms.TextBox txt = new System.Windows.Forms.TextBox();
             
             string s = item.getTextbox().Item1;
-            double d = item.getTextbox().Item2;
-
-            txt = new System.Windows.Forms.TextBox();
+            string d = item.getTextbox().Item2;
+            
             txt.Size = new Size(Convert.ToInt32(scale_x * 34), 10);
             txt.KeyDown += new KeyEventHandler(textBox_KeyDown);
+            txt.LostFocus += textBoxLostFocus;
+            txt.TextChanged += textBoxEdited;
             txt.Name = s;
-            txt.Text = Math.Round(Utils.trueValue(d), 2).ToString();
+            txt.Text = d;
             txt.BackColor = System.Drawing.SystemColors.Control;
             txt.BorderStyle = BorderStyle.None;
             txt.Margin = new Padding(0, 5, 0, 0);
@@ -168,17 +196,18 @@ namespace FamilyEditorInterface
             return txt;
         }
 
+
         private Label createLabel(FamilyEditorItem item)
         {
             Label lbl = new Label();
             
             string s = item.getLabel().Item1;
             double d = item.getLabel().Item2;
-
-            lbl = new Label();
+            
             lbl.AutoSize = true;
             lbl.MaximumSize = new Size(Convert.ToInt32(scale_x * 70), 0);
             lbl.Font = new Font("Arial", 8);
+            if (!item.Associated) lbl.ForeColor = System.Drawing.Color.FromArgb(20, 200, 60); 
             lbl.Text = Utils.Truncate(s, 15);
             lbl.Name = s;
             lbl.Visible = true;
@@ -201,8 +230,7 @@ namespace FamilyEditorInterface
             
             string s = item.getTrackbar().Item1;
             double d = item.getTrackbar().Item2;
-
-            trk = new TrackBar();
+            
             trk.Name = s;
             trk.Text = s;
             trk.Size = new Size(Convert.ToInt32(scale_x * 180), 10);
@@ -211,9 +239,9 @@ namespace FamilyEditorInterface
 
             if (d != 0)
             {
-                trk.Maximum = Convert.ToInt32(d * 100) * 2;
+                trk.Maximum = item.BarValue * 2;
                 trk.Minimum = 1;
-                trk.Value = Convert.ToInt32(d * 100);
+                trk.Value = item.BarValue;
                 trk.TickFrequency = Convert.ToInt32(trk.Maximum * 0.05);
                 trk.MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
                 trk.ValueChanged += new EventHandler(trackBar_ValueChanged);
@@ -245,17 +273,6 @@ namespace FamilyEditorInterface
 
             return chk;
         }
-
-        private void paramNameChanged(object sender, EventArgs e)
-        {
-            Label lbl = (Label)sender;
-            string newName = lbl.Text;
-            MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(lbl.Name, newName));
-            FamilyEditorItem item = result.First(x => x.Name.Equals(lbl.Name));
-            item.Name = newName;
-            FamilyItemsToFormElements(item);
-        }
-
         /// <summary>
         /// Prepare the minimize and maximize icons
         /// </summary>
@@ -271,62 +288,6 @@ namespace FamilyEditorInterface
 
         #region Form Action
 
-        private Autodesk.Revit.DB.Document checkDoc(Autodesk.Revit.DB.Document document)
-        {
-            if (document.IsFamilyDocument)
-            {
-                return document;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private void RecollectData()
-        {
-            result = projectParameters.CollectData();
-            projectParameters.syncDefaults(result, backup);
-            DisplayData();
-        }
-        internal void ThisDocumentChanged()
-        {
-            this.doc = uiapp.ActiveUIDocument.Document;
-            Utils.Init(this.doc);
-            this.projectParameters = new ProjectParameters(doc);
-            this.Text = title + String.Format(" - {0}", Utils.Truncate(doc.Title, 10));
-            this.result = this.projectParameters.CollectData();
-            this.backup = this.projectParameters.CollectData();
-
-            RecollectData();
-        }
-        /// <summary>
-        /// Document Changed triggered event
-        /// </summary>
-        internal void DocumentChanged()
-        {
-            RecollectData();
-        }
-        private void Reset()
-        {
-            result = backup;
-            DisplayData();
-        }
-
-        private void SaveDefaults()
-        {
-            result = projectParameters.CollectData();
-            backup = result;
-        }
-        internal Autodesk.Revit.DB.Document Document()
-        {
-            if (this.doc.IsValidObject) return this.doc;
-            else return null;
-        }
-        internal void Document(Autodesk.Revit.DB.Document doc)
-        {
-            this.doc = doc;
-        }
         protected override CreateParams CreateParams
         {
             get
@@ -353,25 +314,50 @@ namespace FamilyEditorInterface
             return l;
         }
         /// <summary>
+        /// On Parameter Name Change
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void paramNameChanged(object sender, EventArgs e)
+        {
+            Label lbl = sender as Label;
+            FamilyEditorItem item = lbl.Tag as FamilyEditorItem;
+            if (!Utils.UnallowedChacarcters(lbl.Name))
+            {
+                lbl.Name = storeOldLabelValue;
+                return;
+            }
+            string newName = lbl.Name;            
+            // First update the Revit Parameter name 
+            // Second update the item
+            // Third update all other controls connected with this paramter/familyeditoritem
+            MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(item.Name, newName));
+            item.Name = newName;
+            FamilyItemsToFormElements(item);
+        }
+        /// <summary>
         /// On update
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void trackBar_MouseUp(object sender, MouseEventArgs e)
-        {
-            TrackBar tbar = sender as TrackBar;
-
+        {            
             if (user_done_updating)
             {
                 user_done_updating = false;
-                double first = Utils.convertValueTO((double)tbar.Value * 0.01);
+
+                TrackBar tbar = sender as TrackBar;
+                FamilyEditorItem item = tbar.Tag as FamilyEditorItem;
+
+                item.BarValue = tbar.Value;
+
                 if (projectParameters.goUnits)
                 {
                     System.Windows.Forms.TextBox box = mainPanel.Controls.OfType<System.Windows.Forms.TextBox>().Where(x => x.Tag.Equals(tbar.Tag)).Single();
 
-                    box.Text = Math.Round(first, 2).ToString();   //trackbar to textbox value
+                    box.Text = item.BoxValue;   //trackbar to textbox value
                 }
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbar.Name, (double)tbar.Value * 0.01));
+                MakeRequest(RequestId.SlideParam, item.Request);
             }
         }
         /// <summary>
@@ -381,13 +367,52 @@ namespace FamilyEditorInterface
         /// <param name="e"></param>
         private void checkBox_MouseUp(object sender, MouseEventArgs e)
         {
-            CheckBox cbox = sender as CheckBox;
-
             if (user_done_updating)
             {
                 user_done_updating = false;
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(cbox.Name, (double)(cbox.Checked ? 1.0 : 0.0)));
+
+                CheckBox cbox = sender as CheckBox;
+                FamilyEditorItem item = cbox.Tag as FamilyEditorItem;
+
+                item.CheckValue = cbox.Checked;
+
+                MakeRequest(RequestId.SlideParam, item.Request);
             }
+        }
+        private void textBoxEdited(object sender, EventArgs e)
+        {
+            if (!editTextBoxActive)
+            {
+                textBoxBeingEdited = sender as System.Windows.Forms.TextBox;
+                editTextBoxActive = true;
+            }
+        }
+
+        private void textBoxLostFocus(object sender, EventArgs e)
+        {
+            if (editTextBoxActive)
+            {
+                editTextBoxActive = false;
+                FinalizeTextBoxEdit();
+            }
+        }
+
+        private void FinalizeTextBoxEdit()
+        {
+            System.Windows.Forms.TextBox tbox = textBoxBeingEdited;
+            FamilyEditorItem item = tbox.Tag as FamilyEditorItem;
+
+            item.BoxValue = tbox.Text;
+
+            TrackBar tbar = mainPanel.Controls.OfType<TrackBar>().Where(x => x.Tag.Equals(tbox.Tag)).Single();
+
+            if (item.BarValue < tbar.Maximum) tbar.Value = item.BarValue;  //textbox to trackbar value
+            else
+            {
+                tbar.Maximum = item.BarValue * 2;
+                tbar.Value = item.BarValue;
+            }
+            MakeRequest(RequestId.SlideParam, item.Request);
         }
         /// <summary>
         /// On update for textbox
@@ -396,21 +421,13 @@ namespace FamilyEditorInterface
         /// <param name="e"></param>
         private void textBox_KeyDown(object sender, KeyEventArgs e)
         {
-            System.Windows.Forms.TextBox tbox = sender as System.Windows.Forms.TextBox;
             if (e.KeyCode == Keys.Enter)
             {
-                double first = Convert.ToDouble(tbox.Text);
-                int second = Convert.ToInt32(Utils.convertValueFROM(first * 100));
-
-                TrackBar tbar = mainPanel.Controls.OfType<TrackBar>().Where(x => x.Tag.Equals(tbox.Tag)).Single();
-
-                if (second < tbar.Maximum) tbar.Value = second;  //textbox to trackbar value
-                else
+                if(editTextBoxActive)
                 {
-                    tbar.Maximum = second * 2;
-                    tbar.Value = second;
+                    editTextBoxActive = false;
+                    FinalizeTextBoxEdit();
                 }
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(tbox.Name, (double)(Utils.convertValueFROM(Convert.ToDouble(tbox.Text)))));
             }
         }
         /// <summary>
@@ -428,27 +445,20 @@ namespace FamilyEditorInterface
             // do not forget to call the base class
             base.OnFormClosed(e);
         }
-        /// <summary>
-        /// Change Parameter Name
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="value"></param>
-        private void MakeRequest(RequestId request, Tuple<string, string> value)
+        private void MakeRequest(RequestId request, Tuple<string, string> renameValue)
         {
             //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.Value(new List<Tuple<string, string>>() { value });
+            handler.Request.RenameValue(new List<Tuple<string, string>>() { renameValue });
             handler.Request.Make(request);
             exEvent.Raise();
         }
-        /// <summary>
-        ///   A private helper method to make a request
-        ///   and put the dialog to sleep at the same time.
-        /// </summary>
-        /// <remarks>
-        ///   It is expected that the process which executes the request 
-        ///   (the Idling helper in this particular case) will also
-        ///   wake the dialog up after finishing the execution.
-        /// </remarks>
+        private void MakeRequest(RequestId request, List<Tuple<string, string>> renameValue)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.RenameValue(renameValue);
+            handler.Request.Make(request);
+            exEvent.Raise();
+        }
         private void MakeRequest(RequestId request, Tuple<string, double> value)
         {
             //MessageBox.Show("You are in the Control.Request event.");
@@ -456,16 +466,24 @@ namespace FamilyEditorInterface
             handler.Request.Make(request);
             exEvent.Raise();
         }
-        /// <summary>
-        /// Similar to the MakeRequest method taking a single tuplet, 
-        /// this one provides the whole List
-        /// </summary>
-        /// <param name="request">The request.</param>
-        /// <param name="value">The value.</param>
         private void MakeRequest(RequestId request, List<Tuple<string, double>> value)
         {
             //MessageBox.Show("You are in the Control.Request event.");
             handler.Request.Value(value);
+            handler.Request.Make(request);
+            exEvent.Raise();
+        }
+        private void MakeRequest(RequestId request, Tuple<string, string, double> value)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.AllValues(new List<Tuple<string, string, double>>() { value });
+            handler.Request.Make(request);
+            exEvent.Raise();
+        }
+        private void MakeRequest(RequestId request, List<Tuple<string, string, double>> value)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.AllValues(value);
             handler.Request.Make(request);
             exEvent.Raise();
         }
@@ -510,7 +528,11 @@ namespace FamilyEditorInterface
             {
                 if (sameDocument())
                 {
-                    this.DocumentChanged();
+                    this.DisplayData();
+                }
+                else
+                {
+                    this.ThisDocumentChanged();
                 }
             }
             catch (Exception)
@@ -576,7 +598,7 @@ namespace FamilyEditorInterface
             maximizeIcon.Image = (mainContainer.Panel2Collapsed) ? _imageMaxi : _imageMini;
         }
         /// <summary>
-        /// Loads Defaults
+        /// Restore Defaults
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
@@ -585,25 +607,17 @@ namespace FamilyEditorInterface
             if (!validDocument()) return;
             if (sameDocument())
             {
-                List<Tuple<string, double>> value = projectParameters.GetValues(backup);
-                RestoreValues(backup);
-                MakeRequest(RequestId.SlideParam, value);
-                Reset();
+                LoadDefaults();
             }
-        }
-
-        private void RestoreValues(List<FamilyEditorItem> backup)
-        {
-            foreach(var item in backup)
-            {
-                FamilyItemsToFormElements((FamilyEditorItem)item);
-            }
-        }
+        }        
         
         private void FamilyItemsToFormElements(FamilyEditorItem item)
         {
             System.Windows.Forms.TextBox tbox = mainPanel.Controls.OfType<System.Windows.Forms.TextBox>().Where(x => x.Tag.Equals(item)).SingleOrDefault();
-            if(tbox != null) tbox.Name = item.Name;
+            if (tbox != null)
+            {
+                tbox.Name = item.Name;
+            }
             System.Windows.Forms.TrackBar tbar = mainPanel.Controls.OfType<System.Windows.Forms.TrackBar>().Where(x => x.Tag.Equals(item)).SingleOrDefault();
             if(tbar != null)
             {
@@ -634,6 +648,7 @@ namespace FamilyEditorInterface
             if (sameDocument())
             {
                 SaveDefaults();
+                DisplayData();
             }
         }
         /// <summary>
@@ -658,8 +673,8 @@ namespace FamilyEditorInterface
 
         private void AssociateEditorWithLabel(Label label)
         {
-            storeOldLabelValue = label.Text;
-            editWindow.Text = label.Text;
+            storeOldLabelValue = label.Name;
+            editWindow.Text = label.Name;
             label.ForeColor = SystemColors.Control;
             labelBeingEdited = label;
         }
@@ -674,32 +689,35 @@ namespace FamilyEditorInterface
             editWindowActive = true;
             editWindow.KeyUp += TextBoxKeyUp;
             editWindow.Leave += TextBoxLeave;
+            editWindow.LostFocus += TextBoxLeave;
         }
         private void TextBoxLeave(object sender, EventArgs e)
         {
-            FinalizeEdit();
+            if (editWindowActive) FinalizeEdit();
         }
         private void FinalizeEdit()
         {
-            labelBeingEdited.Text = editWindow.Text;
+            editWindowActive = false;
+            labelBeingEdited.Name = items.Any(x => x.Name.Equals(editWindow.Text)) ? storeOldLabelValue : editWindow.Text;
+            labelBeingEdited.Text = Utils.Truncate(labelBeingEdited.Name, 15);
             labelBeingEdited.Focus();
             labelBeingEdited.ForeColor = SystemColors.ControlText;
 
             editWindow.Visible = false;
             editWindow.SendToBack();
-            editWindowActive = false;
+            this.DisplayData();
         }
         private void TextBoxKeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                FinalizeEdit();
+                if (editWindowActive) FinalizeEdit();
                 e.Handled = true;
             }
             if (e.KeyCode == Keys.Escape)
             {
                 editWindow.Text = storeOldLabelValue;
-                FinalizeEdit();
+                if (editWindowActive) FinalizeEdit();
                 e.Handled = true;
             }
         }

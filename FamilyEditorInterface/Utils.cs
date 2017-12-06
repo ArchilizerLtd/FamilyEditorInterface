@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FamilyEditorInterface
@@ -96,34 +97,32 @@ namespace FamilyEditorInterface
                 return source;
             }
         }
-
-        public static double trueValue(double value)
+        /// <summary>
+        /// Check if a string contains unallowed characters
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        internal static bool UnallowedChacarcters(string text)
         {
-            double trueValue = 0.0;
-
-            switch (dut)
+            var regexItem = new Regex("^[a-zA-Z0-9 _!-]+$");
+            bool result = regexItem.IsMatch(text);
+            return(result ?  true :  false);
+        }
+        /// <summary>
+        /// Check if it's a Family Document
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        internal static Autodesk.Revit.DB.Document checkDoc(Autodesk.Revit.DB.Document document)
+        {
+            if (document.IsFamilyDocument)
             {
-                case DisplayUnitType.DUT_METERS:
-                    trueValue = value * METERS_IN_FEET;
-                    break;
-                case DisplayUnitType.DUT_CENTIMETERS:
-                    trueValue = value * METERS_IN_FEET * 100;
-                    break;
-                case DisplayUnitType.DUT_DECIMAL_FEET:
-                    trueValue = value;
-                    break;
-                case DisplayUnitType.DUT_DECIMAL_INCHES:
-                    trueValue = value * 12;
-                    break;
-                case DisplayUnitType.DUT_METERS_CENTIMETERS:
-                    trueValue = value * METERS_IN_FEET;
-                    break;
-                case DisplayUnitType.DUT_MILLIMETERS:
-                    trueValue = value * METERS_IN_FEET * 1000;
-                    break;
+                return document;
             }
-
-            return trueValue;
+            else
+            {
+                return null;
+            }
         }
     }
 }

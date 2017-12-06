@@ -54,7 +54,7 @@ namespace FamilyEditorInterface
         /// </summary>
         internal List<FamilyEditorItem> CollectData()
         {
-            List<FamilyEditorItem> result = new List<FamilyEditorItem>();
+            List<FamilyEditorItem> collectList = new List<FamilyEditorItem>();
             
             FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
@@ -77,9 +77,31 @@ namespace FamilyEditorInterface
 
             //add controlls
             List<ElementId> eId = new List<ElementId>();
-            
+
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            List<Dimension> dimList = collector
+                .OfCategory(BuiltInCategory.OST_Dimensions)
+                .WhereElementIsNotElementType()
+                .Cast<Dimension>()
+                .ToList();
+
+            List<FamilyParameter> paramUsed = new List<FamilyParameter>();
+
+            foreach(Dimension dim in dimList)
+            {
+                try
+                {
+                    if (dim.FamilyLabel != null) paramUsed.Add(dim.FamilyLabel);
+                }
+                catch(Exception)
+                {
+
+                }
+            }
+
             foreach (FamilyParameter fp in famParam.Values)
             {
+                bool associated = !fp.AssociatedParameters.IsEmpty || paramUsed.Any(x => x.Definition.Name.Equals(fp.Definition.Name));
                 ///yes-no parameters
                 if (fp.Definition.ParameterType.Equals(ParameterType.YesNo))
                 {
@@ -87,11 +109,15 @@ namespace FamilyEditorInterface
                     
                     eId.Add(fp.Id);
 
-                    FamilyEditorItem newItem = new FamilyEditorItem();
-                    newItem.addCheckbox(fp.Definition.Name, value);
+                    FamilyEditorItem newItem = new FamilyEditorItem(); // collect data yes-no
+                    newItem.Name = fp.Definition.Name;
+                    newItem.Value = value;
+                    newItem.Type = fp.Definition.ParameterType.ToString();
+                    newItem.Associated = associated;
 
-                    result.Add(newItem);
+                    newItem.addCheckbox();         
 
+                    collectList.Add(newItem);
                     
                     indexChk++;
                     continue;
@@ -103,36 +129,43 @@ namespace FamilyEditorInterface
                               
                 //DisplayUnitType dut = this.doc.GetUnits().GetDisplayUnitType();
                 goUnits = Utils._goUnits();
-
-                if (fp.Definition.ParameterType == ParameterType.Length)
-                {
-                    
-                }
+                
                 if (value != 0)
                 {
-                    FamilyEditorItem newItem = new FamilyEditorItem();
-                    newItem.addTrackbar(fp.Definition.Name, value);
-                    newItem.addLabel(fp.Definition.Name, value);
+                    FamilyEditorItem newItem = new FamilyEditorItem();  // collect data slider, value != 0
+                    newItem.Name = fp.Definition.Name;
+                    newItem.Value = value;
+                    newItem.Type = fp.Definition.ParameterType.ToString();
+                    newItem.Associated = associated;
+
+                    newItem.addTrackbar();
+                    newItem.addLabel();
 
                     //some units are not supported yet
+                    //only if units are supported, add a text box
                     if (goUnits)
                     {
-                        newItem.addTextbox(fp.Definition.Name, value);
+                        newItem.addTextbox();
                     }
 
-                    result.Add(newItem);
+                    collectList.Add(newItem);
                 }
                 else
                 {
-                    FamilyEditorItem newItem = new FamilyEditorItem();
-                    newItem.addTrackbar(fp.Definition.Name, value);
-                    newItem.addLabel(fp.Definition.Name, value);
+                    FamilyEditorItem newItem = new FamilyEditorItem(); // collect data slider, value == 0
+                    newItem.Name = fp.Definition.Name;
+                    newItem.Value = value;
+                    newItem.Type = fp.Definition.ParameterType.ToString();
+                    newItem.Associated = associated;
 
-                    result.Add(newItem);
+                    newItem.addTrackbar();
+                    newItem.addLabel();
+
+                    collectList.Add(newItem);
                 }
             }
-            sort(result);
-            return result;
+            sort(collectList);
+            return collectList;
         }
         /// <summary>
         /// Creates default family type.
@@ -195,21 +228,6 @@ namespace FamilyEditorInterface
         private void sort(List<FamilyEditorItem> list)
         {
             list = list.OrderBy(x => x.Name).ToList();
-        }
-        /// <summary>
-        /// Transforms list of items to list of tuplets
-        /// Used for returning default values to the project parameters
-        /// </summary>
-        /// <param name="backup"></param>
-        /// <returns></returns>
-        internal List<Tuple<string, double>> GetValues(List<FamilyEditorItem> backup)
-        {
-            List<Tuple<string, double>> value = new List<Tuple<string, double>>();
-            foreach(var item in backup)
-            {
-                value.Add(new Tuple<string, double>(item.Name, item.Value()));
-            }
-            return value;
         }
     }
 }
