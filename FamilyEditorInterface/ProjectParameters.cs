@@ -115,7 +115,7 @@ namespace FamilyEditorInterface
                     newItem.Value = value;
                     newItem.Type = fp.Definition.ParameterType.ToString();
                     newItem.Associated = associated;
-
+                    newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.addCheckbox();         
 
                     collectList.Add(newItem);
@@ -131,7 +131,7 @@ namespace FamilyEditorInterface
                 //DisplayUnitType dut = this.doc.GetUnits().GetDisplayUnitType();
                 goUnits = Utils._goUnits();
                 
-                if (value != 0)
+                if (associated)
                 {
                     FamilyEditorItem newItem = new FamilyEditorItem();  // collect data slider, value != 0
                     newItem.Precision = Properties.Settings.Default.Precision;
@@ -139,6 +139,7 @@ namespace FamilyEditorInterface
                     newItem.Value = value;
                     newItem.Type = fp.Definition.ParameterType.ToString();
                     newItem.Associated = associated;
+                    newItem.BuiltIn = fp.Id.IntegerValue < 0;
 
                     newItem.addTrackbar();
                     newItem.addLabel();
@@ -160,6 +161,7 @@ namespace FamilyEditorInterface
                     newItem.Value = value;
                     newItem.Type = fp.Definition.ParameterType.ToString();
                     newItem.Associated = associated;
+                    newItem.BuiltIn = fp.Id.IntegerValue < 0;
 
                     newItem.addTrackbar();
                     newItem.addLabel();
@@ -230,7 +232,7 @@ namespace FamilyEditorInterface
         /// <param name="backup"></param>
         private void sort(List<FamilyEditorItem> list)
         {
-            list = list.OrderBy(x => x.Name).ToList();
+            list = list.OrderBy(x => !x.Associated).ThenBy(x => x.Name).ToList();
         }
     }
 }

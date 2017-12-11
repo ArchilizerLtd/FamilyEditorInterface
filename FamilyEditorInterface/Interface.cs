@@ -31,7 +31,7 @@ namespace FamilyEditorInterface
         private Bitmap _imageMaxi;
         private List<FamilyEditorItem> items;
         private float scale_x, scale_y;
-        private System.Drawing.Color inactiveColor = System.Drawing.Color.FromArgb(120, 100, 150);
+        private System.Drawing.Color transparent = System.Drawing.Color.FromArgb(0, 120, 120, 120);
         private int precision;
 
         // change label text fields
@@ -58,7 +58,7 @@ namespace FamilyEditorInterface
                 ControlStyles.UserPaint |
                 ControlStyles.DoubleBuffer, true);
             this.StartPosition = FormStartPosition.Manual;
-            this.Location = new System.Drawing.Point(Screen.PrimaryScreen.WorkingArea.Width - 400, Convert.ToInt32(Screen.PrimaryScreen.WorkingArea.Height * 0.5 - this.Height * 0.5));
+            this.Location = new System.Drawing.Point(Screen.PrimaryScreen.WorkingArea.Width - 600, Convert.ToInt32(Screen.PrimaryScreen.WorkingArea.Height * 0.5 - this.Height * 0.5));
             this.exEvent = exEvent;
             this.handler = handler;
             this.uiapp = uiapp;
@@ -123,7 +123,7 @@ namespace FamilyEditorInterface
             List<System.Windows.Forms.Control> items = new List<System.Windows.Forms.Control>();
             List<System.Windows.Forms.Control> checks = new List<System.Windows.Forms.Control>();
 
-            this.items = this.items.OrderBy(x => x.Name).ToList();
+            this.items = this.items.OrderBy(x => !x.Associated).ThenBy(x => x.Name).ToList();
 
             foreach (FamilyEditorItem item in this.items)
             {
@@ -169,7 +169,6 @@ namespace FamilyEditorInterface
                 this.offPanel.Controls.Add(error("This family has no Yes/No parameters."));
             }
         }
-
         private Label error(string message)
         {
             Label error = new Label();
@@ -202,8 +201,6 @@ namespace FamilyEditorInterface
 
             return txt;
         }
-
-
         private Label createLabel(FamilyEditorItem item)
         {
             Label lbl = new Label();
@@ -214,8 +211,6 @@ namespace FamilyEditorInterface
             lbl.AutoSize = true;
             lbl.MaximumSize = new Size(Convert.ToInt32(scale_x * 70), 0);
             lbl.Font = new Font("Arial", 8);
-            // Inactive parameter
-            if (!item.Associated) lbl.ForeColor = inactiveColor; 
             lbl.Text = Utils.Truncate(s, 15);
             lbl.Name = s;
             lbl.Visible = true;
@@ -224,7 +219,8 @@ namespace FamilyEditorInterface
             lbl.Click += labelChange;
             lbl.TextChanged += paramNameChanged;
 
-            if (d == 0)
+            // Inactive parameter
+            if (!item.Associated)
             {
                 lbl.ForeColor = System.Drawing.Color.LightGray;
             }
@@ -245,13 +241,14 @@ namespace FamilyEditorInterface
             trk.Padding = new Padding(3, 3, 3, 3);
             trk.Tag = item;
 
-            if (d != 0)
+            if (item.Associated)
             {
-                trk.Maximum = item.BarValue * 2;
-                trk.Minimum = 1;
+                trk.Maximum = item.BarValue == 0 ? 100 : item.BarValue * 2;
+                trk.Minimum = 0;
                 trk.Value = item.BarValue;
                 trk.TickFrequency = Convert.ToInt32(trk.Maximum * 0.05);
                 trk.MouseUp += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
+                trk.MouseWheel += new System.Windows.Forms.MouseEventHandler(trackBar_MouseUp);
                 trk.ValueChanged += new EventHandler(trackBar_ValueChanged);
             }
             else
@@ -273,13 +270,18 @@ namespace FamilyEditorInterface
             chk.Text = Utils.Truncate(s, 18);
 
             chk.Checked = Convert.ToInt32(d) == 1 ? true : false;
-            // Inactive parameter
-            if (!item.Associated) chk.ForeColor = inactiveColor;
             chk.MouseUp += new System.Windows.Forms.MouseEventHandler(checkBox_MouseUp);
             chk.Click += new EventHandler(trackBar_ValueChanged);
             chk.Padding = new Padding(3, 3, 3, 3);
             chk.Margin = new Padding(0, 0, Convert.ToInt32(scale_x * 50), Convert.ToInt32(scale_y * 5));
             chk.Tag = item;
+
+            // Inactive parameter
+            if (!item.Associated)
+            {
+                chk.Enabled = false;
+                chk.ForeColor = System.Drawing.Color.LightGray;
+            }
 
             return chk;
         }
@@ -599,20 +601,6 @@ namespace FamilyEditorInterface
             mainContainer.Panel2Collapsed = !mainContainer.Panel2Collapsed;
             maximizeIcon.Image = (mainContainer.Panel2Collapsed) ? _imageMaxi : _imageMini;
         }
-        /// <summary>
-        /// Restore Defaults
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void defaultButton_Click(object sender, EventArgs e)
-        {
-            if (!validDocument()) return;
-            if (sameDocument())
-            {
-                LoadDefaults();
-            }
-        }        
-        
         private void FamilyItemsToFormElements(FamilyEditorItem item)
         {
             System.Windows.Forms.TextBox tbox = mainPanel.Controls.OfType<System.Windows.Forms.TextBox>().Where(x => x.Tag.Equals(item)).SingleOrDefault();
@@ -668,15 +656,29 @@ namespace FamilyEditorInterface
         private void labelChange(object sender, EventArgs e)
         {
             Label label = sender as Label;
+            FamilyEditorItem item = label.Tag as FamilyEditorItem;
+            if (item.BuiltIn)
+            {
+                DialogResult dialogResult = MessageBox.Show(String.Format("Can't edit or delete BuiltInParameter"), "Error.", MessageBoxButtons.OK);
+                return;
+            }
             if (System.Windows.Forms.Control.ModifierKeys == Keys.Shift)
             {
                 DeleteItem(label);
             }
             else
             {
-                if (editWindowActive) FinalizeEdit();
-                PlaceEditWindowOverLabel(label);
-                AssociateEditorWithLabel(label);
+                if (editWindowActive)
+                {
+                    FinalizeEdit();
+                    return;
+                }
+                else
+                {
+                    PlaceEditWindowOverLabel(label);
+                    AssociateEditorWithLabel(label);
+                    DisableControls();
+                }
             }
         }
         private void DeleteItem(Label lbl)
@@ -687,7 +689,6 @@ namespace FamilyEditorInterface
                 FamilyEditorItem item = lbl.Tag as FamilyEditorItem;
                 MakeRequest(RequestId.DeleteId, item.Name);
                 items.Remove(item);
-                //FamilyItemsToFormElements(item);
             }
             DocumentRefresh();
         }
@@ -695,13 +696,13 @@ namespace FamilyEditorInterface
         {
             storeOldLabelValue = label.Name;
             editWindow.Text = label.Name;
-            label.ForeColor = SystemColors.Control;
+            label.ForeColor = transparent;
             labelBeingEdited = label;
         }
         private void PlaceEditWindowOverLabel(Label label)
         {
             editWindow.Location = new System.Drawing.Point(label.Location.X + mainContainer.Location.X + 15, label.Location.Y + mainContainer.Location.Y + 17);
-            editWindow.Size = label.Size ;
+            editWindow.Size = label.Size;
             if (!Controls.Contains(editWindow)) Controls.Add(editWindow);
             editWindow.Visible = true;
             editWindow.BringToFront();
@@ -722,10 +723,24 @@ namespace FamilyEditorInterface
             labelBeingEdited.Text = Utils.Truncate(labelBeingEdited.Name, 15);
             labelBeingEdited.Focus();
             labelBeingEdited.ForeColor = SystemColors.ControlText;
-
-            //editWindow.Visible = false;
+            
             editWindow.SendToBack();
+            EnableControls();
             this.DisplayData();
+        }
+        /// <summary>
+        /// Disable the main canvas while renaming parameter
+        /// </summary>
+        private void DisableControls()
+        {
+            mainContainer.Enabled = false;
+        }
+        /// <summary>
+        /// Enable the main canvas after finishing with the renaming of the parameter
+        /// </summary>
+        private void EnableControls()
+        {
+            mainContainer.Enabled = true;
         }
         /// <summary>
         /// Opens the Settings Menu
@@ -770,7 +785,32 @@ namespace FamilyEditorInterface
                 e.Handled = true;
             }
         }
-        // Escape button
+
+        private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DocumentRefresh();
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (!validDocument()) return;
+            if (sameDocument())
+            {
+                LoadDefaults();
+            }
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!validDocument()) return;
+            if (sameDocument())
+            {
+                SaveDefaults();
+                DisplayData();
+            }
+        }
+
+        // Escape button - doesn't work here?!
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Escape)
