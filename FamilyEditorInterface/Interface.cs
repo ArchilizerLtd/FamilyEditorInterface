@@ -168,6 +168,8 @@ namespace FamilyEditorInterface
             {
                 this.offPanel.Controls.Add(error("This family has no Yes/No parameters."));
             }
+            // reset the value editing mode if on
+            if (editTextBoxActive) editTextBoxActive = false;
         }
         private Label error(string message)
         {
@@ -209,9 +211,9 @@ namespace FamilyEditorInterface
             double d = item.getLabel().Item2;
             
             lbl.AutoSize = true;
-            lbl.MaximumSize = new Size(Convert.ToInt32(scale_x * 70), 0);
+            lbl.MaximumSize = new Size(Convert.ToInt32(scale_x * 90), 0);
             lbl.Font = new Font("Arial", 8);
-            lbl.Text = Utils.Truncate(s, 15);
+            lbl.Text = Utils.Truncate(s, 12);
             lbl.Name = s;
             lbl.Visible = true;
             lbl.Padding = new Padding(3, 4, 3, 3);
@@ -391,6 +393,7 @@ namespace FamilyEditorInterface
                 MakeRequest(RequestId.SlideParam, item.Request);
             }
         }
+        // on textbox text change
         private void textBoxEdited(object sender, EventArgs e)
         {
             if (!editTextBoxActive)
@@ -399,7 +402,7 @@ namespace FamilyEditorInterface
                 editTextBoxActive = true;
             }
         }
-
+        // on textbox lost focus
         private void textBoxLostFocus(object sender, EventArgs e)
         {
             if (editTextBoxActive)
@@ -408,7 +411,7 @@ namespace FamilyEditorInterface
                 FinalizeTextBoxEdit();
             }
         }
-
+        // finish the edits
         private void FinalizeTextBoxEdit()
         {
             System.Windows.Forms.TextBox tbox = textBoxBeingEdited;
@@ -618,7 +621,7 @@ namespace FamilyEditorInterface
             if (lbl != null)
             {
                 lbl.Name = item.Name;
-                lbl.Text = Utils.Truncate(item.Name, 15);
+                lbl.Text = Utils.Truncate(item.Name, 12);
             }
             System.Windows.Forms.CheckBox chk = mainPanel.Controls.OfType<System.Windows.Forms.CheckBox>().Where(x => x.Tag.Equals(item)).SingleOrDefault();
             if (chk != null)
@@ -701,8 +704,9 @@ namespace FamilyEditorInterface
         }
         private void PlaceEditWindowOverLabel(Label label)
         {
-            editWindow.Location = new System.Drawing.Point(label.Location.X + mainContainer.Location.X + 15, label.Location.Y + mainContainer.Location.Y + 17);
-            editWindow.Size = label.Size;
+            //editWindow.Location = new System.Drawing.Point(label.Location.X + mainContainer.Location.X + 15, label.Location.Y + mainContainer.Location.Y + 17);
+            editWindow.Location = new System.Drawing.Point(label.Location.X + mainContainer.Location.X + mainPanel.Location.X + paramGroupBox.Location.X, label.Location.Y + mainContainer.Location.Y + +mainPanel.Location.Y + paramGroupBox.Location.Y);
+            editWindow.Size = new Size(label.Size.Width - 5, label.Size.Height);
             if (!Controls.Contains(editWindow)) Controls.Add(editWindow);
             editWindow.Visible = true;
             editWindow.BringToFront();
@@ -720,7 +724,7 @@ namespace FamilyEditorInterface
         {
             editWindowActive = false;
             labelBeingEdited.Name = items.Any(x => x.Name.Equals(editWindow.Text)) ? storeOldLabelValue : editWindow.Text;
-            labelBeingEdited.Text = Utils.Truncate(labelBeingEdited.Name, 15);
+            labelBeingEdited.Text = Utils.Truncate(labelBeingEdited.Name, 12);
             labelBeingEdited.Focus();
             labelBeingEdited.ForeColor = SystemColors.ControlText;
             
@@ -781,7 +785,7 @@ namespace FamilyEditorInterface
             if (e.KeyCode == Keys.Escape)
             {
                 editWindow.Text = storeOldLabelValue;
-                if (editWindowActive) FinalizeEdit();
+                if (editWindowActive) FinalizeEdit(); 
                 e.Handled = true;
             }
         }
