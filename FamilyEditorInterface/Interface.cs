@@ -220,6 +220,7 @@ namespace FamilyEditorInterface
             lbl.Tag = item;
             lbl.Click += labelChange;
             lbl.TextChanged += paramNameChanged;
+            this.toolTip1.SetToolTip(lbl, s);
 
             // Inactive parameter
             if (!item.Associated)
@@ -653,19 +654,37 @@ namespace FamilyEditorInterface
             //MessageBox.Show("You are in the Control.Wake up event.");
             //EnableCommands(true);
         }
-
+        /// <summary>
+        /// Shuffle parameter values
+        /// </summary>
         private void Shuffle()
         {
             Random random = new Random();
             foreach(FamilyEditorItem item in items)
             {
-                if(item.getCheckbox() == null)
+                if(item.getCheckbox() == null && projectParameters.goUnits && item.Value != 0 && item.getTextbox() != null)
                 {
-                    double v = item.Value;
-                    item.Value = random.Next(0, Convert.ToInt32(v * 2));
+                    double v = Convert.ToDouble(item.BoxValue);
+                    int plus = Convert.ToInt32(v + 0.25 * v);    // plus minus values - around the current value +-25%
+                    int minus = Convert.ToInt32(v - 0.25 * v);
+                    int randValue = random.Next(minus, plus);
+                    item.BoxValue = randValue.ToString();
+
+                    System.Windows.Forms.TextBox box = mainPanel.Controls.OfType<System.Windows.Forms.TextBox>().Where(x => x.Tag.Equals(item)).Single();
+                    TrackBar tbar = mainPanel.Controls.OfType<TrackBar>().Where(x => x.Tag.Equals(item)).Single();
+
+                    if (item.BarValue < tbar.Maximum) tbar.Value = item.BarValue;  //textbox to trackbar value
+                    else
+                    {
+                        tbar.Maximum = item.BarValue * 2;
+                        tbar.Value = item.BarValue;
+                    }
+
+                    box.Text = item.BoxValue;   //trackbar to textbox value
+
+                    MakeRequest(RequestId.SlideParam, item.Request);
                 }
             }
-            DisplayData();
         }
         #endregion
 
@@ -676,7 +695,12 @@ namespace FamilyEditorInterface
             FamilyEditorItem item = label.Tag as FamilyEditorItem;
             if (item.BuiltIn)
             {
-                DialogResult dialogResult = MessageBox.Show(String.Format("Can't edit or delete BuiltInParameter"), "Error.", MessageBoxButtons.OK);
+                DialogResult dialogResult = MessageBox.Show(String.Format("Cannot edit or delete BuiltInParameter"), "Error.", MessageBoxButtons.OK);
+                return;
+            }
+            else if (item.Shared)
+            {
+                DialogResult dialogResult = MessageBox.Show(String.Format("Cannot rename Shared Parameter"), "Error.", MessageBoxButtons.OK);
                 return;
             }
             if (System.Windows.Forms.Control.ModifierKeys == Keys.Shift)
@@ -824,21 +848,11 @@ namespace FamilyEditorInterface
                 DisplayData();
             }
         }  
-        private void pictureBox_MouseEnter(object sender, EventArgs e)
-        {
-           PictureBox pbox = sender as PictureBox;
-            pbox.BorderStyle = BorderStyle.FixedSingle;
-        }
-
-        private void pictureBox_MouseLeave(object sender, EventArgs e)
-        {
-            PictureBox pbox = sender as PictureBox;
-            pbox.BorderStyle = BorderStyle.None;
-        }
 
         private void shuffleToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Shuffle();
+            DisplayData();
         }
 
         // Escape button - doesn't work here?!

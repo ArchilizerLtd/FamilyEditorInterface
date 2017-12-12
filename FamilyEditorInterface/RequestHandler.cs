@@ -81,15 +81,11 @@ namespace FamilyEditorInterface
             return;
         }
          /// <summary>
-         ///   The main door-modification subroutine - called from every request 
+         /// Executes on restore all values
          /// </summary>
-         /// <remarks>
-         ///   It searches the current selection for all doors
-         ///   and if it finds any it applies the requested operation to them
-         /// </remarks>
-         /// <param name="uiapp">The Revit application object</param>
-         /// <param name="text">Caption of the transaction for the operation.</param>
-         /// <param name="operation">A delegate to perform the operation on an instance of a door.</param>
+         /// <param name="uiapp"></param>
+         /// <param name="text"></param>
+         /// <param name="values"></param>
         private void ExecuteParameterChange(UIApplication uiapp, String text, List<Tuple<string, string, double>> values)
         {
             UIDocument uidoc = uiapp.ActiveUIDocument;

@@ -63,6 +63,36 @@ namespace FamilyEditorInterface.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap aecarchbaseres_15681_1 {
+            get {
+                object obj = ResourceManager.GetObject("aecarchbaseres_15681_1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap aecbaseres_13442 {
+            get {
+                object obj = ResourceManager.GetObject("aecbaseres_13442", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap aecbaseres_14380_2 {
+            get {
+                object obj = ResourceManager.GetObject("aecbaseres_14380_2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap archilizer_01 {
             get {
                 object obj = ResourceManager.GetObject("archilizer_01", resourceCulture);
@@ -83,29 +113,9 @@ namespace FamilyEditorInterface.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap refresh {
+        internal static System.Drawing.Bitmap revitui_2017_1 {
             get {
-                object obj = ResourceManager.GetObject("refresh", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap reload {
-            get {
-                object obj = ResourceManager.GetObject("reload", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap save {
-            get {
-                object obj = ResourceManager.GetObject("save", resourceCulture);
+                object obj = ResourceManager.GetObject("revitui_2017_1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

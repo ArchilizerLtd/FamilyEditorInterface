@@ -22,7 +22,7 @@ namespace FamilyEditorInterface
         private string boxValue;
         private bool checkValue, initialName, initialValue;
         private bool associated;
-        private bool builtIn;
+        private bool builtIn, shared;
         private int precision;
 
         public FamilyEditorItem()
@@ -64,7 +64,6 @@ namespace FamilyEditorInterface
                     oldValue = value;
                     initialValue = false;
                 }
-                //Convert.ToInt32(value) == 0 ? 100 :
                 this.barValue = Convert.ToInt32(value * 100);
                 this.boxValue = Math.Round(Utils.convertValueTO(this.value), this.precision).ToString();
 
@@ -181,6 +180,17 @@ namespace FamilyEditorInterface
             internal set
             {
                 builtIn = value;
+            }
+        }
+        public bool Shared
+        {
+            get
+            {
+                return shared;
+            }
+            internal set
+            {
+                shared = value;
             }
         }
         public void RestoreDefaults()

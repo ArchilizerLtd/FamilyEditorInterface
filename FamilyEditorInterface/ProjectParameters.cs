@@ -116,6 +116,7 @@ namespace FamilyEditorInterface
                     newItem.Type = fp.Definition.ParameterType.ToString();
                     newItem.Associated = associated;
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
+                    newItem.Shared = fp.IsShared;
                     newItem.addCheckbox();         
 
                     collectList.Add(newItem);
@@ -140,6 +141,7 @@ namespace FamilyEditorInterface
                     newItem.Type = fp.Definition.ParameterType.ToString();
                     newItem.Associated = associated;
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
+                    newItem.Shared = fp.IsShared;
 
                     newItem.addTrackbar();
                     newItem.addLabel();
@@ -162,6 +164,7 @@ namespace FamilyEditorInterface
                     newItem.Type = fp.Definition.ParameterType.ToString();
                     newItem.Associated = associated;
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
+                    newItem.Shared = fp.IsShared;
 
                     newItem.addTrackbar();
                     newItem.addLabel();

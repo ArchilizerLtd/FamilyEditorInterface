@@ -43,35 +43,33 @@ namespace FamilyEditorInterface
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.shuffleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitLine = new System.Windows.Forms.Label();
-            this.maximizeIcon = new System.Windows.Forms.PictureBox();
             this.offPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.paramGroupBox = new System.Windows.Forms.GroupBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.logoPictureBox = new System.Windows.Forms.PictureBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.shuffleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.shuffleBtn = new System.Windows.Forms.Button();
+            this.reloadBtn = new System.Windows.Forms.Button();
+            this.refreshBtn = new System.Windows.Forms.Button();
+            this.saveBtn = new System.Windows.Forms.Button();
+            this.logoPictureBox = new System.Windows.Forms.PictureBox();
+            this.maximizeIcon = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).BeginInit();
             this.mainContainer.Panel1.SuspendLayout();
             this.mainContainer.Panel2.SuspendLayout();
             this.mainContainer.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.maximizeIcon)).BeginInit();
             this.paramGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.maximizeIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // exitButton
             // 
             this.exitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.exitButton.Location = new System.Drawing.Point(277, 487);
+            this.exitButton.Location = new System.Drawing.Point(277, 481);
             this.exitButton.Name = "exitButton";
-            this.exitButton.Size = new System.Drawing.Size(75, 21);
+            this.exitButton.Size = new System.Drawing.Size(75, 23);
             this.exitButton.TabIndex = 5;
             this.exitButton.Text = "Exit";
             this.exitButton.UseVisualStyleBackColor = true;
@@ -80,9 +78,9 @@ namespace FamilyEditorInterface
             // setButton
             // 
             this.setButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.setButton.Location = new System.Drawing.Point(196, 487);
+            this.setButton.Location = new System.Drawing.Point(196, 481);
             this.setButton.Name = "setButton";
-            this.setButton.Size = new System.Drawing.Size(75, 21);
+            this.setButton.Size = new System.Drawing.Size(75, 23);
             this.setButton.TabIndex = 4;
             this.setButton.Text = "Settings";
             this.setButton.UseVisualStyleBackColor = true;
@@ -159,6 +157,14 @@ namespace FamilyEditorInterface
             this.toolStripMenuItem1.Text = "Restore";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.restoreStripMenuItem1_Click);
             // 
+            // shuffleToolStripMenuItem
+            // 
+            this.shuffleToolStripMenuItem.Name = "shuffleToolStripMenuItem";
+            this.shuffleToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.shuffleToolStripMenuItem.Text = "Shuffle";
+            this.shuffleToolStripMenuItem.Visible = false;
+            this.shuffleToolStripMenuItem.Click += new System.EventHandler(this.shuffleToolStripMenuItem_Click);
+            // 
             // splitLine
             // 
             this.splitLine.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -170,19 +176,6 @@ namespace FamilyEditorInterface
             this.splitLine.Size = new System.Drawing.Size(319, 1);
             this.splitLine.TabIndex = 1;
             this.splitLine.Visible = false;
-            // 
-            // maximizeIcon
-            // 
-            this.maximizeIcon.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.maximizeIcon.Image = global::FamilyEditorInterface.Properties.Resources.maximize;
-            this.maximizeIcon.InitialImage = ((System.Drawing.Image)(resources.GetObject("maximizeIcon.InitialImage")));
-            this.maximizeIcon.Location = new System.Drawing.Point(300, 367);
-            this.maximizeIcon.Name = "maximizeIcon";
-            this.maximizeIcon.Size = new System.Drawing.Size(30, 30);
-            this.maximizeIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.maximizeIcon.TabIndex = 1;
-            this.maximizeIcon.TabStop = false;
-            this.maximizeIcon.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // offPanel
             // 
@@ -210,19 +203,66 @@ namespace FamilyEditorInterface
             this.paramGroupBox.TabStop = false;
             this.paramGroupBox.Text = "Parameters";
             // 
-            // pictureBox1
+            // shuffleBtn
             // 
-            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.pictureBox1.Image = global::FamilyEditorInterface.Properties.Resources.save;
-            this.pictureBox1.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.InitialImage")));
-            this.pictureBox1.Location = new System.Drawing.Point(12, 440);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(16, 16);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 2;
-            this.pictureBox1.TabStop = false;
-            this.toolTip1.SetToolTip(this.pictureBox1, "Save");
-            this.pictureBox1.Click += new System.EventHandler(this.saveButton_Click);
+            this.shuffleBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.shuffleBtn.BackgroundImage = global::FamilyEditorInterface.Properties.Resources.aecarchbaseres_15681_1;
+            this.shuffleBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.shuffleBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.shuffleBtn.ForeColor = System.Drawing.SystemColors.Control;
+            this.shuffleBtn.Location = new System.Drawing.Point(108, 442);
+            this.shuffleBtn.Name = "shuffleBtn";
+            this.shuffleBtn.Size = new System.Drawing.Size(24, 24);
+            this.shuffleBtn.TabIndex = 9;
+            this.toolTip1.SetToolTip(this.shuffleBtn, "Shuffle ");
+            this.shuffleBtn.UseVisualStyleBackColor = true;
+            this.shuffleBtn.Visible = false;
+            this.shuffleBtn.Click += new System.EventHandler(this.shuffleToolStripMenuItem_Click);
+            // 
+            // reloadBtn
+            // 
+            this.reloadBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.reloadBtn.BackgroundImage = global::FamilyEditorInterface.Properties.Resources.aecbaseres_13442;
+            this.reloadBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.reloadBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.reloadBtn.ForeColor = System.Drawing.SystemColors.Control;
+            this.reloadBtn.Location = new System.Drawing.Point(77, 442);
+            this.reloadBtn.Name = "reloadBtn";
+            this.reloadBtn.Size = new System.Drawing.Size(24, 24);
+            this.reloadBtn.TabIndex = 8;
+            this.toolTip1.SetToolTip(this.reloadBtn, "Reload saved values.");
+            this.reloadBtn.UseVisualStyleBackColor = true;
+            this.reloadBtn.Click += new System.EventHandler(this.restoreStripMenuItem1_Click);
+            // 
+            // refreshBtn
+            // 
+            this.refreshBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.refreshBtn.BackgroundImage = global::FamilyEditorInterface.Properties.Resources.aecbaseres_14380_2;
+            this.refreshBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.refreshBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.refreshBtn.ForeColor = System.Drawing.SystemColors.Control;
+            this.refreshBtn.Location = new System.Drawing.Point(46, 442);
+            this.refreshBtn.Name = "refreshBtn";
+            this.refreshBtn.Size = new System.Drawing.Size(24, 24);
+            this.refreshBtn.TabIndex = 7;
+            this.toolTip1.SetToolTip(this.refreshBtn, "Refresh Document.");
+            this.refreshBtn.UseVisualStyleBackColor = true;
+            this.refreshBtn.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
+            // 
+            // saveBtn
+            // 
+            this.saveBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.saveBtn.BackgroundImage = global::FamilyEditorInterface.Properties.Resources.revitui_2017_1;
+            this.saveBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.saveBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.saveBtn.ForeColor = System.Drawing.SystemColors.Control;
+            this.saveBtn.Location = new System.Drawing.Point(15, 442);
+            this.saveBtn.Name = "saveBtn";
+            this.saveBtn.Size = new System.Drawing.Size(24, 24);
+            this.saveBtn.TabIndex = 6;
+            this.toolTip1.SetToolTip(this.saveBtn, "Save Parameter values.");
+            this.saveBtn.UseVisualStyleBackColor = true;
+            this.saveBtn.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // logoPictureBox
             // 
@@ -235,41 +275,19 @@ namespace FamilyEditorInterface
             this.logoPictureBox.TabIndex = 5;
             this.logoPictureBox.TabStop = false;
             // 
-            // pictureBox2
+            // maximizeIcon
             // 
-            this.pictureBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.pictureBox2.Image = global::FamilyEditorInterface.Properties.Resources.refresh;
-            this.pictureBox2.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox2.InitialImage")));
-            this.pictureBox2.Location = new System.Drawing.Point(38, 440);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(16, 16);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox2.TabIndex = 6;
-            this.pictureBox2.TabStop = false;
-            this.toolTip1.SetToolTip(this.pictureBox2, "Refresh");
-            this.pictureBox2.Click += new System.EventHandler(this.refreshButton_Click);
-            // 
-            // pictureBox3
-            // 
-            this.pictureBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.pictureBox3.BackColor = System.Drawing.SystemColors.Control;
-            this.pictureBox3.Image = global::FamilyEditorInterface.Properties.Resources.reload;
-            this.pictureBox3.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox3.InitialImage")));
-            this.pictureBox3.Location = new System.Drawing.Point(64, 440);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(16, 16);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox3.TabIndex = 7;
-            this.pictureBox3.TabStop = false;
-            this.toolTip1.SetToolTip(this.pictureBox3, "Reload");
-            this.pictureBox3.Click += new System.EventHandler(this.restoreStripMenuItem1_Click);
-            // 
-            // shuffleToolStripMenuItem
-            // 
-            this.shuffleToolStripMenuItem.Name = "shuffleToolStripMenuItem";
-            this.shuffleToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
-            this.shuffleToolStripMenuItem.Text = "Shuffle";
-            this.shuffleToolStripMenuItem.Click += new System.EventHandler(this.shuffleToolStripMenuItem_Click);
+            this.maximizeIcon.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.maximizeIcon.Image = global::FamilyEditorInterface.Properties.Resources.maximize;
+            this.maximizeIcon.InitialImage = ((System.Drawing.Image)(resources.GetObject("maximizeIcon.InitialImage")));
+            this.maximizeIcon.Location = new System.Drawing.Point(300, 367);
+            this.maximizeIcon.Name = "maximizeIcon";
+            this.maximizeIcon.Size = new System.Drawing.Size(30, 30);
+            this.maximizeIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.maximizeIcon.TabIndex = 1;
+            this.maximizeIcon.TabStop = false;
+            this.toolTip1.SetToolTip(this.maximizeIcon, "Expand to see Yes/No Parameters.");
+            this.maximizeIcon.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // Interface
             // 
@@ -277,9 +295,10 @@ namespace FamilyEditorInterface
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(364, 515);
-            this.Controls.Add(this.pictureBox3);
-            this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.shuffleBtn);
+            this.Controls.Add(this.reloadBtn);
+            this.Controls.Add(this.refreshBtn);
+            this.Controls.Add(this.saveBtn);
             this.Controls.Add(this.setButton);
             this.Controls.Add(this.logoPictureBox);
             this.Controls.Add(this.paramGroupBox);
@@ -296,12 +315,9 @@ namespace FamilyEditorInterface
             ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).EndInit();
             this.mainContainer.ResumeLayout(false);
             this.contextMenuStrip1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.maximizeIcon)).EndInit();
             this.paramGroupBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.maximizeIcon)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -319,10 +335,11 @@ namespace FamilyEditorInterface
         private ToolStripMenuItem toolStripMenuItem1;
         private ToolStripMenuItem refreshToolStripMenuItem;
         private ToolStripMenuItem saveToolStripMenuItem;
-        private PictureBox pictureBox1;
-        private PictureBox pictureBox2;
-        private PictureBox pictureBox3;
         private ToolStripMenuItem shuffleToolStripMenuItem;
         private ToolTip toolTip1;
+        private Button saveBtn;
+        private Button refreshBtn;
+        private Button reloadBtn;
+        private Button shuffleBtn;
     }
 }
