@@ -127,6 +127,9 @@
   <ItemGroup>
     <Content Include="archilizer.png.ico" />
     <Content Include="FEI icon.ico" />
+    <None Include="Resources\if_reload_62243.png" />
+    <None Include="Resources\if_arrow_circle_left_62149.png" />
+    <None Include="Resources\if_save_62248.png" />
     <EmbeddedResource Include="Resources\archilizer-01.png" />
     <EmbeddedResource Include="maximize.png" />
     <EmbeddedResource Include="minimize.png" />

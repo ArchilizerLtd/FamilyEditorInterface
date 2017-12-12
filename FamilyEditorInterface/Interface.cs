@@ -31,7 +31,7 @@ namespace FamilyEditorInterface
         private Bitmap _imageMaxi;
         private List<FamilyEditorItem> items;
         private float scale_x, scale_y;
-        private System.Drawing.Color transparent = System.Drawing.Color.FromArgb(0, 120, 120, 120);
+        private System.Drawing.Color transparent = System.Drawing.Color.FromArgb(120, 191, 231, 252);
         private int precision;
 
         // change label text fields
@@ -653,6 +653,20 @@ namespace FamilyEditorInterface
             //MessageBox.Show("You are in the Control.Wake up event.");
             //EnableCommands(true);
         }
+
+        private void Shuffle()
+        {
+            Random random = new Random();
+            foreach(FamilyEditorItem item in items)
+            {
+                if(item.getCheckbox() == null)
+                {
+                    double v = item.Value;
+                    item.Value = random.Next(0, Convert.ToInt32(v * 2));
+                }
+            }
+            DisplayData();
+        }
         #endregion
 
         #region Text Edit
@@ -789,13 +803,11 @@ namespace FamilyEditorInterface
                 e.Handled = true;
             }
         }
-
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DocumentRefresh();
         }
-
-        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        private void restoreStripMenuItem1_Click(object sender, EventArgs e)
         {
             if (!validDocument()) return;
             if (sameDocument())
@@ -803,7 +815,6 @@ namespace FamilyEditorInterface
                 LoadDefaults();
             }
         }
-
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!validDocument()) return;
@@ -812,6 +823,22 @@ namespace FamilyEditorInterface
                 SaveDefaults();
                 DisplayData();
             }
+        }  
+        private void pictureBox_MouseEnter(object sender, EventArgs e)
+        {
+           PictureBox pbox = sender as PictureBox;
+            pbox.BorderStyle = BorderStyle.FixedSingle;
+        }
+
+        private void pictureBox_MouseLeave(object sender, EventArgs e)
+        {
+            PictureBox pbox = sender as PictureBox;
+            pbox.BorderStyle = BorderStyle.None;
+        }
+
+        private void shuffleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Shuffle();
         }
 
         // Escape button - doesn't work here?!
