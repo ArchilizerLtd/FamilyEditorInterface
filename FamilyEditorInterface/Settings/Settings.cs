@@ -13,6 +13,19 @@ namespace FamilyEditorInterface.Settings
     public partial class Settings : Form
     {
         private int precision;
+        private bool systemParam;
+        public bool SystemParam
+        {
+            get
+            {
+                return systemParam;
+            }
+            internal set
+            {
+                systemParam = value;
+                sysParamChk.Checked = systemParam;
+            }
+        }
         public int Precision
         {
             get
@@ -65,6 +78,11 @@ namespace FamilyEditorInterface.Settings
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+        private void sysParamChk_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox chk = sender as CheckBox;
+            systemParam = chk.Checked;
         }
     }
 }

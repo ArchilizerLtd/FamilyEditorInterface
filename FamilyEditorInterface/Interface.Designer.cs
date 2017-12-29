@@ -45,6 +45,7 @@ namespace FamilyEditorInterface
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.shuffleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitLine = new System.Windows.Forms.Label();
+            this.maximizeIcon = new System.Windows.Forms.PictureBox();
             this.offPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.paramGroupBox = new System.Windows.Forms.GroupBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
@@ -53,15 +54,14 @@ namespace FamilyEditorInterface
             this.refreshBtn = new System.Windows.Forms.Button();
             this.saveBtn = new System.Windows.Forms.Button();
             this.logoPictureBox = new System.Windows.Forms.PictureBox();
-            this.maximizeIcon = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).BeginInit();
             this.mainContainer.Panel1.SuspendLayout();
             this.mainContainer.Panel2.SuspendLayout();
             this.mainContainer.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.maximizeIcon)).BeginInit();
             this.paramGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.maximizeIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // exitButton
@@ -177,6 +177,20 @@ namespace FamilyEditorInterface
             this.splitLine.TabIndex = 1;
             this.splitLine.Visible = false;
             // 
+            // maximizeIcon
+            // 
+            this.maximizeIcon.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.maximizeIcon.Image = global::FamilyEditorInterface.Properties.Resources.maximize;
+            this.maximizeIcon.InitialImage = ((System.Drawing.Image)(resources.GetObject("maximizeIcon.InitialImage")));
+            this.maximizeIcon.Location = new System.Drawing.Point(300, 367);
+            this.maximizeIcon.Name = "maximizeIcon";
+            this.maximizeIcon.Size = new System.Drawing.Size(30, 30);
+            this.maximizeIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.maximizeIcon.TabIndex = 1;
+            this.maximizeIcon.TabStop = false;
+            this.toolTip1.SetToolTip(this.maximizeIcon, "Expand to see Yes/No Parameters.");
+            this.maximizeIcon.Click += new System.EventHandler(this.pictureBox1_Click);
+            // 
             // offPanel
             // 
             this.offPanel.AutoScroll = true;
@@ -216,7 +230,6 @@ namespace FamilyEditorInterface
             this.shuffleBtn.TabIndex = 9;
             this.toolTip1.SetToolTip(this.shuffleBtn, "Shuffle ");
             this.shuffleBtn.UseVisualStyleBackColor = true;
-            this.shuffleBtn.Visible = false;
             this.shuffleBtn.Click += new System.EventHandler(this.shuffleToolStripMenuItem_Click);
             // 
             // reloadBtn
@@ -275,20 +288,6 @@ namespace FamilyEditorInterface
             this.logoPictureBox.TabIndex = 5;
             this.logoPictureBox.TabStop = false;
             // 
-            // maximizeIcon
-            // 
-            this.maximizeIcon.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.maximizeIcon.Image = global::FamilyEditorInterface.Properties.Resources.maximize;
-            this.maximizeIcon.InitialImage = ((System.Drawing.Image)(resources.GetObject("maximizeIcon.InitialImage")));
-            this.maximizeIcon.Location = new System.Drawing.Point(300, 367);
-            this.maximizeIcon.Name = "maximizeIcon";
-            this.maximizeIcon.Size = new System.Drawing.Size(30, 30);
-            this.maximizeIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.maximizeIcon.TabIndex = 1;
-            this.maximizeIcon.TabStop = false;
-            this.toolTip1.SetToolTip(this.maximizeIcon, "Expand to see Yes/No Parameters.");
-            this.maximizeIcon.Click += new System.EventHandler(this.pictureBox1_Click);
-            // 
             // Interface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -315,9 +314,9 @@ namespace FamilyEditorInterface
             ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).EndInit();
             this.mainContainer.ResumeLayout(false);
             this.contextMenuStrip1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.maximizeIcon)).EndInit();
             this.paramGroupBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.maximizeIcon)).EndInit();
             this.ResumeLayout(false);
 
         }

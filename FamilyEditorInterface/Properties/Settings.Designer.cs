@@ -46,5 +46,17 @@ namespace FamilyEditorInterface.Properties {
                 this["Precision"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SystemParameters {
+            get {
+                return ((bool)(this["SystemParameters"]));
+            }
+            set {
+                this["SystemParameters"] = value;
+            }
+        }
     }
 }

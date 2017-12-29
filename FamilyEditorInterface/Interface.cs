@@ -201,6 +201,8 @@ namespace FamilyEditorInterface
             txt.ForeColor = System.Drawing.Color.FromArgb(50, 50, 50);
             txt.Tag = item;
 
+            if (!item.Visible) txt.Visible = false;
+
             return txt;
         }
         private Label createLabel(FamilyEditorItem item)
@@ -227,6 +229,8 @@ namespace FamilyEditorInterface
             {
                 lbl.ForeColor = System.Drawing.Color.LightGray;
             }
+
+            if (!item.Visible) lbl.Visible = false;
 
             return lbl;
         }
@@ -259,6 +263,8 @@ namespace FamilyEditorInterface
                 trk.Enabled = false;
             }
 
+            if (!item.Visible) trk.Visible = false; 
+
             return trk;
         }
 
@@ -285,6 +291,8 @@ namespace FamilyEditorInterface
                 chk.Enabled = false;
                 chk.ForeColor = System.Drawing.Color.LightGray;
             }
+
+            if (!item.Visible) chk.Visible = false;
 
             return chk;
         }
@@ -474,6 +482,13 @@ namespace FamilyEditorInterface
             handler.Request.Make(request);
             exEvent.Raise();
         }
+        private void MakeRequest(RequestId request, List<Tuple<string, double>> values)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.Value(values);
+            handler.Request.Make(request);
+            exEvent.Raise();
+        }
         private void MakeRequest(RequestId request, string deleteValue)
         {
             //MessageBox.Show("You are in the Control.Request event.");
@@ -534,6 +549,8 @@ namespace FamilyEditorInterface
             if (!validDocument()) return;
             try
             {
+                this.ThisDocumentChanged();
+                /*
                 if (sameDocument())
                 {
                     this.DisplayData();
@@ -542,6 +559,7 @@ namespace FamilyEditorInterface
                 {
                     this.ThisDocumentChanged();
                 }
+                */
             }
             catch (Exception)
             {
@@ -660,6 +678,8 @@ namespace FamilyEditorInterface
         private void Shuffle()
         {
             Random random = new Random();
+            List<Tuple<string, double>> requestValues = new List<Tuple<string, double>>();
+
             foreach(FamilyEditorItem item in items)
             {
                 if(item.getCheckbox() == null && projectParameters.goUnits && item.Value != 0 && item.getTextbox() != null)
@@ -681,9 +701,9 @@ namespace FamilyEditorInterface
                     }
 
                     box.Text = item.BoxValue;   //trackbar to textbox value
-
-                    MakeRequest(RequestId.SlideParam, item.Request);
+                    requestValues.Add(item.Request);
                 }
+                if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
             }
         }
         #endregion
@@ -724,7 +744,7 @@ namespace FamilyEditorInterface
         }
         private void DeleteItem(Label lbl)
         {
-            DialogResult dialogResult = MessageBox.Show(String.Format("Are you sure you want to delete {0} parameter?", lbl.Text), "Delete confirmation.", MessageBoxButtons.YesNo);
+            DialogResult dialogResult = MessageBox.Show(String.Format("Are you sure you want to delete {0} parameter?", (lbl.Tag as FamilyEditorItem).Name), "Delete confirmation.", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
             {
                 FamilyEditorItem item = lbl.Tag as FamilyEditorItem;
@@ -794,11 +814,14 @@ namespace FamilyEditorInterface
             using (Settings.Settings set = new Settings.Settings())
             {
                 set.Precision = this.precision;
+                set.SystemParam = Properties.Settings.Default.SystemParameters;
                 var dialogResult = set.ShowDialog();
                 if(dialogResult == DialogResult.OK)
                 {
                     ChangePrecision(set.Precision);
                     this.precision = set.Precision;
+                    Properties.Settings.Default.SystemParameters = set.SystemParam;
+                    ThisDocumentChanged();
                 }
             }
         }

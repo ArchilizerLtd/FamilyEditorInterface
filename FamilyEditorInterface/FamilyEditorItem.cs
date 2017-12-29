@@ -24,6 +24,7 @@ namespace FamilyEditorInterface
         private bool associated;
         private bool builtIn, shared;
         private int precision;
+        private bool visible;
 
         public FamilyEditorItem()
         {
@@ -79,6 +80,17 @@ namespace FamilyEditorInterface
             internal set
             {
                 precision = value;
+            }
+        }
+        public bool Visible
+        {
+            get
+            {
+                return visible;
+            }
+            internal set
+            {
+                visible = value;
             }
         }
         public int BarValue
