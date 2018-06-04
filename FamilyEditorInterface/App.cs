@@ -46,7 +46,7 @@ namespace FamilyEditorInterface
         static string path = Assembly.GetExecutingAssembly().Location;
         static string contentPath = Path.GetDirectoryName(Path.GetDirectoryName(path)) + "/";
         static string helpFile = "file:///C:/ProgramData/Autodesk/ApplicationPlugins/FamilyEditorInterface.bundle/Content/Family%20Editor%20Interface%20_%20Revit%20_%20Autodesk%20App%20Store.html";
-        static string largeIcon = contentPath + "familyeditorinterface32.png";
+        static string largeIcon = contentPath + "family_editor_interface.png";
         static string smallIcon = contentPath + "familyeditorinterface16.png";
         #region Ribbon
         /// <summary>
@@ -81,6 +81,7 @@ namespace FamilyEditorInterface
                 application.CreateRibbonTab(tabName);
             }
             catch (Autodesk.Revit.Exceptions.ArgumentException) { }
+
             List<RibbonPanel> panels = application.GetRibbonPanels();
             RibbonPanel rvtRibbonPanel = null;
             // Pick the correct panel
@@ -94,25 +95,48 @@ namespace FamilyEditorInterface
             }
             //PulldownButtonData data = new PulldownButtonData("Options", "Family Editor" + Environment.NewLine + "Interface");
 
-            BitmapSource img32 = new BitmapImage (new Uri (@largeIcon));
-            BitmapSource img16 = new BitmapImage (new Uri (@smallIcon));
+
+            // Get dll assembly path
+            string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
+
+            //BitmapSource img32 = new BitmapImage (new Uri (@largeIcon));
+            //BitmapSource img16 = new BitmapImage (new Uri (@smallIcon));
 
             //RibbonItem item = rvtRibbonPanel.AddItem(data);
             //PushButton optionsBtn = item as PushButton;
             //ContextualHelp ch = new ContextualHelp(ContextualHelpType.Url, "file:///C:/Users/adicted/AppData/Roaming/Autodesk/Revit/Addins/2015/Family Editor Interface _ AutoCAD _ Autodesk App Store.html");
             ContextualHelp ch = new ContextualHelp(ContextualHelpType.Url, @helpFile);
             
-            PushButton familyEI = rvtRibbonPanel.AddItem(new PushButtonData("Family Editor", "Family Editor" + Environment.NewLine +  "Interface", path,
-                "FamilyEditorInterface.Command")) as PushButton;
+            //PushButton familyEI = rvtRibbonPanel.AddItem(new PushButtonData("Family Editor", "Family Editor" + Environment.NewLine +  "Interface", path,
+            //    "FamilyEditorInterface.Command")) as PushButton;
 
-            familyEI.Image = img16;
-            familyEI.LargeImage = img32;
-            familyEI.ToolTip = Message;
-            familyEI.SetContextualHelp(ch);
+
+            CreatePushButton(rvtRibbonPanel, String.Format("Family Editor" + Environment.NewLine + "Interface"), thisAssemblyPath, "FamilyEditorInterface.Command",
+                Message, "family_editor_interface.png", ch);
+
+            //familyEI.Image = img16;
+            //familyEI.LargeImage = img32;
+            //familyEI.ToolTip = Message;
+            //familyEI.SetContextualHelp(ch);
             //optionsBtn.AddPushButton(new PushButtonData("Automatic Dimensions", "AutoDim", path,
             //    "AutomaticDimensions.AutoDim"));
             //optionsBtn.AddPushButton(new PushButtonData("CAD|BIM", "CAD|BIM", path,
             //    "BimpowAddIn.BimToCad"));
+        }
+
+        private static void CreatePushButton(RibbonPanel ribbonPanel, string name, string path, string command, string tooltip, string icon, ContextualHelp ch)
+        {
+            PushButtonData pbData = new PushButtonData(
+                name,
+                name,
+                path,
+                command);
+
+            PushButton pb = ribbonPanel.AddItem(pbData) as PushButton;
+            pb.ToolTip = tooltip;
+            pb.SetContextualHelp(ch);
+            BitmapImage pb2Image = new BitmapImage(new Uri(String.Format("pack://application:,,,/FamilyEditorInterface;component/Resources/{0}", icon)));
+            pb.LargeImage = pb2Image;
         }
         /// <summary>
         /// event handler that auto-rejects renaming of views

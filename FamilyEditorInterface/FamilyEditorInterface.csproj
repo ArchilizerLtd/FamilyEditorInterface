@@ -127,6 +127,7 @@
   <ItemGroup>
     <Content Include="archilizer.png.ico" />
     <Content Include="FEI icon.ico" />
+    <Resource Include="Resources\family_editor_interface.png" />
     <None Include="Resources\revitui_2017-1.png" />
     <None Include="Resources\aecbaseres_14380-2.png" />
     <None Include="Resources\aecbaseres_13442.png" />
