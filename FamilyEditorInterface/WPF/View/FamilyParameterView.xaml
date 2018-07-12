@@ -3,9 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FamilyEditorInterface.WPF"
+        xmlns:local="clr-namespace:FamilyEditorInterface.WPF;assembly="
         mc:Ignorable="d"
         Title="FamilyParameterView" Height="450" Width="800">
+    <Window.Resources>
+        <local:RevitToUnitConverter x:Key="ReverseUnitConverter"></local:RevitToUnitConverter>
+    </Window.Resources>
     <Grid Margin="20">
         <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True">
             <ItemsControl.ItemTemplate>
@@ -20,7 +23,7 @@
                                 <KeyBinding Command="{Binding AddCommand}" Key="Return"/>
                             </TextBox.InputBindings>
                         </TextBox>
-                        <TextBox Text="{Binding Value}" Grid.Column="1"/>
+                        <TextBox Text="{Binding Value, Converter={StaticResource ReverseUnitConverter}}" Grid.Column="1"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

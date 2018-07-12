@@ -78,6 +78,9 @@ namespace FamilyEditorInterface.WPF
             this._Application = uiapp;
             this.exEvent = exEvent;
             this.handler = handler;
+
+            Utils.Init(this.doc);
+
             this.PopulateModel();
             this._enabled = true;
         }
@@ -163,7 +166,7 @@ namespace FamilyEditorInterface.WPF
                 else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
                 eId.Add(fp.Id);
 
-                //DisplayUnitType dut = this.doc.GetUnits().GetDisplayUnitType();
+                //DisplayUnitType dut = this.doc.GetUnits().GetDisplayUnitType(); // set family units
                 //goUnits = Utils._goUnits();
 
                 if (associated)
@@ -246,7 +249,7 @@ namespace FamilyEditorInterface.WPF
             view = new FamilyParameterView(this);
             System.Windows.Interop.WindowInteropHelper x = new System.Windows.Interop.WindowInteropHelper(view);
             x.Owner = hWndRevit.Handle;
-
+            view.Closed += FormClosed;
             view.Show();
         }
 
