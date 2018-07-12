@@ -21,6 +21,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 using System.Windows.Forms;
 using System.Diagnostics;
+using FamilyEditorInterface.WPF;
 #endregion
 
 namespace FamilyEditorInterface
@@ -35,11 +36,15 @@ namespace FamilyEditorInterface
         // class instance
         internal static Application thisApp = null;
         // ModelessForm instance
-        private Interface m_MyForm;
+        //private Interface m_MyForm;
         /// <summary>
         /// Tooltip
         /// </summary>
         public const string Message = "Interactive interface for Family Editor.";
+
+        private FamilyParameterViewModel _presenter;
+        private Document _document;
+
         /// <summary>
         /// Get absolute path to this assembly
         /// </summary>
@@ -48,6 +53,7 @@ namespace FamilyEditorInterface
         static string helpFile = "file:///C:/ProgramData/Autodesk/ApplicationPlugins/FamilyEditorInterface.bundle/Content/Family%20Editor%20Interface%20_%20Revit%20_%20Autodesk%20App%20Store.html";
         static string largeIcon = contentPath + "family_editor_interface.png";
         static string smallIcon = contentPath + "familyeditorinterface16.png";
+        private bool _disabled;
         #region Ribbon
         /// <summary>
         /// Use embedded image to load as an icon for the ribbon
@@ -176,12 +182,47 @@ namespace FamilyEditorInterface
             //a.DialogBoxShowing
             //+= new EventHandler<DialogBoxShowingEventArgs>(
             //    a_DialogBoxShowing);
-            m_MyForm = null;  // no dialog needed yet; ThermalAsset command will bring it
+            
+            _presenter = null;
             thisApp = this;  // static access to this application instance
             c_app.DocumentChanged
                 += new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(
                     c_app_DocumentChanged);
             return Result.Succeeded;
+        }
+        /// <summary>
+        /// On Document Switched
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnViewActivated(object sender, ViewActivatedEventArgs e)
+        {
+            Document doc = e.CurrentActiveView.Document;
+
+            // If the document is a Family Document, disable the UI
+            if (!doc.IsFamilyDocument)
+            {
+                if (!_disabled)
+                {
+                    _presenter.Disable();
+                    _disabled = true;
+                }
+                return;
+            }
+            else
+            {
+                if (_disabled)
+                {
+                    _presenter.Enable();
+                    _disabled = false;
+                }
+            }
+            if (_document.Title != doc.Title)
+            {
+                _document = doc;
+                _presenter._Application = new UIApplication(doc.Application);
+                _presenter.DocumentSwitched();
+            }
         }
         /// <summary>
         /// On document change, update Family Parameters
@@ -190,19 +231,19 @@ namespace FamilyEditorInterface
         /// <param name="e"></param>
         private void c_app_DocumentChanged(object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e)
         {
-            if (m_MyForm != null && m_MyForm.Visible)
+            if (_presenter != null && _presenter._enabled)
             {
                 IList<String> operations = e.GetTransactionNames();
-                if (operations.Contains("Delete param") || operations.Contains("New param"))
+                if (operations.Contains("param"))
                 {
-                    m_MyForm.ThisDocumentChanged();
-                } 
+                    _presenter.ThisDocumentChanged();
+                }
                 else if (operations.Contains("Family Types"))
                 {
                     //not sure how to filter that
                     //ICollection<ElementId> changedId = e.GetModifiedElementIds();
                     //m_MyForm.ElementChanged(changedId);
-                    m_MyForm.ThisDocumentChanged();
+                    _presenter.ThisDocumentChanged();
                 }
             }
         }
@@ -213,10 +254,10 @@ namespace FamilyEditorInterface
             c_app.DocumentChanged
                 -= new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(
                     c_app_DocumentChanged);
-
-            if (m_MyForm != null && m_MyForm.Visible)
+            
+            if (_presenter != null)
             {
-                m_MyForm.Close();
+                _presenter.Close();
             }
 
             return Result.Succeeded;
@@ -238,25 +279,38 @@ namespace FamilyEditorInterface
                 _hWndRevit = new WindowHandle(h);
             }
 
-            if (m_MyForm == null || m_MyForm.IsDisposed)
+
+            if (_presenter == null || _presenter.IsClosed)
             {
                 //new handler
                 RequestHandler handler = new RequestHandler();
                 //new event
                 ExternalEvent exEvent = ExternalEvent.Create(handler);
+                // set current document
+                _document = uiapp.ActiveUIDocument.Document;
+                
+                _presenter = new FamilyParameterViewModel(uiapp,exEvent,handler);
 
-                m_MyForm = new Interface(uiapp, exEvent, handler);
-                //pass parent (Revit) thread here
-                m_MyForm.Show(_hWndRevit);
+                try
+                {
+                    //pass parent (Revit) thread here
+                    _presenter.Show(_hWndRevit);
+                }
+                catch (Exception ex)
+                {
+                    TaskDialog.Show("Error", ex.Message);
+                    _presenter.Dispose();
+                    _presenter = null;
+                }
             }
         }
 
         public void WakeFormUp()
         {
-            if (m_MyForm != null)
-            {
-                m_MyForm.WakeUp();
-            }
+            //if (m_MyForm != null)
+            //{
+            //    m_MyForm.WakeUp();
+            //}
         }
     }
     /// <summary>
