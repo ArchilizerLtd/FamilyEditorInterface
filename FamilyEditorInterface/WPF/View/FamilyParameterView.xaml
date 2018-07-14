@@ -7,6 +7,11 @@
         mc:Ignorable="d"
         Title="FamilyParameterView" Height="450" Width="800">
     <Window.Resources>
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Style.Setters>
+                <Setter Property="local:InputBindingsManager.UpdatePropertySourceWhenEnterPressed" Value="TextBox.Text"/>
+            </Style.Setters>
+        </Style>
         <local:RevitToUnitConverter x:Key="ReverseUnitConverter"></local:RevitToUnitConverter>
         <local:MultiplyConverter x:Key="MultiplyConverter"></local:MultiplyConverter>
     </Window.Resources>
@@ -20,18 +25,13 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200">
-                            <TextBox.InputBindings>
-                                <KeyBinding Command="{Binding AddCommand}" Key="Return"/>
-                            </TextBox.InputBindings>
-                        </TextBox>
+                        <!--The Name-->
+                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="200"/>
+                        <!--The Value Slider-->
                         <Slider Value="{Binding Value, Delay=500}"
                                 Maximum="{Binding Value, Mode=OneTime, Converter={StaticResource MultiplyConverter}}"  Grid.Column="1" Margin="5"/>
-                        <TextBox Text="{Binding Value, Converter={StaticResource ReverseUnitConverter}}" Grid.Column="2" Width="100">
-                            <TextBox.InputBindings>
-                                <KeyBinding Command="{Binding AddCommand}" Key="Return"/>
-                            </TextBox.InputBindings>
-                        </TextBox>
+                        <!--The Value-->
+                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter} }" Grid.Column="2" Width="100"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
