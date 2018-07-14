@@ -18,15 +18,29 @@ namespace FamilyEditorInterface.WPF
     /// <summary>
     /// Int to Color Converter
     /// </summary>
+    public class MultiplyConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (double)value * 2;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (double)value / 2;
+        }
+    }
+    /// <summary>
+    /// Int to Color Converter
+    /// </summary>
     public class RevitToUnitConverter : IValueConverter
     {       
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return Utils.convertValueTO((double)value);
+            return Math.Round(Utils.convertValueTO((double)value),0);
         }
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return Math.Round(Utils.convertValueFROM(Double.Parse((string)value)));
+            return Utils.convertValueFROM(Double.Parse((string)value.ToString()));
         }
     }
     /// <summary>

@@ -41,7 +41,7 @@ namespace FamilyEditorInterface
         /// </summary>
         SlideParam = 1,
         /// <summary>
-        /// "Regenerate Document" request
+        /// "Delete an element" request
         /// </summary>
         DeleteId = 2,
         /// <summary>

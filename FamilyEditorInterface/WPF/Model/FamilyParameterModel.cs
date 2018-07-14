@@ -43,6 +43,7 @@ namespace FamilyEditorInterface.WPF
             get { return _value; }
             set
             {
+                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(_name, value));
                 _value = value;
                 RaisePropertyChanged("Value");
             }

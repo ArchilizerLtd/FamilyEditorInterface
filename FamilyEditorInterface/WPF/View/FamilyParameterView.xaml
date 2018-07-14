@@ -8,6 +8,7 @@
         Title="FamilyParameterView" Height="450" Width="800">
     <Window.Resources>
         <local:RevitToUnitConverter x:Key="ReverseUnitConverter"></local:RevitToUnitConverter>
+        <local:MultiplyConverter x:Key="MultiplyConverter"></local:MultiplyConverter>
     </Window.Resources>
     <Grid Margin="20">
         <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True">
@@ -17,13 +18,20 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200">
                             <TextBox.InputBindings>
                                 <KeyBinding Command="{Binding AddCommand}" Key="Return"/>
                             </TextBox.InputBindings>
                         </TextBox>
-                        <TextBox Text="{Binding Value, Converter={StaticResource ReverseUnitConverter}}" Grid.Column="1"/>
+                        <Slider Value="{Binding Value, Delay=500}"
+                                Maximum="{Binding Value, Mode=OneTime, Converter={StaticResource MultiplyConverter}}"  Grid.Column="1" Margin="5"/>
+                        <TextBox Text="{Binding Value, Converter={StaticResource ReverseUnitConverter}}" Grid.Column="2" Width="100">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="{Binding AddCommand}" Key="Return"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
