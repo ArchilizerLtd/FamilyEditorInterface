@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MahApps.Metro.Controls;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -46,13 +47,18 @@ namespace FamilyEditorInterface.WPF
     /// <summary>
     /// Interaction logic for FamilyParameterView.xaml
     /// </summary>
-    public partial class FamilyParameterView : Window
+    public partial class FamilyParameterView : MetroWindow
     {
         public FamilyParameterView(FamilyParameterViewModel vm)
         {
+            MahApps.Metro.Controls.SplitButton btn = new SplitButton();
             this.DataContext = vm;
-
             InitializeComponent();
+        }
+
+        private void btnDialogOk_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
     public static class InputBindingsManager
