@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FamilyEditorInterface.WPF
 {
@@ -12,6 +9,9 @@ namespace FamilyEditorInterface.WPF
     {
         private ExternalEvent exEvent;
         private RequestHandler handler;
+
+        public RelayCommand DeleteCommand { get; private set; }
+
         private string _name;
         private double _value;
         private string _type;
@@ -22,10 +22,13 @@ namespace FamilyEditorInterface.WPF
         private bool _visible;
         private bool _suppres;
 
+
         public FamilyParameterModel(ExternalEvent exEvent, RequestHandler handler)
         {
             this.exEvent = exEvent;
             this.handler = handler;
+
+            DeleteCommand = new RelayCommand(o => Delete("DeleteTextBox"));
         }
 
         public string Name
@@ -45,7 +48,7 @@ namespace FamilyEditorInterface.WPF
             set
             {
                 // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
-                if (!_suppres) MakeRequest(RequestId.SlideParam, new Tuple<string, double>(_name, value));
+                if (!_suppres) MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, value));
                 else _suppres = false;
                 _value = value;
                 RaisePropertyChanged("Value");
@@ -124,6 +127,12 @@ namespace FamilyEditorInterface.WPF
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+
+        private void Delete(object sender)
+        {
+            MakeRequest(RequestId.DeleteId, Name);
+            //RaisePropertyChanged("Delete");
+        }
 
         #region Request Handling
         private void MakeRequest(RequestId request, Tuple<string, string> renameValue)

@@ -3,6 +3,7 @@ using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -93,6 +94,7 @@ namespace FamilyEditorInterface.WPF
         private void PopulateModel()
         {
             ValueParameters = new ObservableCollection<FamilyParameterModel>();
+            ValueParameters.CollectionChanged += ValueParameters_CollectionChanged;
             CheckParameters = new ObservableCollection<FamilyParameterModel>();
             famParam = new SortedList<string, FamilyParameter>();
             
@@ -138,7 +140,7 @@ namespace FamilyEditorInterface.WPF
                 {
                     if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
 
-                    eId.Add(fp.Id);
+                    //eId.Add(fp.Id);
 
                     FamilyParameterModel newItem = new FamilyParameterModel(exEvent, handler); // collect data yes-no
                     newItem.Precision = Properties.Settings.Default.Precision;
@@ -152,16 +154,12 @@ namespace FamilyEditorInterface.WPF
 
                     CheckParameters.Add(newItem);
 
-                    //indexChk++;
                     continue;
                 }
                 ///slider parameters
                 if (fp.StorageType == StorageType.Double) value = Convert.ToDouble(familyType.AsDouble(fp));
                 else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
                 eId.Add(fp.Id);
-
-                //DisplayUnitType dut = this.doc.GetUnits().GetDisplayUnitType(); // set family units
-                //goUnits = Utils._goUnits();
 
                 if (associated)
                 {
@@ -174,13 +172,6 @@ namespace FamilyEditorInterface.WPF
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
                     newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.SystemParameters); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
-
-                    ////some units are not supported yet
-                    ////only if units are supported, add a text box
-                    //if (goUnits)
-                    //{
-                    //    newItem.addTextbox();
-                    //}
 
                     ValueParameters.Add(newItem);
                 }
@@ -199,7 +190,24 @@ namespace FamilyEditorInterface.WPF
                     ValueParameters.Add(newItem);
                 }
             }            
-        }        
+        }
+
+        private void ValueParameters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+                foreach (FamilyParameterModel item in e.NewItems)
+                    item.PropertyChanged += MyType_PropertyChanged;
+
+            if (e.OldItems != null)
+                foreach (FamilyParameterModel item in e.OldItems)
+                    item.PropertyChanged -= MyType_PropertyChanged;
+        }
+        void MyType_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Delete") return;
+                //_valueParameters.Remove((FamilyParameterModel)sender);
+        }
+
         /// <summary>
         /// Check parameter conditions
         /// </summary>
@@ -234,7 +242,10 @@ namespace FamilyEditorInterface.WPF
             view.Close();
             IsClosed = true;
         }
-
+        /// <summary>
+        /// Show the Window, Start the Form
+        /// </summary>
+        /// <param name="hWndRevit"></param>
         internal void Show(WindowHandle hWndRevit)
         {
             view = new FamilyParameterView(this);
@@ -243,8 +254,6 @@ namespace FamilyEditorInterface.WPF
             view.Closed += FormClosed;
             view.Show();
         }
-
-
         /// <summary>
         /// Shuffle parameter values
         /// </summary>
@@ -268,6 +277,13 @@ namespace FamilyEditorInterface.WPF
                 if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
             }
         }
+        private void MakeRequest(RequestId request, string deleteValue)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.DeleteValue(new List<string>() { deleteValue });
+            handler.Request.Make(request);
+            exEvent.Raise();
+        }
         private void MakeRequest(RequestId request, List<Tuple<string, double>> values)
         {
             //MessageBox.Show("You are in the Control.Request event.");
@@ -282,6 +298,7 @@ namespace FamilyEditorInterface.WPF
             {
                 _enabled = true;
                 view.IsEnabled = true;
+                view.Visibility = System.Windows.Visibility.Visible;
             }
         }
 
@@ -291,6 +308,7 @@ namespace FamilyEditorInterface.WPF
             {
                 _enabled = false;
                 view.IsEnabled = false;
+                view.Visibility = System.Windows.Visibility.Hidden;
             }
         }
 
@@ -307,7 +325,8 @@ namespace FamilyEditorInterface.WPF
 
         internal void DocumentSwitched()
         {
-            throw new NotImplementedException();
+            Utils.Init(this.doc);
+            this.PopulateModel();
         }
 
         internal void Dispose()
@@ -325,11 +344,7 @@ namespace FamilyEditorInterface.WPF
 
         protected void RaisePropertyChanged(string propertyName)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -198,7 +198,7 @@ namespace FamilyEditorInterface
 
             if ((uidoc != null))
             {
-                using (TransactionGroup tg = new TransactionGroup(doc, "Parameter Change"))
+                using (TransactionGroup tg = new TransactionGroup(doc, "Parameter Delete"))
                 {
                     tg.Start();
                     using (Transaction trans = new Transaction(uidoc.Document))
@@ -243,7 +243,7 @@ namespace FamilyEditorInterface
 
             if ((uidoc != null))
             {
-                using (Transaction trans = new Transaction(uidoc.Document))
+                using (Transaction trans = new Transaction(uidoc.Document, "Parameter Name Changed"))
                 {
                     // Since we'll modify the document, we need a transaction
                     // It's best if a transaction is scoped by a 'using' block

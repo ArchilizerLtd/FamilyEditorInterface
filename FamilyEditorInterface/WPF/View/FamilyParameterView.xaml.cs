@@ -19,6 +19,20 @@ using System.Windows.Shapes;
 namespace FamilyEditorInterface.WPF
 {
     /// <summary>
+    /// Boolean to Color Converter
+    /// </summary>
+    public class BoolToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (bool)value ? Visibility.Collapsed : Visibility.Visible;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return null;
+        }
+    }
+    /// <summary>
     /// Int to Color Converter
     /// </summary>
     public class MultiplyConverter : IValueConverter
@@ -33,6 +47,21 @@ namespace FamilyEditorInterface.WPF
         }
     }
     /// <summary>
+    /// Boolean to Color Converter
+    /// </summary>
+    public class BoolToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (bool)value ? new SolidColorBrush(Colors.Black) : new SolidColorBrush(Colors.LightGray);
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return null;
+        }
+
+    }
+    /// <summary>
     /// Int to Color Converter
     /// </summary>
     public class RevitToUnitConverter : IValueConverter
@@ -45,6 +74,26 @@ namespace FamilyEditorInterface.WPF
         {
             return Utils.convertValueFROM(Double.Parse((string)value.ToString()));
         }
+    }
+    public class BindingProxy : Freezable
+    {
+        #region Overrides of Freezable
+
+        protected override Freezable CreateInstanceCore()
+        {
+            return new BindingProxy();
+        }
+
+        #endregion
+
+        public object Data
+        {
+            get { return (object)GetValue(DataProperty); }
+            set { SetValue(DataProperty, value); }
+        }
+
+        public static readonly DependencyProperty DataProperty =
+         DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy));
     }
     /// <summary>
     /// Interaction logic for FamilyParameterView.xaml

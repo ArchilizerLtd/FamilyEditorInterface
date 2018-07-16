@@ -44,6 +44,7 @@ namespace FamilyEditorInterface
 
         private FamilyParameterViewModel _presenter;
         private Document _document;
+        private bool _started;
 
         /// <summary>
         /// Get absolute path to this assembly
@@ -54,6 +55,15 @@ namespace FamilyEditorInterface
         static string largeIcon = contentPath + "family_editor_interface.png";
         static string smallIcon = contentPath + "familyeditorinterface16.png";
         private bool _disabled;
+
+        public bool Started 
+        {
+            get { return _started; }
+            set
+            {
+                _started = value;
+            }
+        }
         #region Ribbon
         /// <summary>
         /// Use embedded image to load as an icon for the ribbon
@@ -179,15 +189,13 @@ namespace FamilyEditorInterface
         {
             ControlledApplication c_app = a.ControlledApplication;
             AddRibbonPanel(a);
-            //a.DialogBoxShowing
-            //+= new EventHandler<DialogBoxShowingEventArgs>(
-            //    a_DialogBoxShowing);
             
             _presenter = null;
             thisApp = this;  // static access to this application instance
             c_app.DocumentChanged
                 += new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(
                     c_app_DocumentChanged);
+            a.ViewActivated += new EventHandler<Autodesk.Revit.UI.Events.ViewActivatedEventArgs>(OnViewActivated);
             return Result.Succeeded;
         }
         /// <summary>
@@ -197,6 +205,7 @@ namespace FamilyEditorInterface
         /// <param name="e"></param>
         private void OnViewActivated(object sender, ViewActivatedEventArgs e)
         {
+            if (!Started) return;
             Document doc = e.CurrentActiveView.Document;
 
             // If the document is a Family Document, disable the UI
@@ -231,20 +240,34 @@ namespace FamilyEditorInterface
         /// <param name="e"></param>
         private void c_app_DocumentChanged(object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e)
         {
+            List<string> commands = new List<string>()
+            {
+                "param",
+                "Modify element attributes",
+                "Family Types",
+                "Add Parameter",
+                "Delete Selection",
+                "Delete Parameter",
+                "Parameter Delete",
+                "Parameter Change",
+                "Change Parameter Name",
+                "Project Units"
+            };
+            if (!Started) return;
             if (_presenter != null && _presenter._enabled)
             {
                 IList<String> operations = e.GetTransactionNames();
-                if (operations.Contains("param"))
+                if (commands.Any(operations.Contains))
                 {
                     _presenter.ThisDocumentChanged();
                 }
-                else if (operations.Contains("Family Types"))
-                {
-                    //not sure how to filter that
-                    //ICollection<ElementId> changedId = e.GetModifiedElementIds();
-                    //m_MyForm.ElementChanged(changedId);
-                    _presenter.ThisDocumentChanged();
-                }
+                //else if (operations.Contains("Family Types"))
+                //{
+                //    //not sure how to filter that
+                //    //ICollection<ElementId> changedId = e.GetModifiedElementIds();
+                //    //m_MyForm.ElementChanged(changedId);
+                //    _presenter.ThisDocumentChanged();
+                //}
             }
         }
 
@@ -254,7 +277,9 @@ namespace FamilyEditorInterface
             c_app.DocumentChanged
                 -= new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(
                     c_app_DocumentChanged);
-            
+
+            a.ViewActivated -= new EventHandler<Autodesk.Revit.UI.Events.ViewActivatedEventArgs>(OnViewActivated);
+            Started = false;
             if (_presenter != null)
             {
                 _presenter.Close();
@@ -282,13 +307,18 @@ namespace FamilyEditorInterface
 
             if (_presenter == null || _presenter.IsClosed)
             {
+                if(!uiapp.ActiveUIDocument.Document.IsFamilyDocument)
+                {
+                    TaskDialog.Show("Error", "Usable only in Family Documents");
+                    return;
+                }
                 //new handler
                 RequestHandler handler = new RequestHandler();
                 //new event
                 ExternalEvent exEvent = ExternalEvent.Create(handler);
                 // set current document
+
                 _document = uiapp.ActiveUIDocument.Document;
-                
                 _presenter = new FamilyParameterViewModel(uiapp,exEvent,handler);
 
                 try

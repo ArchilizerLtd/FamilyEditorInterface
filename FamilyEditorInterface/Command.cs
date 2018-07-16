@@ -28,6 +28,7 @@ namespace FamilyEditorInterface
         {            
             try
             {
+                Application.thisApp.Started = true;
                 Application.thisApp.ShowForm(commandData.Application);
                 return Result.Succeeded;
             }
