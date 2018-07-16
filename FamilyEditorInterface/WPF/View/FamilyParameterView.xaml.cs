@@ -1,4 +1,6 @@
 ﻿using MahApps.Metro.Controls;
+using MaterialDesignColors;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -53,12 +55,77 @@ namespace FamilyEditorInterface.WPF
         {
             MahApps.Metro.Controls.SplitButton btn = new SplitButton();
             this.DataContext = vm;
+
+            // Places the UI where it needs to go
+            this.Loaded += new RoutedEventHandler(MyWindow_Loaded);
+
+            InitializeMaterialDesign();
             InitializeComponent();
         }
-
-        private void btnDialogOk_Click(object sender, RoutedEventArgs e)
+        private void InitializeMaterialDesign()
         {
+            // Create dummy objects to force the MaterialDesign assemblies to be loaded
+            // from this assembly, which causes the MaterialDesign assemblies to be searched
+            // relative to this assembly's path. Otherwise, the MaterialDesign assemblies
+            // are searched relative to Eclipse's path, so they're not found.
+            var card = new Card();
+            var hue = new Hue("Dummy", Colors.Black, Colors.White);
+        }
+        private void BtnDialogOk_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+        #region Location
+        // On loaded, move the UI to the up-right corner
+        // or load the previous position and size
+        private void MyWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.WindowStartupLocation = WindowStartupLocation.Manual;
+            double screenHeight = SystemParameters.FullPrimaryScreenHeight;
+            double screenWidth = SystemParameters.FullPrimaryScreenWidth;
+            this.Top = 160;
+            this.Left = screenWidth - this.Width - 80;
+            try
+            {
+                Rect bounds = Properties.Settings.Default.WindowPosition;
+                if (bounds.IsEmpty)
+                {
+                    SavePosition();
+                    return;
+                }
+                if (bounds.Top != 0)
+                {
+                    this.Top = bounds.Top;
 
+                }
+                if (bounds.Left != 0)
+                {
+                    this.Left = bounds.Left;
+                }
+                // Restore the size only for a manually sized window.
+                if (bounds.Width != 0 && bounds.Height != 0)
+                {
+                    this.SizeToContent = SizeToContent.Manual;
+                    this.Width = bounds.Width;
+                    this.Height = bounds.Height;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("No settings stored.");
+            }
+        }
+        // Save the location of the UI (per user)
+        private void SavePosition()
+        {
+            Properties.Settings.Default.WindowPosition = this.RestoreBounds;
+            Properties.Settings.Default.Save();
+        }
+        #endregion
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            SavePosition();
         }
     }
     public static class InputBindingsManager
@@ -134,5 +201,6 @@ namespace FamilyEditorInterface.WPF
                 binding.UpdateSource();
             }
         }
+
     }
 }

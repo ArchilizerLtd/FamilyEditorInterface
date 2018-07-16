@@ -5,16 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FamilyEditorInterface.WPF;assembly="                      
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         x:Name="MainWindow"
-        GlowBrush="{DynamicResource AccentColorBrush}"
+        TextElement.FontWeight="Light"
+        TextElement.FontSize="12"
+        TextOptions.TextFormattingMode="Ideal"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-        Title="Family Parameters" Height="600" MaxWidth="400" Width="400">
+        Title="Family Parameters" Height="600" MaxWidth="350" Width="350" MinWidth="350"
+        Closing="MainWindow_Closing">
     <Window.Resources>
         <ResourceDictionary>
-            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}" x:Key="EnterText">
                 <Style.Setters>
                     <Setter Property="local:InputBindingsManager.UpdatePropertySourceWhenEnterPressed" Value="TextBox.Text"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="MinWidth" Value="50" />
+                    <Setter Property="Padding" Value="5"/>
                 </Style.Setters>
             </Style>
             <local:RevitToUnitConverter x:Key="ReverseUnitConverter"></local:RevitToUnitConverter>
@@ -25,27 +34,27 @@
         </ResourceDictionary>
     </Window.Resources>
     <DockPanel Margin="20,20,20,20">
-        <WrapPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,25,0,0">
-            <Button x:Name="btnShuffle" Style="{DynamicResource MetroCircleButtonStyle}" Height="30" Width="40" BorderThickness="0" Margin="0 0 60 0" Content="Shuffle"/>
-            <Button IsDefault="True" Name="btnDialogOk" Click="btnDialogOk_Click" MinWidth="85" Margin="0,0,10,0">_Ok</Button>
-            <Button IsCancel="True" MinWidth="85">_Cancel</Button>
-        </WrapPanel>
-        <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True">
+        <DockPanel DockPanel.Dock="Bottom">
+            <Button x:Name="btnShuffle" Style="{DynamicResource MetroCircleButtonStyle}" Height="30" Width="30" BorderThickness="0" Margin="0 0 60 0" DockPanel.Dock="Left"
+                    Content="{materialDesign:PackIcon Kind=Shuffle}" Command="{Binding ShuffleCommand}"/>            
+            <Button Name="btnDialogOk" Click="BtnDialogOk_Click" MinWidth="75" DockPanel.Dock="Right" HorizontalAlignment="Right" TextElement.FontSize="12">Close</Button>
+        </DockPanel>
+        <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="5">
+                    <Grid Margin="0 5 0 5">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <!--The Name-->
-                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="60" BorderThickness="0"/>
+                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource EnterText}"/>
                         <!--The Value Slider-->
                         <Slider Value="{Binding Value, Delay=500}"
-                                Maximum="{Binding Value, Mode=OneTime, Converter={StaticResource MultiplyConverter}}"  Grid.Column="1" Margin="5"/>
+                                Maximum="{Binding Value, Mode=OneTime, Converter={StaticResource MultiplyConverter}}" Grid.Column="1" Margin="10 0 10 0"/>
                         <!--The Value-->
-                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter} }" Grid.Column="2" Width="60" BorderThickness="0"/>
+                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter} }" Grid.Column="2" Style="{StaticResource EnterText}"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

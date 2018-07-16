@@ -8,6 +8,20 @@ using System.Threading.Tasks;
 
 namespace FamilyEditorInterface
 {
+    public class SingleRandom : Random
+    {
+        static SingleRandom _Instance;
+        public static SingleRandom Instance
+        {
+            get
+            {
+                if (_Instance == null) _Instance = new SingleRandom();
+                return _Instance;
+            }
+        }
+
+        private SingleRandom() { }
+    }
     public static class Utils
     {
         private static DisplayUnitType dut;

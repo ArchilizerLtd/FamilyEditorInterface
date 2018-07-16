@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace FamilyEditorInterface.WPF
 {
@@ -20,6 +21,8 @@ namespace FamilyEditorInterface.WPF
         internal bool _enabled;
         public FamilyParameterView view;
         private SortedList<string, FamilyParameter> famParam;
+
+        public ICommand ShuffleCommand { get; set; }
 
         private ObservableCollection<FamilyParameterModel> _valueParameters;
         private ObservableCollection<FamilyParameterModel> _checkParameters;
@@ -79,6 +82,8 @@ namespace FamilyEditorInterface.WPF
             this.exEvent = exEvent;
             this.handler = handler;
 
+            ShuffleCommand = new RelayCommand(o => Shuffle("ShuffleButton"));
+
             Utils.Init(this.doc);
 
             this.PopulateModel();
@@ -90,21 +95,11 @@ namespace FamilyEditorInterface.WPF
             ValueParameters = new ObservableCollection<FamilyParameterModel>();
             CheckParameters = new ObservableCollection<FamilyParameterModel>();
             famParam = new SortedList<string, FamilyParameter>();
-
-            //List<FamilyEditorItem> collectList = new List<FamilyEditorItem>();
-
+            
             FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
-
-            //if (familyType == null)
-            //{
-            //    familyType = CreateDefaultFamilyType(familyManager);
-            //}
-
-            //int indexChk = 0;
+            
             double value = 0.0;
-
-            //famParam.Clear();
 
             foreach (FamilyParameter fp in familyManager.Parameters)
             {
@@ -112,7 +107,6 @@ namespace FamilyEditorInterface.WPF
                 else famParam.Add(fp.Definition.Name, fp);
             }
 
-            //add controlls
             List<ElementId> eId = new List<ElementId>();
 
             FilteredElementCollector collector = new FilteredElementCollector(doc);
@@ -204,10 +198,8 @@ namespace FamilyEditorInterface.WPF
                     
                     ValueParameters.Add(newItem);
                 }
-            }
-            //sort(collectList);
-        }
-        
+            }            
+        }        
         /// <summary>
         /// Check parameter conditions
         /// </summary>
@@ -240,7 +232,6 @@ namespace FamilyEditorInterface.WPF
         internal void Close()
         {
             view.Close();
-
             IsClosed = true;
         }
 
@@ -251,6 +242,38 @@ namespace FamilyEditorInterface.WPF
             x.Owner = hWndRevit.Handle;
             view.Closed += FormClosed;
             view.Show();
+        }
+
+
+        /// <summary>
+        /// Shuffle parameter values
+        /// </summary>
+        private void Shuffle(object sender)
+        {
+            SingleRandom random = SingleRandom.Instance;
+            List<Tuple<string, double>> requestValues = new List<Tuple<string, double>>();
+
+            foreach (var item in _valueParameters)
+            {
+                if (item.Value != 0)
+                {
+                    double v = item.Value;
+                    double plus = (v + 0.25 * v);    // plus minus values - around the current value +-25%
+                    double minus = (v - 0.25 * v);
+                    double randValue = random.NextDouble() * (plus - minus) + minus;
+                    item.SuppressUpdate();
+                    item.Value = randValue;
+                    requestValues.Add(new Tuple<string, double>(item.Name, randValue));
+                }
+                if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
+            }
+        }
+        private void MakeRequest(RequestId request, List<Tuple<string, double>> values)
+        {
+            //MessageBox.Show("You are in the Control.Request event.");
+            handler.Request.Value(values);
+            handler.Request.Make(request);
+            exEvent.Raise();
         }
 
         internal void Enable()
@@ -300,7 +323,6 @@ namespace FamilyEditorInterface.WPF
         }
         #endregion
 
-
         protected void RaisePropertyChanged(string propertyName)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
@@ -311,5 +333,38 @@ namespace FamilyEditorInterface.WPF
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+    }
+    /// <summary>
+    /// The Command interface that will let us relay button events to view model methods
+    /// </summary>
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Predicate<object> _canExecute;
+
+        public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
+        {
+            if (execute == null) throw new ArgumentNullException("execute");
+
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            return _canExecute == null || _canExecute(parameter);
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public void Execute(object parameter)
+        {
+            _execute(parameter ?? "<N/A>");
+        }
+
     }
 }

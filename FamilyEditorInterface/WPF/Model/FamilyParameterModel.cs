@@ -20,6 +20,7 @@ namespace FamilyEditorInterface.WPF
         private bool _shared;
         private int _precision;
         private bool _visible;
+        private bool _suppres;
 
         public FamilyParameterModel(ExternalEvent exEvent, RequestHandler handler)
         {
@@ -43,7 +44,9 @@ namespace FamilyEditorInterface.WPF
             get { return _value; }
             set
             {
-                MakeRequest(RequestId.SlideParam, new Tuple<string, double>(_name, value));
+                // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
+                if (!_suppres) MakeRequest(RequestId.SlideParam, new Tuple<string, double>(_name, value));
+                else _suppres = false;
                 _value = value;
                 RaisePropertyChanged("Value");
             }
@@ -157,6 +160,11 @@ namespace FamilyEditorInterface.WPF
             handler.Request.AllValues(value);
             handler.Request.Make(request);
             exEvent.Raise();
+        }
+
+        internal void SuppressUpdate()
+        {
+            this._suppres = true;
         }
         #endregion
 
