@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace FamilyEditorInterface
 {
@@ -48,6 +49,12 @@ namespace FamilyEditorInterface
                     return p;
                 case DisplayUnitType.DUT_DECIMAL_INCHES:
                     return p * 12;
+                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
+                    NotSupported(dut);
+                    break;
+                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
+                    NotSupported(dut);
+                    break;
                 case DisplayUnitType.DUT_METERS_CENTIMETERS:
                     return p * METERS_IN_FEET;
                 case DisplayUnitType.DUT_MILLIMETERS:
@@ -74,6 +81,12 @@ namespace FamilyEditorInterface
                     return p;
                 case DisplayUnitType.DUT_DECIMAL_INCHES:
                     return p / 12;
+                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
+                    NotSupported(dut);
+                    break;
+                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
+                    NotSupported(dut);
+                    break;
                 case DisplayUnitType.DUT_METERS_CENTIMETERS:
                     return p / METERS_IN_FEET;
                 case DisplayUnitType.DUT_MILLIMETERS:
@@ -82,6 +95,14 @@ namespace FamilyEditorInterface
                     return p / METERS_IN_FEET / 10;
             }
             return p;
+        }
+        /// <summary>
+        /// Throw exception on unsupported dut type
+        /// </summary>
+        /// <param name="dut"></param>
+        private static void NotSupported(DisplayUnitType dut)
+        {
+            MessageBox.Show("Unit Type not supported.", "Unit Error");
         }
         /// <summary>
         /// check if we support user units

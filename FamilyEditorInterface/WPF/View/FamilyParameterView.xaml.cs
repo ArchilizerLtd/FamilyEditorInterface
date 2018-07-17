@@ -17,7 +17,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace FamilyEditorInterface.WPF
-{
+{    
+    /// <summary>
+    /// Boolean to CheckBox Converter
+    /// </summary>
+    public class BoolToCheckedConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (double)value > 0.0 ? true : false;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (bool)value ? 1.0 : 0.0;
+        }
+    }
     /// <summary>
     /// Boolean to Color Converter
     /// </summary>
@@ -68,7 +82,7 @@ namespace FamilyEditorInterface.WPF
     {       
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return Math.Round(Utils.convertValueTO((double)value),0);
+            return Math.Round(Utils.convertValueTO((double)value), Properties.Settings.Default.Precision);
         }
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
@@ -179,7 +193,6 @@ namespace FamilyEditorInterface.WPF
     }
     public static class InputBindingsManager
     {
-
         public static readonly DependencyProperty UpdatePropertySourceWhenEnterPressedProperty = DependencyProperty.RegisterAttached(
                 "UpdatePropertySourceWhenEnterPressed", typeof(DependencyProperty), typeof(InputBindingsManager), new PropertyMetadata(null, OnUpdatePropertySourceWhenEnterPressedPropertyChanged));
 

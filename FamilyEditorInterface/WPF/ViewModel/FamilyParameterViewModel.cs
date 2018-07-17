@@ -24,6 +24,8 @@ namespace FamilyEditorInterface.WPF
         private SortedList<string, FamilyParameter> famParam;
 
         public ICommand ShuffleCommand { get; set; }
+        public ICommand PrecisionCommand { get; set; }
+        public ICommand DeleteUnusedCommand { get; set; }
 
         private ObservableCollection<FamilyParameterModel> _valueParameters;
         private ObservableCollection<FamilyParameterModel> _builtInParameters;
@@ -94,8 +96,8 @@ namespace FamilyEditorInterface.WPF
             this.handler = handler;
 
             ShuffleCommand = new RelayCommand(o => Shuffle("ShuffleButton"));
-
-            Utils.Init(this.doc);
+            PrecisionCommand = new RelayCommand(o => Precision("PrecisionButton"));
+            DeleteUnusedCommand = new RelayCommand(o => DeleteUnused("DeleteUnusedButton"));
 
             this.PopulateModel();
             this._enabled = true;
@@ -112,6 +114,7 @@ namespace FamilyEditorInterface.WPF
             FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
             
+            Utils.Init(this.doc);
             double value = 0.0;
 
             foreach (FamilyParameter fp in familyManager.Parameters)
@@ -289,10 +292,47 @@ namespace FamilyEditorInterface.WPF
                 if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
             }
         }
-        private void MakeRequest(RequestId request, string deleteValue)
+        /// <summary>
+        /// Change Precision
+        /// </summary>
+        private void Precision(object sender)
+        {
+            Settings settings = new Settings();
+            var holder = Properties.Settings.Default.Precision;
+            if (settings.ShowDialog() == true)
+            {
+                if (Properties.Settings.Default.Precision != holder)
+                    PopulateModel();
+            }
+        }
+        /// <summary>
+        /// Delete Unused Parameters
+        /// </summary>
+        /// <param name="sender"></param>
+        private void DeleteUnused(object sender)
+        {
+            List<string> values = new List<string>();
+
+            foreach(var item in ValueParameters)
+            {
+                if (!item.Associated) values.Add(item.Name);
+            }
+
+            foreach (var item in CheckParameters)
+            {
+                if (!item.Associated) values.Add(item.Name);
+            }
+
+            if (values.Count > 0)
+            {
+                System.Windows.Forms.MessageBox.Show(string.Format("{0} Parameters will be removed.", values.Count.ToString()));
+                MakeRequest(RequestId.DeleteId, values);
+            }
+        }
+        private void MakeRequest(RequestId request, List<string> values)
         {
             //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.DeleteValue(new List<string>() { deleteValue });
+            handler.Request.DeleteValue(values);
             handler.Request.Make(request);
             exEvent.Raise();
         }

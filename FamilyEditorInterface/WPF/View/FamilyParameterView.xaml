@@ -13,7 +13,7 @@
         TextOptions.TextFormattingMode="Ideal"
         FontFamily="{DynamicResource MaterialDesignFont}"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-        Title="Family Parameters" Height="600" MaxWidth="350" Width="350" MinWidth="350"
+        Title="Family Parameters" Height="600" MaxWidth="360" Width="360" MinWidth="360"
         Closing="MainWindow_Closing">
     <Window.Resources>
         <ResourceDictionary>
@@ -26,10 +26,14 @@
                     <Setter Property="Padding" Value="2 0 0 0"/>
                 </Style.Setters>
             </Style>
+            <DataTemplate x:Key="expanderHeader">
+                <TextBlock Text="{Binding}" FontSize="14" FontWeight="Medium" Margin="-24 0 0 0"/>
+            </DataTemplate>
             <local:RevitToUnitConverter x:Key="ReverseUnitConverter"></local:RevitToUnitConverter>
             <local:MultiplyConverter x:Key="MultiplyConverter"></local:MultiplyConverter>
             <local:BoolToColorConverter x:Key="BoolToColorConverter"></local:BoolToColorConverter>
             <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></local:BoolToVisibilityConverter>
+            <local:BoolToCheckedConverter x:Key="BoolToCheckedConverter"></local:BoolToCheckedConverter>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/FamilyEditorInterface;component/Resources/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -41,78 +45,113 @@
             <Button x:Name="btnShuffle" Style="{DynamicResource MetroCircleButtonStyle}" Height="30" Width="30" BorderThickness="0" DockPanel.Dock="Left"
                     Content="{materialDesign:PackIcon Kind=Shuffle}" Command="{Binding ShuffleCommand}" ToolTip="Shuffle Parameter Values"/>
             <Button x:Name="btnDeleteAllUnused" Style="{DynamicResource MetroCircleButtonStyle}" Height="30" Width="30" BorderThickness="0" DockPanel.Dock="Left"
-                    Content="{materialDesign:PackIcon Kind=DeleteEmpty}" ToolTip="Delete all unused Parameters"/>
+                    Content="{materialDesign:PackIcon Kind=DeleteEmpty}" Command="{Binding DeleteUnusedCommand}" ToolTip="Delete all unused Parameters"/>
             <Button x:Name="btnViewBuiltIn" Style="{DynamicResource MetroCircleButtonStyle}" Height="30" Width="30" BorderThickness="0" DockPanel.Dock="Left"
                     Content="{materialDesign:PackIcon Kind=Eye}" ToolTip="View BuiltIn Parameters"/>
+            <Button x:Name="btnSettings" Style="{DynamicResource MetroCircleButtonStyle}" Height="30" Width="30" BorderThickness="0" DockPanel.Dock="Left"
+                    Content="{materialDesign:PackIcon Kind=Settings}" Command="{Binding PrecisionCommand}" ToolTip="Settings"/>
             <Button Name="btnDialogOk" Click="BtnDialogOk_Click" MinWidth="75" DockPanel.Dock="Right" HorizontalAlignment="Right" TextElement.FontSize="12">Close</Button>
         </DockPanel>
-        <Expander Name="ValueParameters" ExpandDirection="Down" IsExpanded="True" DockPanel.Dock="Top" Header="Value Parameters" 
-                  Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-            <Expander.Content>
-                <ScrollViewer Controls:ScrollViewerHelper.VerticalScrollBarOnLeftSide="True" VerticalScrollBarVisibility="Auto"
-                          MaxHeight="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Expander}}}">
-                    <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="0 12 0 12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <!--The Name-->
-                                    <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
-                                        <TextBox.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
-                                            </ContextMenu>
-                                        </TextBox.ContextMenu>
-                                    </TextBox>
-                                    <!--The Value Slider-->
-                                    <Slider Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
+        <!--Parameters-->
+        <ScrollViewer Controls:ScrollViewerHelper.VerticalScrollBarOnLeftSide="True" VerticalScrollBarVisibility="Auto"
+                          MaxHeight="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DockPanel}}}">
+            <DockPanel DockPanel.Dock="Top" Margin="0 0 15 0">
+                <!--Value Parameters-->
+                <Expander Name="ValueParameters" ExpandDirection="Down" IsExpanded="True" DockPanel.Dock="Top"                          
+                  Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" 
+                          HeaderTemplate="{StaticResource expanderHeader}" Header="Value Parameters">
+                    <Expander.Content>
+                        <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0 12 0 12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <!--The Name-->
+                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
+                                            <TextBox.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
+                                                </ContextMenu>
+                                            </TextBox.ContextMenu>
+                                        </TextBox>
+                                        <!--The Value Slider-->
+                                        <Slider Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
                                 Maximum="{Binding Value, Mode=OneTime, Converter={StaticResource MultiplyConverter}}" Grid.Column="1" Margin="10 2 10 0" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"/>
-                                    <!--The Value-->
-                                    <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter} }" Grid.Column="2" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </Expander.Content>
-        </Expander>
-        <Expander Name="BuiltInParameters" ExpandDirection="Down" IsExpanded="False" DockPanel.Dock="Top" Header="BuiltIn Parameters" 
-                  Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" ScrollViewer.CanContentScroll="True">
-            <Expander.Content>
-                <ScrollViewer Controls:ScrollViewerHelper.VerticalScrollBarOnLeftSide="True" VerticalScrollBarVisibility="Auto"
-                              MaxHeight="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Expander}}}">
-                    <ItemsControl ItemsSource="{Binding BuiltInParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="0 12 0 12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <!--The Name-->
-                                    <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
-                                        <TextBox.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
-                                            </ContextMenu>
-                                        </TextBox.ContextMenu>
-                                    </TextBox>
-                                    <!--The Value Slider-->
-                                    <Slider Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
+                                        <!--The Value-->
+                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter} }" Grid.Column="2" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Expander.Content>
+                </Expander>
+                <!--BuiltIn Parameters-->
+                <Expander Name="BuiltInParameters" ExpandDirection="Down" IsExpanded="False" DockPanel.Dock="Top" Header="BuiltIn Parameters" 
+                  Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" ScrollViewer.CanContentScroll="True" 
+                          HeaderTemplate="{StaticResource expanderHeader}">
+                    <Expander.Content>
+                        <ItemsControl ItemsSource="{Binding BuiltInParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0 12 0 12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <!--The Name-->
+                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
+                                            <TextBox.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
+                                                </ContextMenu>
+                                            </TextBox.ContextMenu>
+                                        </TextBox>
+                                        <!--The Value Slider-->
+                                        <Slider Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
                                     Maximum="{Binding Value, Mode=OneTime, Converter={StaticResource MultiplyConverter}}" Grid.Column="1" Margin="10 2 10 0" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"/>
-                                    <!--The Value-->
-                                    <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter} }" Grid.Column="2" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </Expander.Content>
-        </Expander>
+                                        <!--The Value-->
+                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter}}" Grid.Column="2" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Expander.Content>
+                </Expander>
+                <!--Yes/No Parameters-->
+                <Expander Name="YesNoParameters" ExpandDirection="Down" IsExpanded="False" DockPanel.Dock="Top" Header="Yes/No Parameters" 
+                  Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" ScrollViewer.CanContentScroll="True"
+                          HeaderTemplate="{StaticResource expanderHeader}">
+                    <Expander.Content>
+                        <ItemsControl ItemsSource="{Binding CheckParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0 12 0 12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <!--The Name-->
+                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
+                                            <TextBox.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
+                                                </ContextMenu>
+                                            </TextBox.ContextMenu>
+                                        </TextBox>
+                                        <!--The Value Slider-->
+                                        <CheckBox IsChecked="{Binding Value, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="1"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Expander.Content>
+                </Expander>
+            </DockPanel>
+        </ScrollViewer>
     </DockPanel>
 </Controls:MetroWindow>
