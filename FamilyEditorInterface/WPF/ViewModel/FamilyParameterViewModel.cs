@@ -26,6 +26,7 @@ namespace FamilyEditorInterface.WPF
         public ICommand ShuffleCommand { get; set; }
 
         private ObservableCollection<FamilyParameterModel> _valueParameters;
+        private ObservableCollection<FamilyParameterModel> _builtInParameters;
         private ObservableCollection<FamilyParameterModel> _checkParameters;
 
         public ObservableCollection<FamilyParameterModel> ValueParameters
@@ -35,6 +36,15 @@ namespace FamilyEditorInterface.WPF
             {
                 _valueParameters = value;
                 RaisePropertyChanged("ValueParameters");
+            }
+        }
+        public ObservableCollection<FamilyParameterModel> BuiltInParameters
+        {
+            get { return _builtInParameters; }
+            set
+            {
+                _builtInParameters = value;
+                RaisePropertyChanged("BuiltInParameters");
             }
         }
         public ObservableCollection<FamilyParameterModel> CheckParameters
@@ -95,6 +105,7 @@ namespace FamilyEditorInterface.WPF
         {
             ValueParameters = new ObservableCollection<FamilyParameterModel>();
             ValueParameters.CollectionChanged += ValueParameters_CollectionChanged;
+            BuiltInParameters = new ObservableCollection<FamilyParameterModel>();
             CheckParameters = new ObservableCollection<FamilyParameterModel>();
             famParam = new SortedList<string, FamilyParameter>();
             
@@ -135,6 +146,7 @@ namespace FamilyEditorInterface.WPF
             foreach (FamilyParameter fp in famParam.Values)
             {
                 bool associated = !fp.AssociatedParameters.IsEmpty || paramUsed.Any(x => x.Definition.Name.Equals(fp.Definition.Name));
+                bool builtIn = fp.Id.IntegerValue < 0;
                 ///yes-no parameters
                 if (fp.Definition.ParameterType.Equals(ParameterType.YesNo))
                 {
@@ -161,7 +173,7 @@ namespace FamilyEditorInterface.WPF
                 else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
                 eId.Add(fp.Id);
 
-                if (associated)
+                if (!builtIn)
                 {
                     FamilyParameterModel newItem = new FamilyParameterModel(exEvent, handler);  // collect data slider, value != 0
                     newItem.Precision = Properties.Settings.Default.Precision;
@@ -186,8 +198,8 @@ namespace FamilyEditorInterface.WPF
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
                     newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.SystemParameters); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
-                    
-                    ValueParameters.Add(newItem);
+
+                    BuiltInParameters.Add(newItem);
                 }
             }            
         }
