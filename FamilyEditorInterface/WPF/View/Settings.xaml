@@ -35,8 +35,8 @@
 " Name="lblWarningNumber" Grid.Column="1">Precision</Label>
         <TextBox Margin="5 0 0 0"  Padding="2" Name="txtAnswer" Grid.Column="1" Grid.Row="1" MinWidth="250" PreviewTextInput="txtAnswer_PreviewTextInput">Answer</TextBox>
         <WrapPanel Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,25,0,0">
-            <Button IsDefault="True" Name="btnDialogOk" Click="btnDialogOk_Click" MinWidth="75" Margin="0,0,10,0">_Ok</Button>
-            <Button IsCancel="True" MinWidth="75">_Cancel</Button>
+            <Button IsDefault="True" Name="btnDialogOk" Click="btnDialogOk_Click" MinWidth="75" Margin="0,0,10,0" TextElement.FontSize="12">_Ok</Button>
+            <Button IsCancel="True" MinWidth="75" TextElement.FontSize="12">_Cancel</Button>
         </WrapPanel>
     </Grid>
 </Controls:MetroWindow>

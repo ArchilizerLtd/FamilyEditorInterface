@@ -117,7 +117,7 @@ namespace FamilyEditorInterface
                     newItem.Associated = associated;
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
-                    newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.SystemParameters); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
+                    newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.AssociatedVisibility); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
                     newItem.addCheckbox();         
 
                     collectList.Add(newItem);
@@ -143,7 +143,7 @@ namespace FamilyEditorInterface
                     newItem.Associated = associated;
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
-                    newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.SystemParameters); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
+                    newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.AssociatedVisibility); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
 
                     newItem.addTrackbar();
                     newItem.addLabel();
@@ -167,7 +167,7 @@ namespace FamilyEditorInterface
                     newItem.Associated = associated;
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
-                    newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.SystemParameters); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
+                    newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.AssociatedVisibility); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
 
                     newItem.addTrackbar();
                     newItem.addLabel();

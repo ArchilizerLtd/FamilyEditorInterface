@@ -58,7 +58,16 @@ namespace FamilyEditorInterface.WPF
         // Checks the input against the Regex (only positive integers)
         private static bool IsTextAllowed(string text)
         {
-            return !_regex.IsMatch(text);
+            int result = 0;
+            if (Int32.TryParse(text, out result))
+            {
+                // Your conditions
+                if (result >= 0 && result < 5)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

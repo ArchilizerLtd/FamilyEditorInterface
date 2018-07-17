@@ -814,13 +814,13 @@ namespace FamilyEditorInterface
             using (Settings.Settings set = new Settings.Settings())
             {
                 set.Precision = this.precision;
-                set.SystemParam = Properties.Settings.Default.SystemParameters;
+                set.SystemParam = Properties.Settings.Default.AssociatedVisibility;
                 var dialogResult = set.ShowDialog();
                 if(dialogResult == DialogResult.OK)
                 {
                     ChangePrecision(set.Precision);
                     this.precision = set.Precision;
-                    Properties.Settings.Default.SystemParameters = set.SystemParam;
+                    Properties.Settings.Default.AssociatedVisibility = set.SystemParam;
                     ThisDocumentChanged();
                 }
             }

@@ -26,6 +26,7 @@ namespace FamilyEditorInterface.WPF
         public ICommand ShuffleCommand { get; set; }
         public ICommand PrecisionCommand { get; set; }
         public ICommand DeleteUnusedCommand { get; set; }
+        public ICommand VisibilityCommand { get; set; }
 
         private ObservableCollection<FamilyParameterModel> _valueParameters;
         private ObservableCollection<FamilyParameterModel> _builtInParameters;
@@ -94,13 +95,21 @@ namespace FamilyEditorInterface.WPF
             this._Application = uiapp;
             this.exEvent = exEvent;
             this.handler = handler;
+            handler.EncounteredError += RollBackState;
 
             ShuffleCommand = new RelayCommand(o => Shuffle("ShuffleButton"));
             PrecisionCommand = new RelayCommand(o => Precision("PrecisionButton"));
             DeleteUnusedCommand = new RelayCommand(o => DeleteUnused("DeleteUnusedButton"));
+            VisibilityCommand = new RelayCommand(o => ChangeVisibility("ToggleVisibility"));
 
             this.PopulateModel();
             this._enabled = true;
+        }
+
+        // Force update in case of error
+        private void RollBackState(object sender, EventArgs e)
+        {
+            PopulateModel();
         }
 
         private void PopulateModel()
@@ -120,7 +129,11 @@ namespace FamilyEditorInterface.WPF
             foreach (FamilyParameter fp in familyManager.Parameters)
             {
                 if (!famEdit(fp, familyType)) continue;
-                else famParam.Add(fp.Definition.Name, fp);
+                else
+                {
+                    if (!famParam.ContainsKey(fp.Definition.Name))
+                        famParam.Add(fp.Definition.Name, fp);
+                }
             }
 
             List<ElementId> eId = new List<ElementId>();
@@ -165,7 +178,7 @@ namespace FamilyEditorInterface.WPF
                     newItem.Associated = associated;
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
-                    newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.SystemParameters); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
+                    newItem.Visible = associated ? true : Properties.Settings.Default.AssociatedVisibility;
 
                     CheckParameters.Add(newItem);
 
@@ -186,7 +199,7 @@ namespace FamilyEditorInterface.WPF
                     newItem.Associated = associated;
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
-                    newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.SystemParameters); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
+                    newItem.Visible = associated ? true : Properties.Settings.Default.AssociatedVisibility;
 
                     ValueParameters.Add(newItem);
                 }
@@ -200,7 +213,7 @@ namespace FamilyEditorInterface.WPF
                     newItem.Associated = associated;
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
-                    newItem.Visible = !(newItem.BuiltIn && !Properties.Settings.Default.SystemParameters); // if it's a built-in parameter and built-in parameters are hidden from settings, hide (false)
+                    newItem.Visible = associated ? true : Properties.Settings.Default.AssociatedVisibility;
 
                     BuiltInParameters.Add(newItem);
                 }
@@ -220,7 +233,6 @@ namespace FamilyEditorInterface.WPF
         void MyType_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "Delete") return;
-                //_valueParameters.Remove((FamilyParameterModel)sender);
         }
 
         /// <summary>
@@ -329,6 +341,26 @@ namespace FamilyEditorInterface.WPF
                 MakeRequest(RequestId.DeleteId, values);
             }
         }
+        /// <summary>
+        /// Toggle Visibility of Parameters which are not associated
+        /// </summary>
+        /// <param name="sender"></param>
+        private void ChangeVisibility(object sender)
+        {
+            Properties.Settings.Default.AssociatedVisibility = !Properties.Settings.Default.AssociatedVisibility;
+
+            foreach (var item in ValueParameters)
+                if (!item.Associated)
+                    item.Visible = Properties.Settings.Default.AssociatedVisibility;
+
+            foreach (var item in BuiltInParameters)
+                if (!item.Associated)
+                    item.Visible = Properties.Settings.Default.AssociatedVisibility;
+
+            foreach (var item in CheckParameters)
+                if (!item.Associated)
+                    item.Visible = Properties.Settings.Default.AssociatedVisibility;
+        }
         private void MakeRequest(RequestId request, List<string> values)
         {
             //MessageBox.Show("You are in the Control.Request event.");
@@ -377,7 +409,6 @@ namespace FamilyEditorInterface.WPF
 
         internal void DocumentSwitched()
         {
-            Utils.Init(this.doc);
             this.PopulateModel();
         }
 

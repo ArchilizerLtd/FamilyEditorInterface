@@ -17,7 +17,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace FamilyEditorInterface.WPF
-{    
+{
+    #region Converters
     /// <summary>
     /// Boolean to CheckBox Converter
     /// </summary>
@@ -29,7 +30,7 @@ namespace FamilyEditorInterface.WPF
         }
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return (bool)value ? 1.0 : 0.0;
+            return (bool)value ? 1.0 : -1.0;
         }
     }
     /// <summary>
@@ -39,7 +40,7 @@ namespace FamilyEditorInterface.WPF
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (bool)value ? Visibility.Collapsed : Visibility.Visible;
+            return (bool)value ? Visibility.Visible : Visibility.Collapsed;
         }
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
@@ -109,6 +110,9 @@ namespace FamilyEditorInterface.WPF
         public static readonly DependencyProperty DataProperty =
          DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy));
     }
+    #endregion
+
+    #region Main
     /// <summary>
     /// Interaction logic for FamilyParameterView.xaml
     /// </summary>
@@ -138,7 +142,40 @@ namespace FamilyEditorInterface.WPF
         {
             Close();
         }
-        #region Location
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            SavePosition();
+        }
+        // Check if the input text matches the Regex
+        private void txtAnswer_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            TextBox box = sender as TextBox;
+            if (box.SelectionLength > 0)
+            {
+                e.Handled = !IsTextAllowed(e.Text);
+            }
+            else
+            {
+                e.Handled = !IsTextAllowed(((TextBox)sender).Text + e.Text);
+            }
+        }
+        // Checks the input against the Regex (only positive integers)
+        private static bool IsTextAllowed(string text)
+        {
+            double result = 0.0;
+            if (Double.TryParse(text, out result))
+            {
+                // Your conditions
+                if (result >= 0 && result < 100000)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        #endregion
+
+    #region Location
         // On loaded, move the UI to the up-right corner
         // or load the previous position and size
         private void MyWindow_Loaded(object sender, RoutedEventArgs e)
@@ -184,13 +221,12 @@ namespace FamilyEditorInterface.WPF
             Properties.Settings.Default.WindowPosition = this.RestoreBounds;
             Properties.Settings.Default.Save();
         }
-        #endregion
-
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            SavePosition();
-        }
     }
+    #endregion
+
+
+    #region InputBindingsManager
+
     public static class InputBindingsManager
     {
         public static readonly DependencyProperty UpdatePropertySourceWhenEnterPressedProperty = DependencyProperty.RegisterAttached(
@@ -263,6 +299,6 @@ namespace FamilyEditorInterface.WPF
                 binding.UpdateSource();
             }
         }
-
     }
+    #endregion
 }

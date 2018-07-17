@@ -25,7 +25,7 @@
                     <Setter Property="MinWidth" Value="50" />
                     <Setter Property="Padding" Value="2 0 0 0"/>
                 </Style.Setters>
-            </Style>
+            </Style>            
             <DataTemplate x:Key="expanderHeader">
                 <TextBlock Text="{Binding}" FontSize="14" FontWeight="Medium" Margin="-24 0 0 0"/>
             </DataTemplate>
@@ -47,7 +47,7 @@
             <Button x:Name="btnDeleteAllUnused" Style="{DynamicResource MetroCircleButtonStyle}" Height="30" Width="30" BorderThickness="0" DockPanel.Dock="Left"
                     Content="{materialDesign:PackIcon Kind=DeleteEmpty}" Command="{Binding DeleteUnusedCommand}" ToolTip="Delete all unused Parameters"/>
             <Button x:Name="btnViewBuiltIn" Style="{DynamicResource MetroCircleButtonStyle}" Height="30" Width="30" BorderThickness="0" DockPanel.Dock="Left"
-                    Content="{materialDesign:PackIcon Kind=Eye}" ToolTip="View BuiltIn Parameters"/>
+                    Content="{materialDesign:PackIcon Kind=Eye}" Command="{Binding VisibilityCommand}" ToolTip="Toggle visibility of nonassociated Parameters"/>
             <Button x:Name="btnSettings" Style="{DynamicResource MetroCircleButtonStyle}" Height="30" Width="30" BorderThickness="0" DockPanel.Dock="Left"
                     Content="{materialDesign:PackIcon Kind=Settings}" Command="{Binding PrecisionCommand}" ToolTip="Settings"/>
             <Button Name="btnDialogOk" Click="BtnDialogOk_Click" MinWidth="75" DockPanel.Dock="Right" HorizontalAlignment="Right" TextElement.FontSize="12">Close</Button>
@@ -64,7 +64,7 @@
                         <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0 12 0 12">
+                                    <Grid Margin="0 12 0 12" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
@@ -82,7 +82,8 @@
                                         <Slider Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
                                 Maximum="{Binding Value, Mode=OneTime, Converter={StaticResource MultiplyConverter}}" Grid.Column="1" Margin="10 2 10 0" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"/>
                                         <!--The Value-->
-                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter} }" Grid.Column="2" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"/>
+                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter}}" Grid.Column="2" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"
+                                                 PreviewTextInput="txtAnswer_PreviewTextInput"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -97,14 +98,14 @@
                         <ItemsControl ItemsSource="{Binding BuiltInParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0 12 0 12">
+                                    <Grid Margin="0 12 0 12" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <!--The Name-->
-                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
+                                        <TextBox Text="{Binding Path=Name, Mode=OneWay}" Style="{StaticResource EnterText}" IsReadOnly="True" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
@@ -115,7 +116,8 @@
                                         <Slider Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
                                     Maximum="{Binding Value, Mode=OneTime, Converter={StaticResource MultiplyConverter}}" Grid.Column="1" Margin="10 2 10 0" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"/>
                                         <!--The Value-->
-                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter}}" Grid.Column="2" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"/>
+                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus, Converter={StaticResource ReverseUnitConverter}}" Grid.Column="2" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}"
+                                                 PreviewTextInput="txtAnswer_PreviewTextInput"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -130,7 +132,7 @@
                         <ItemsControl ItemsSource="{Binding CheckParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0 12 0 12">
+                                    <Grid Margin="0 12 0 12"  Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>

@@ -20,6 +20,8 @@ namespace FamilyEditorInterface
         private delegate void FamilyOperation(FamilyManager fm, FamilyParameter fp);
         // The value of the latest request made by the modeless form 
         private Request m_request = new Request();
+        // Encountered Error, notify the View Model to roll back (update)
+        public event EventHandler EncounteredError;
                 
         /// <summary>
         /// A public property to access the current request value
@@ -73,6 +75,11 @@ namespace FamilyEditorInterface
                         }
                 }
             }
+            catch(Exception)
+            {
+                if (EncounteredError != null)
+                    EncounteredError(this, null);
+            }
             finally
             {
                 Application.thisApp.WakeFormUp();
@@ -107,6 +114,12 @@ namespace FamilyEditorInterface
                     {
                         using (Transaction trans = new Transaction(uidoc.Document))
                         {
+                            FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
+                            FailureHandler failureHandler = new FailureHandler();
+                            failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
+                            failureHandlingOptions.SetClearAfterRollback(true);
+                            trans.SetFailureHandlingOptions(failureHandlingOptions);
+
                             FamilyManager mgr = doc.FamilyManager;
                             FamilyParameter fp = mgr.get_Parameter(value.Item1);
                             // Since we'll modify the document, we need a transaction
@@ -120,6 +133,11 @@ namespace FamilyEditorInterface
                                 if (!value.Item1.Equals(value.Item2)) mgr.RenameParameter(fp, value.Item2);
                                 trans.Commit();
                                 uidoc.RefreshActiveView();
+                            }
+                            if (failureHandler.ErrorMessage != "")
+                            {
+                                if (EncounteredError != null)
+                                    EncounteredError(this, null);
                             }
                         }
                     }
@@ -159,6 +177,12 @@ namespace FamilyEditorInterface
                     {
                         using (Transaction trans = new Transaction(uidoc.Document))
                         {
+                            FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
+                            FailureHandler failureHandler = new FailureHandler();
+                            failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
+                            failureHandlingOptions.SetClearAfterRollback(true);
+                            trans.SetFailureHandlingOptions(failureHandlingOptions);
+
                             FamilyManager mgr = doc.FamilyManager;
                             FamilyParameter fp = mgr.get_Parameter(value.Item1);
                             // Since we'll modify the document, we need a transaction
@@ -171,6 +195,11 @@ namespace FamilyEditorInterface
                                 doc.Regenerate();
                                 trans.Commit();
                                 uidoc.RefreshActiveView();
+                                if (failureHandler.ErrorMessage != "")
+                                {
+                                    if (EncounteredError != null)
+                                        EncounteredError(this, null);
+                                }
                             }
                         }
                     }
@@ -203,6 +232,11 @@ namespace FamilyEditorInterface
                     tg.Start();
                     using (Transaction trans = new Transaction(uidoc.Document))
                     {
+                        FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
+                        FailureHandler failureHandler = new FailureHandler();
+                        failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
+                        failureHandlingOptions.SetClearAfterRollback(true);
+                        trans.SetFailureHandlingOptions(failureHandlingOptions);
                         // Since we'll modify the document, we need a transaction
                         // It's best if a transaction is scoped by a 'using' block
                         // The name of the transaction was given as an argument
@@ -218,6 +252,11 @@ namespace FamilyEditorInterface
                         doc.Regenerate();
                         trans.Commit();
                         uidoc.RefreshActiveView();
+                        if (failureHandler.ErrorMessage != "")
+                        {
+                            if (EncounteredError != null)
+                                EncounteredError(this, null);
+                        }
                     }
                     tg.Assimilate();
                 }
@@ -245,6 +284,12 @@ namespace FamilyEditorInterface
             {
                 using (Transaction trans = new Transaction(uidoc.Document, "Parameter Name Changed"))
                 {
+                    FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
+                    FailureHandler failureHandler = new FailureHandler();
+                    failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
+                    failureHandlingOptions.SetClearAfterRollback(true);
+                    trans.SetFailureHandlingOptions(failureHandlingOptions);
+
                     // Since we'll modify the document, we need a transaction
                     // It's best if a transaction is scoped by a 'using' block
                     // The name of the transaction was given as an argument
@@ -261,8 +306,74 @@ namespace FamilyEditorInterface
                     doc.Regenerate();
                     trans.Commit();
                     uidoc.RefreshActiveView();
+                    if (failureHandler.ErrorMessage != "")
+                    {
+                        if (EncounteredError != null)
+                            EncounteredError(this, null);
+                    }
                 }
             }
+        }
+    }
+    public class FailureHandler : IFailuresPreprocessor
+    {
+        public string ErrorMessage { set; get; }
+        public string ErrorSeverity { set; get; }
+
+        public FailureHandler()
+        {
+            ErrorMessage = "";
+            ErrorSeverity = "";
+        }
+
+        public FailureProcessingResult PreprocessFailures(
+          FailuresAccessor failuresAccessor)
+        {
+            IList<FailureMessageAccessor> failureMessages
+              = failuresAccessor.GetFailureMessages();
+
+            foreach (FailureMessageAccessor
+              failureMessageAccessor in failureMessages)
+            {
+                // We're just deleting all of the warning level 
+                // failures and rolling back any others
+
+                FailureDefinitionId id = failureMessageAccessor
+                  .GetFailureDefinitionId();
+
+                try
+                {
+                    ErrorMessage = failureMessageAccessor
+                      .GetDescriptionText();
+                }
+                catch
+                {
+                    ErrorMessage = "Unknown Error";
+                }
+
+                try
+                {
+                    FailureSeverity failureSeverity
+                      = failureMessageAccessor.GetSeverity();
+
+                    ErrorSeverity = failureSeverity.ToString();
+
+                    if (failureSeverity == FailureSeverity.Warning)
+                    {
+                        failuresAccessor.DeleteWarning(
+                          failureMessageAccessor);
+                    }
+                    else
+                    {
+                        return FailureProcessingResult
+                          .ProceedWithRollBack;
+                    }
+                }
+                catch
+                {
+                }
+            }
+            return FailureProcessingResult.Continue;
         }
     }
 }

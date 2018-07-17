@@ -21,8 +21,7 @@ namespace FamilyEditorInterface.WPF
         private int _precision;
         private bool _visible;
         private bool _suppres;
-
-
+        
         public FamilyParameterModel(ExternalEvent exEvent, RequestHandler handler)
         {
             this.exEvent = exEvent;
@@ -47,11 +46,19 @@ namespace FamilyEditorInterface.WPF
             get { return _value; }
             set
             {
-                // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
-                if (!_suppres) MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, value));
-                else _suppres = false;
-                _value = value;
-                RaisePropertyChanged("Value");
+                if(value <= 0 && Type != Autodesk.Revit.DB.ParameterType.YesNo.ToString())
+                {
+                    // Reset the value
+                    RaisePropertyChanged("Value");
+                }
+                else
+                {
+                    // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
+                    if (!_suppres) MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, value));
+                    else _suppres = false;
+                    _value = value;
+                    RaisePropertyChanged("Value");
+                }
             }
         }
 
@@ -64,7 +71,6 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("Precision");
             }
         }
-
 
         public bool Visible
         {
@@ -92,6 +98,7 @@ namespace FamilyEditorInterface.WPF
             set
             {
                 _associated = value;
+                if (_associated && !Properties.Settings.Default.AssociatedVisibility) Visible = false;
                 RaisePropertyChanged("Associated");
             }
         }

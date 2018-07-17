@@ -31,6 +31,11 @@ namespace FamilyEditorInterface
         public static void Init(Document doc)
         {
             dut = doc.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits;
+            if(!_goUnits())
+            {
+                NotSupported(dut);
+                dut = DisplayUnitType.DUT_DECIMAL_FEET;
+            }
         }
         /// <summary>
         /// forward conversion of project to unit values
@@ -49,12 +54,6 @@ namespace FamilyEditorInterface
                     return p;
                 case DisplayUnitType.DUT_DECIMAL_INCHES:
                     return p * 12;
-                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
-                    NotSupported(dut);
-                    break;
-                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
-                    NotSupported(dut);
-                    break;
                 case DisplayUnitType.DUT_METERS_CENTIMETERS:
                     return p * METERS_IN_FEET;
                 case DisplayUnitType.DUT_MILLIMETERS:
@@ -81,12 +80,6 @@ namespace FamilyEditorInterface
                     return p;
                 case DisplayUnitType.DUT_DECIMAL_INCHES:
                     return p / 12;
-                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
-                    NotSupported(dut);
-                    break;
-                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
-                    NotSupported(dut);
-                    break;
                 case DisplayUnitType.DUT_METERS_CENTIMETERS:
                     return p / METERS_IN_FEET;
                 case DisplayUnitType.DUT_MILLIMETERS:
@@ -102,7 +95,7 @@ namespace FamilyEditorInterface
         /// <param name="dut"></param>
         private static void NotSupported(DisplayUnitType dut)
         {
-            MessageBox.Show("Unit Type not supported.", "Unit Error");
+            //System.Windows.MessageBox.Show("Unit Type not supported.", "Family Editor Interface");
         }
         /// <summary>
         /// check if we support user units
