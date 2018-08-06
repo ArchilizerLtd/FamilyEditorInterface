@@ -14,14 +14,13 @@ namespace FamilyEditorInterface.WPF
 {
     public class FamilyParameterViewModel : INotifyPropertyChanged
     {
-        private UIApplication uiapp;
         private Document doc;
-        private ExternalEvent exEvent;
-        private RequestHandler handler;
+        private string documentName;
         internal bool IsClosed;
         internal bool _enabled;
         public FamilyParameterView view;
         private SortedList<string, FamilyParameter> famParam;
+        public EventHandler PresenterClosed;
 
         public ICommand ShuffleCommand { get; set; }
         public ICommand PrecisionCommand { get; set; }
@@ -58,23 +57,7 @@ namespace FamilyEditorInterface.WPF
                 _checkParameters = value;
                 RaisePropertyChanged("CheckParameters");
             }
-        }
-
-        public UIApplication _Application
-        {
-            get
-            {
-                return uiapp;
-            }
-            set
-            {
-                if (uiapp != value)
-                {
-                    uiapp = value;
-                    _Document = uiapp.ActiveUIDocument.Document;
-                }
-            }
-        }
+        }        
         public Document _Document
         {
             get
@@ -86,16 +69,31 @@ namespace FamilyEditorInterface.WPF
                 if (doc != value)
                 {
                     doc = value;
+                    _DocumentName = doc.Title.Replace(".rfa","");
+                }
+            }
+        }
+        public string _DocumentName
+        {
+            get
+            {
+                return documentName;
+            }
+            set
+            {
+                if (documentName != value)
+                {
+                    documentName = value;
+                    RaisePropertyChanged("_DocumentName");
                 }
             }
         }
 
-        public FamilyParameterViewModel(UIApplication uiapp, ExternalEvent exEvent, RequestHandler handler)
+        public FamilyParameterViewModel(Document document)
         {
-            this._Application = uiapp;
-            this.exEvent = exEvent;
-            this.handler = handler;
-            handler.EncounteredError += RollBackState;
+            Application.handler.EncounteredError += RollBackState;
+
+            this._Document = document;
 
             ShuffleCommand = new RelayCommand(o => Shuffle("ShuffleButton"));
             PrecisionCommand = new RelayCommand(o => Precision("PrecisionButton"));
@@ -170,7 +168,7 @@ namespace FamilyEditorInterface.WPF
 
                     //eId.Add(fp.Id);
 
-                    FamilyParameterModel newItem = new FamilyParameterModel(exEvent, handler); // collect data yes-no
+                    FamilyParameterModel newItem = new FamilyParameterModel(); // collect data yes-no
                     newItem.Precision = Properties.Settings.Default.Precision;
                     newItem.Name = fp.Definition.Name;
                     newItem.Value = value;
@@ -179,6 +177,7 @@ namespace FamilyEditorInterface.WPF
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
                     newItem.Visible = associated ? true : Properties.Settings.Default.AssociatedVisibility;
+                    newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
 
                     CheckParameters.Add(newItem);
 
@@ -191,7 +190,7 @@ namespace FamilyEditorInterface.WPF
 
                 if (!builtIn)
                 {
-                    FamilyParameterModel newItem = new FamilyParameterModel(exEvent, handler);  // collect data slider, value != 0
+                    FamilyParameterModel newItem = new FamilyParameterModel();  // collect data slider, value != 0
                     newItem.Precision = Properties.Settings.Default.Precision;
                     newItem.Name = fp.Definition.Name;
                     newItem.Value = value;
@@ -200,12 +199,13 @@ namespace FamilyEditorInterface.WPF
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
                     newItem.Visible = associated ? true : Properties.Settings.Default.AssociatedVisibility;
+                    newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
 
                     ValueParameters.Add(newItem);
                 }
                 else
                 {
-                    FamilyParameterModel newItem = new FamilyParameterModel(exEvent, handler); // collect data slider, value == 0
+                    FamilyParameterModel newItem = new FamilyParameterModel(); // collect data slider, value == 0
                     newItem.Precision = Properties.Settings.Default.Precision;
                     newItem.Name = fp.Definition.Name;
                     newItem.Value = value;
@@ -214,6 +214,7 @@ namespace FamilyEditorInterface.WPF
                     newItem.BuiltIn = fp.Id.IntegerValue < 0;
                     newItem.Shared = fp.IsShared;
                     newItem.Visible = associated ? true : Properties.Settings.Default.AssociatedVisibility;
+                    newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
 
                     BuiltInParameters.Add(newItem);
                 }
@@ -364,16 +365,16 @@ namespace FamilyEditorInterface.WPF
         private void MakeRequest(RequestId request, List<string> values)
         {
             //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.DeleteValue(values);
-            handler.Request.Make(request);
-            exEvent.Raise();
+            Application.handler.Request.DeleteValue(values);
+            Application.handler.Request.Make(request);
+            Application.exEvent.Raise();
         }
         private void MakeRequest(RequestId request, List<Tuple<string, double>> values)
         {
             //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.Value(values);
-            handler.Request.Make(request);
-            exEvent.Raise();
+            Application.handler.Request.Value(values);
+            Application.handler.Request.Make(request);
+            Application.exEvent.Raise();
         }
 
         internal void Enable()
@@ -411,17 +412,15 @@ namespace FamilyEditorInterface.WPF
         {
             this.PopulateModel();
         }
-
+        // Close down the presenter and raise the event
         internal void Dispose()
         {
-            // Revit handler stuff
-            exEvent.Dispose();
-            exEvent = null;
-            handler = null;
             // This form is closed
             IsClosed = true;
             // Remove registered events
             view.Closed -= FormClosed;
+            if (PresenterClosed != null)
+                PresenterClosed(this, new EventArgs());
         }
         #endregion
 

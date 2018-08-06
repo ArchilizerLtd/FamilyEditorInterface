@@ -28,8 +28,9 @@ namespace FamilyEditorInterface
         {            
             try
             {
+                Application.App = commandData.Application;
                 Application.thisApp.Started = true;
-                Application.thisApp.ShowForm(commandData.Application);
+                Application.thisApp.ShowForm();
                 return Result.Succeeded;
             }
             catch (Exception ex)

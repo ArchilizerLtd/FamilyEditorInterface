@@ -27,8 +27,15 @@
                 </Style.Setters>
             </Style>            
             <DataTemplate x:Key="expanderHeader">
-                <TextBlock Text="{Binding}" FontSize="14" FontWeight="Medium" Margin="-24 0 0 0"/>
+                <TextBlock Text="{Binding}" FontSize="12" FontWeight="Medium" Margin="-24 0 0 0"/>
             </DataTemplate>
+            <Style TargetType="{x:Type TextBlock}" x:Key="header">
+                <Style.Setters>
+                    <Setter Property="FontSize" Value="12"/>
+                    <Setter Property="FontWeight" Value="Medium"/>
+                    <Setter Property="TextTrimming" Value="WordEllipsis"/>
+                </Style.Setters>
+            </Style>
             <local:RevitToUnitConverter x:Key="ReverseUnitConverter"></local:RevitToUnitConverter>
             <local:MultiplyConverter x:Key="MultiplyConverter"></local:MultiplyConverter>
             <local:BoolToColorConverter x:Key="BoolToColorConverter"></local:BoolToColorConverter>
@@ -52,6 +59,10 @@
                     Content="{materialDesign:PackIcon Kind=Settings}" Command="{Binding PrecisionCommand}" ToolTip="Settings"/>
             <Button Name="btnDialogOk" Click="BtnDialogOk_Click" MinWidth="75" DockPanel.Dock="Right" HorizontalAlignment="Right" TextElement.FontSize="12">Close</Button>
         </DockPanel>
+        <!--Title-->
+        <DockPanel DockPanel.Dock="Top" Margin="0 0 15 15">
+            <TextBlock Text="{Binding Path=_DocumentName, Mode=OneWay}" Style="{StaticResource header}" ToolTip="{Binding Path=_DocumentName, Mode=OneWay}"></TextBlock>
+        </DockPanel>            
         <!--Parameters-->
         <ScrollViewer Controls:ScrollViewerHelper.VerticalScrollBarOnLeftSide="True" VerticalScrollBarVisibility="Auto"
                           MaxHeight="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DockPanel}}}">
@@ -75,6 +86,7 @@
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
+                                                    <MenuItem Header="{Binding Path=TypeOrInstance}" Command="{Binding TypeToInstanceCommand}"/>
                                                 </ContextMenu>
                                             </TextBox.ContextMenu>
                                         </TextBox>
@@ -109,6 +121,7 @@
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
+                                                    <MenuItem Header="{Binding Path=TypeOrInstance}" Command="{Binding TypeToInstanceCommand}"/>
                                                 </ContextMenu>
                                             </TextBox.ContextMenu>
                                         </TextBox>
@@ -142,6 +155,7 @@
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
+                                                    <MenuItem Header="{Binding Path=TypeOrInstance}" Command="{Binding TypeToInstanceCommand}"/>
                                                 </ContextMenu>
                                             </TextBox.ContextMenu>
                                         </TextBox>

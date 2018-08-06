@@ -107,7 +107,6 @@ namespace FamilyEditorInterface
             if (dut.Equals(DisplayUnitType.DUT_FRACTIONAL_INCHES)) return false;
             return true;
         }
-
         /// <summary>
         /// truncate string and add '..' at the end
         /// </summary>
@@ -152,5 +151,51 @@ namespace FamilyEditorInterface
                 return null;
             }
         }
+
+        #region Request Handling
+        // Toggle Type to Instance and vica verse
+        public static void MakeRequest(RequestId request, string name, string type)
+        {
+            Application.handler.Request.TypeToInstance(new List<string>() { name });
+            Application.handler.Request.Make(request);
+            Application.exEvent.Raise();
+        }
+
+        // Rename Parameter
+        public static void MakeRequest(RequestId request, Tuple<string, string> renameValue)
+        {
+            Application.handler.Request.RenameValue(new List<Tuple<string, string>>() { renameValue });
+            Application.handler.Request.Make(request);
+            Application.exEvent.Raise();
+        }
+        // Change Parameter Value of Multiple
+        public static void MakeRequest(RequestId request, List<Tuple<string, double>> values)
+        {
+            Application.handler.Request.Value(values);
+            Application.handler.Request.Make(request);
+            Application.exEvent.Raise();
+        }
+        // Delete Parameter
+        public static void MakeRequest(RequestId request, string deleteValue)
+        {
+            Application.handler.Request.DeleteValue(new List<string>() { deleteValue });
+            Application.handler.Request.Make(request);
+            Application.exEvent.Raise();
+        }
+        // Change Parameter Value
+        public static void MakeRequest(RequestId request, Tuple<string, double> value)
+        {
+            Application.handler.Request.Value(new List<Tuple<string, double>>() { value });
+            Application.handler.Request.Make(request);
+            Application.exEvent.Raise();
+        }
+        // Change all values
+        public static void MakeRequest(RequestId request, List<Tuple<string, string, double>> value)
+        {
+            Application.handler.Request.AllValues(value);
+            Application.handler.Request.Make(request);
+            Application.exEvent.Raise();
+        }
+        #endregion
     }
 }

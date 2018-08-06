@@ -7,14 +7,13 @@ namespace FamilyEditorInterface.WPF
 {
     public class FamilyParameterModel : INotifyPropertyChanged
     {
-        private ExternalEvent exEvent;
-        private RequestHandler handler;
-
         public RelayCommand DeleteCommand { get; private set; }
+        public RelayCommand TypeToInstanceCommand { get; private set; }
 
         private string _name;
         private double _value;
         private string _type;
+        private string _typeOrInstance;
         private bool _associated;
         private bool _builtIn;
         private bool _shared;
@@ -22,12 +21,10 @@ namespace FamilyEditorInterface.WPF
         private bool _visible;
         private bool _suppres;
         
-        public FamilyParameterModel(ExternalEvent exEvent, RequestHandler handler)
+        public FamilyParameterModel()
         {
-            this.exEvent = exEvent;
-            this.handler = handler;
-
             DeleteCommand = new RelayCommand(o => Delete("DeleteTextBox"));
+            TypeToInstanceCommand = new RelayCommand(o => TypeToInstance("TypeToInstance"));
         }
 
         public string Name
@@ -35,7 +32,7 @@ namespace FamilyEditorInterface.WPF
             get { return _name; }
             set
             {
-                MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(_name, value));
+                //Utils.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(_name, value));
                 _name = value;
                 RaisePropertyChanged("Name");
             }
@@ -54,7 +51,7 @@ namespace FamilyEditorInterface.WPF
                 else
                 {
                     // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
-                    if (!_suppres) MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, value));
+                    if (!_suppres) Utils.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, value));
                     else _suppres = false;
                     _value = value;
                     RaisePropertyChanged("Value");
@@ -69,6 +66,16 @@ namespace FamilyEditorInterface.WPF
             {
                 _precision = value;
                 RaisePropertyChanged("Precision");
+            }
+        }
+
+        public string TypeOrInstance
+        {
+            get { return _typeOrInstance; }
+            set
+            {
+                _typeOrInstance = value;
+                RaisePropertyChanged("TypeOrInstance");
             }
         }
 
@@ -137,52 +144,17 @@ namespace FamilyEditorInterface.WPF
 
         private void Delete(object sender)
         {
-            MakeRequest(RequestId.DeleteId, Name);
-            //RaisePropertyChanged("Delete");
+            Utils.MakeRequest(RequestId.DeleteId, Name);
         }
-
-        #region Request Handling
-        private void MakeRequest(RequestId request, Tuple<string, string> renameValue)
+        private void TypeToInstance(object sender)
         {
-            //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.RenameValue(new List<Tuple<string, string>>() { renameValue });
-            handler.Request.Make(request);
-            exEvent.Raise();
-        }
-        private void MakeRequest(RequestId request, List<Tuple<string, double>> values)
-        {
-            //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.Value(values);
-            handler.Request.Make(request);
-            exEvent.Raise();
-        }
-        private void MakeRequest(RequestId request, string deleteValue)
-        {
-            //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.DeleteValue(new List<string>() { deleteValue });
-            handler.Request.Make(request);
-            exEvent.Raise();
-        }
-        private void MakeRequest(RequestId request, Tuple<string, double> value)
-        {
-            //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.Value(new List<Tuple<string, double>>() { value });
-            handler.Request.Make(request);
-            exEvent.Raise();
-        }
-        private void MakeRequest(RequestId request, List<Tuple<string, string, double>> value)
-        {
-            //MessageBox.Show("You are in the Control.Request event.");
-            handler.Request.AllValues(value);
-            handler.Request.Make(request);
-            exEvent.Raise();
+            TypeOrInstance = TypeOrInstance.Equals("Instance") ? "Type" : "Instance";
+            Utils.MakeRequest(RequestId.TypeToInstance, Name, Type);
         }
 
         internal void SuppressUpdate()
         {
             this._suppres = true;
         }
-        #endregion
-
     }
 }

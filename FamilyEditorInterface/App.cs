@@ -22,6 +22,7 @@ using Autodesk.Revit.UI.Events;
 using System.Windows.Forms;
 using System.Diagnostics;
 using FamilyEditorInterface.WPF;
+using Autodesk.Revit.DB.Events;
 #endregion
 
 namespace FamilyEditorInterface
@@ -33,6 +34,10 @@ namespace FamilyEditorInterface
     {
         // windows Revit handle
         static WindowHandle _hWndRevit = null;
+
+        public static RequestHandler handler;
+        public static ExternalEvent exEvent;
+
         // class instance
         internal static Application thisApp = null;
         // ModelessForm instance
@@ -64,6 +69,7 @@ namespace FamilyEditorInterface
                 _started = value;
             }
         }
+        public static UIApplication App;
         #region Ribbon
         /// <summary>
         /// Use embedded image to load as an icon for the ribbon
@@ -189,13 +195,13 @@ namespace FamilyEditorInterface
         {
             ControlledApplication c_app = a.ControlledApplication;
             AddRibbonPanel(a);
-            
+
             _presenter = null;
             thisApp = this;  // static access to this application instance
-            c_app.DocumentChanged
-                += new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(
-                    c_app_DocumentChanged);
+            c_app.DocumentChanged += new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(c_app_DocumentChanged);
+            c_app.DocumentClosed += new EventHandler<Autodesk.Revit.DB.Events.DocumentClosedEventArgs>(c_app_DocumentClosed);
             a.ViewActivated += new EventHandler<Autodesk.Revit.UI.Events.ViewActivatedEventArgs>(OnViewActivated);
+
             return Result.Succeeded;
         }
         /// <summary>
@@ -206,8 +212,14 @@ namespace FamilyEditorInterface
         private void OnViewActivated(object sender, ViewActivatedEventArgs e)
         {
             if (!Started) return;
-            Document doc = e.CurrentActiveView.Document;
 
+            if(_presenter == null)
+            {
+                ShowForm();
+                return;
+            }
+            Document doc = e.CurrentActiveView.Document;
+            
             // If the document is a Family Document, disable the UI
             if (!doc.IsFamilyDocument)
             {
@@ -229,7 +241,7 @@ namespace FamilyEditorInterface
             if (_document.Title != doc.Title)
             {
                 _document = doc;
-                _presenter._Application = new UIApplication(doc.Application);
+                _presenter._Document = doc;
                 _presenter.DocumentSwitched();
             }
         }
@@ -270,14 +282,20 @@ namespace FamilyEditorInterface
                 //}
             }
         }
-
+        private void c_app_DocumentClosed(object sender, DocumentClosedEventArgs e)
+        {
+            if (App.ActiveUIDocument == null && Started && _presenter != null)
+            {
+                _presenter.Close();
+                _presenter.Dispose();
+                _presenter = null;
+            }
+        }
         public Result OnShutdown(UIControlledApplication a)
         {
             ControlledApplication c_app = a.ControlledApplication;
-            c_app.DocumentChanged
-                -= new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(
-                    c_app_DocumentChanged);
-
+            c_app.DocumentChanged -= new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(c_app_DocumentChanged);
+            c_app.DocumentClosed -= new EventHandler<Autodesk.Revit.DB.Events.DocumentClosedEventArgs>(c_app_DocumentClosed);
             a.ViewActivated -= new EventHandler<Autodesk.Revit.UI.Events.ViewActivatedEventArgs>(OnViewActivated);
             Started = false;
             if (_presenter != null)
@@ -291,7 +309,7 @@ namespace FamilyEditorInterface
         /// De-facto the command is here.
         /// </summary>
         /// <param name="uiapp"></param>
-        public void ShowForm(UIApplication uiapp)
+        public void ShowForm()
         {
             //get the isntance of Revit Thread
             //to pass it to the Windows Form later
@@ -304,27 +322,27 @@ namespace FamilyEditorInterface
                 _hWndRevit = new WindowHandle(h);
             }
 
-
             if (_presenter == null || _presenter.IsClosed)
             {
-                if(!uiapp.ActiveUIDocument.Document.IsFamilyDocument)
+                if(!App.ActiveUIDocument.Document.IsFamilyDocument)
                 {
                     TaskDialog.Show("Error", "Usable only in Family Documents");
                     return;
                 }
                 //new handler
-                RequestHandler handler = new RequestHandler();
+                handler = new RequestHandler();
                 //new event
-                ExternalEvent exEvent = ExternalEvent.Create(handler);
+                exEvent = ExternalEvent.Create(handler);
                 // set current document
 
-                _document = uiapp.ActiveUIDocument.Document;
-                _presenter = new FamilyParameterViewModel(uiapp,exEvent,handler);
-
+                _document = App.ActiveUIDocument.Document;
+                _presenter = new FamilyParameterViewModel(_document);
+                
                 try
                 {
                     //pass parent (Revit) thread here
                     _presenter.Show(_hWndRevit);
+                    _presenter.PresenterClosed += Stop;
                 }
                 catch (Exception ex)
                 {
@@ -334,7 +352,10 @@ namespace FamilyEditorInterface
                 }
             }
         }
-
+        private void Stop(object sender, EventArgs e)
+        {
+            Started = false;
+        }
         public void WakeFormUp()
         {
             //if (m_MyForm != null)

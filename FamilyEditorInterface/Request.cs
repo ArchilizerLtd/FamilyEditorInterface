@@ -52,6 +52,7 @@ namespace FamilyEditorInterface
         /// "Change Parameter Name" request
         /// </summary>
         ChangeParamName = 4,
+        TypeToInstance = 5,
     }
 
    /// <summary>
@@ -70,6 +71,7 @@ namespace FamilyEditorInterface
         private List<Tuple<string, double>> value;
         private List<Tuple<string, string>> renameValue;
         private List<string> deleteValue;
+        private List<string> typeToInstance;
         private List<Tuple<string, string, double>> allValues;
         /// <summary>
         ///   Take - The Idling handler calls this to obtain the latest request. 
@@ -112,6 +114,10 @@ namespace FamilyEditorInterface
         {
             this.allValues = allValues;
         }
+        internal void TypeToInstance(List<string> typeToInstance)
+        {
+            this.typeToInstance = typeToInstance;
+        }
         // try to transport the message
         internal List<string> GetDeleteValue()
         {
@@ -120,12 +126,17 @@ namespace FamilyEditorInterface
         // try to transport the message
         internal List<Tuple<string, double>> GetValue()
         {
-          return this.value;
+            return this.value;
         }
         // try to transport the message
         internal List<Tuple<string, string>> GetRenameValue()
         {
             return this.renameValue;
+        }
+        // try to transport the message
+        internal List<string> GetTypeToInstanceValue()
+        {
+            return this.typeToInstance;
         }
         // try to transport the message
         internal List<Tuple<string, string, double>> GetAllValues()

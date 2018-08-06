@@ -69,6 +69,11 @@ namespace FamilyEditorInterface
                             ExecuteParameterChange(uiapp, "Restore All", Request.GetAllValues());
                             break;
                         }
+                    case RequestId.TypeToInstance:
+                        {
+                            ExecuteParameterChange(uiapp, "Type To Instance", Request.GetTypeToInstanceValue(), "type or instance");
+                            break;
+                        }
                     default:
                         {
                             break;
@@ -208,11 +213,72 @@ namespace FamilyEditorInterface
             }
         }
         /// <summary>
-         /// Executes on parameter delete
-         /// </summary>
-         /// <param name="uiapp"></param>
-         /// <param name="text"></param>
-         /// <param name="values"></param>
+        /// Executes on type to instance change
+        /// </summary>
+        /// <param name="uiapp"></param>
+        /// <param name="text"></param>
+        /// <param name="values"></param>
+        private void ExecuteParameterChange(UIApplication uiapp, String text, List<string> values, string type)
+        {
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Document doc = uidoc.Document;
+
+            if (!doc.IsFamilyDocument)
+            {
+                Command.global_message =
+                  "Please run this command in a family document.";
+                TaskDialog.Show("Message", Command.global_message);
+            }
+
+            if ((uidoc != null))
+            {
+                using (TransactionGroup tg = new TransactionGroup(doc, "Parameter Type To Instance"))
+                {
+                    tg.Start();
+                    using (Transaction trans = new Transaction(uidoc.Document))
+                    {
+                        FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
+                        FailureHandler failureHandler = new FailureHandler();
+                        failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
+                        failureHandlingOptions.SetClearAfterRollback(true);
+                        trans.SetFailureHandlingOptions(failureHandlingOptions);
+                        // Since we'll modify the document, we need a transaction
+                        // It's best if a transaction is scoped by a 'using' block
+                        // The name of the transaction was given as an argument
+                        if (trans.Start(text) == TransactionStatus.Started)
+                        {
+                            FamilyManager mgr = doc.FamilyManager;
+                            foreach (var value in values)
+                            {
+                                FamilyParameter fp = mgr.get_Parameter(value);
+                                if (fp.IsInstance)
+                                {
+                                    mgr.MakeType(fp);
+                                }
+                                else {
+                                    mgr.MakeInstance(fp);
+                                };
+                            }
+                        }
+                        doc.Regenerate();
+                        trans.Commit();
+                        uidoc.RefreshActiveView();
+                        if (failureHandler.ErrorMessage != "")
+                        {
+                            if (EncounteredError != null)
+                                EncounteredError(this, null);
+                        }
+                    }
+                    tg.Assimilate();
+                }
+            }
+        }
+        /// <summary>
+        /// Executes on parameter delete
+        /// </summary>
+        /// <param name="uiapp"></param>
+        /// <param name="text"></param>
+        /// <param name="values"></param>
         private void ExecuteParameterChange(UIApplication uiapp, String text, List<string> values)
         {
             UIDocument uidoc = uiapp.ActiveUIDocument;
