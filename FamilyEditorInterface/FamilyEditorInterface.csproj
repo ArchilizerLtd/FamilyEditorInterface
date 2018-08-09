@@ -46,7 +46,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>archilizer.png.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
@@ -94,14 +95,6 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="Command.cs" />
-    <Compile Include="FamilyEditorItem.cs" />
-    <Compile Include="Interface.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Interface.Designer.cs">
-      <DependentUpon>Interface.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProjectParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -143,20 +136,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Interface.resx">
-      <DependentUpon>Interface.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Settings\Settings.resx">
       <DependentUpon>Settings.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="archilizer.png.ico" />
-    <Content Include="FEI icon.ico" />
     <Resource Include="Resources\family_editor_interface.png" />
     <None Include="Resources\revitui_2017-1.png" />
     <None Include="Resources\aecbaseres_14380-2.png" />
@@ -170,8 +159,6 @@
     <None Include="Resources\if_arrow_circle_left_62149.png" />
     <None Include="Resources\if_save_62248.png" />
     <EmbeddedResource Include="Resources\archilizer-01.png" />
-    <EmbeddedResource Include="maximize.png" />
-    <EmbeddedResource Include="minimize.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

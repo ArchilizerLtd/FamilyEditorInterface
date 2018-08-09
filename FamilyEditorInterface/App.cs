@@ -37,11 +37,12 @@ namespace FamilyEditorInterface
 
         public static RequestHandler handler;
         public static ExternalEvent exEvent;
+        
+        public static UIApplication App;
 
         // class instance
         internal static Application thisApp = null;
-        // ModelessForm instance
-        //private Interface m_MyForm;
+
         /// <summary>
         /// Tooltip
         /// </summary>
@@ -61,6 +62,7 @@ namespace FamilyEditorInterface
         static string smallIcon = contentPath + "familyeditorinterface16.png";
         private bool _disabled;
 
+        // Marks if the Plugin has been started
         public bool Started 
         {
             get { return _started; }
@@ -69,7 +71,7 @@ namespace FamilyEditorInterface
                 _started = value;
             }
         }
-        public static UIApplication App;
+        
         #region Ribbon
         /// <summary>
         /// Use embedded image to load as an icon for the ribbon
@@ -191,13 +193,15 @@ namespace FamilyEditorInterface
             }
         }
         #endregion
+
+        #region Revit Hooks
         public Result OnStartup(UIControlledApplication a)
         {
             ControlledApplication c_app = a.ControlledApplication;
             AddRibbonPanel(a);
 
-            _presenter = null;
             thisApp = this;  // static access to this application instance
+
             c_app.DocumentChanged += new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(c_app_DocumentChanged);
             c_app.DocumentClosed += new EventHandler<Autodesk.Revit.DB.Events.DocumentClosedEventArgs>(c_app_DocumentClosed);
             a.ViewActivated += new EventHandler<Autodesk.Revit.UI.Events.ViewActivatedEventArgs>(OnViewActivated);
@@ -211,9 +215,9 @@ namespace FamilyEditorInterface
         /// <param name="e"></param>
         private void OnViewActivated(object sender, ViewActivatedEventArgs e)
         {
-            if (!Started) return;
+            if (!Started) return;  // only do if the plugin is active
 
-            if(_presenter == null)
+            if (_presenter == null)
             {
                 ShowForm();
                 return;
@@ -252,6 +256,8 @@ namespace FamilyEditorInterface
         /// <param name="e"></param>
         private void c_app_DocumentChanged(object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e)
         {
+            if (!Started) return;  // only do if the plugin is active
+
             List<string> commands = new List<string>()
             {
                 "param",
@@ -273,31 +279,28 @@ namespace FamilyEditorInterface
                 {
                     _presenter.ThisDocumentChanged();
                 }
-                //else if (operations.Contains("Family Types"))
-                //{
-                //    //not sure how to filter that
-                //    //ICollection<ElementId> changedId = e.GetModifiedElementIds();
-                //    //m_MyForm.ElementChanged(changedId);
-                //    _presenter.ThisDocumentChanged();
-                //}
             }
         }
         private void c_app_DocumentClosed(object sender, DocumentClosedEventArgs e)
         {
+            if (!Started) return;  // only do if the plugin is active
+
             if (App.ActiveUIDocument == null && Started && _presenter != null)
             {
                 _presenter.Close();
-                _presenter.Dispose();
                 _presenter = null;
             }
         }
         public Result OnShutdown(UIControlledApplication a)
         {
             ControlledApplication c_app = a.ControlledApplication;
+
             c_app.DocumentChanged -= new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(c_app_DocumentChanged);
             c_app.DocumentClosed -= new EventHandler<Autodesk.Revit.DB.Events.DocumentClosedEventArgs>(c_app_DocumentClosed);
             a.ViewActivated -= new EventHandler<Autodesk.Revit.UI.Events.ViewActivatedEventArgs>(OnViewActivated);
-            Started = false;
+
+            if(Started) Started = false;
+
             if (_presenter != null)
             {
                 _presenter.Close();
@@ -305,14 +308,19 @@ namespace FamilyEditorInterface
 
             return Result.Succeeded;
         }
+        #endregion
+
+        #region Show Form
         /// <summary>
         /// De-facto the command is here.
         /// </summary>
         /// <param name="uiapp"></param>
         public void ShowForm()
         {
-            //get the isntance of Revit Thread
-            //to pass it to the Windows Form later
+            _presenter = null;
+            
+            // get the isntance of Revit Thread
+            // to pass it to the Windows Form later
             if (null == _hWndRevit)
             {
                 Process process
@@ -363,6 +371,7 @@ namespace FamilyEditorInterface
             //    m_MyForm.WakeUp();
             //}
         }
+        #endregion
     }
     /// <summary>
     /// Retrieve Revit Windows thread in order to pass it to the form as it's owner
