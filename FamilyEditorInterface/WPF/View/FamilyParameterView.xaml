@@ -22,8 +22,9 @@
                     <Setter Property="local:InputBindingsManager.UpdatePropertySourceWhenEnterPressed" Value="TextBox.Text"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                     <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="MinWidth" Value="50" />
+                    <Setter Property="MinWidth" Value="50"/>
                     <Setter Property="Padding" Value="2 0 0 0"/>
+                    <Setter Property="MaxWidth" Value="160"/>
                 </Style.Setters>
             </Style>            
             <DataTemplate x:Key="expanderHeader">
@@ -75,20 +76,28 @@
                         <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0 12 0 12" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Grid Margin="0 12 0 12" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Validation.ErrorTemplate="{StaticResource validationErrorTemplate}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <!--The Name-->
-                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
+                                        <TextBox ToolTip="{Binding Path=Name}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
+                                            
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
                                                     <MenuItem Header="{Binding Path=TypeOrInstance}" Command="{Binding TypeToInstanceCommand}"/>
                                                 </ContextMenu>
                                             </TextBox.ContextMenu>
+                                            <TextBox.Text>
+                                                <Binding Path="Name" Mode="TwoWay" UpdateSourceTrigger="LostFocus">
+                                                    <Binding.ValidationRules>
+                                                        <local:NameValidator></local:NameValidator>
+                                                    </Binding.ValidationRules>
+                                                </Binding>
+                                            </TextBox.Text>
                                         </TextBox>
                                         <!--The Value Slider-->
                                         <Slider Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
@@ -117,13 +126,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <!--The Name-->
-                                        <TextBox Text="{Binding Path=Name, Mode=OneWay}" Style="{StaticResource EnterText}" IsReadOnly="True" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
-                                            <TextBox.ContextMenu>
-                                                <ContextMenu>
-                                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
-                                                    <MenuItem Header="{Binding Path=TypeOrInstance}" Command="{Binding TypeToInstanceCommand}"/>
-                                                </ContextMenu>
-                                            </TextBox.ContextMenu>
+                                        <TextBox Text="{Binding Path=Name, Mode=OneWay}"  ToolTip="{Binding Path=Name}" Style="{StaticResource EnterText}" IsReadOnly="True" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
                                         </TextBox>
                                         <!--The Value Slider-->
                                         <Slider Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
@@ -151,7 +154,7 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <!--The Name-->
-                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
+                                        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"  ToolTip="{Binding Path=Name}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>

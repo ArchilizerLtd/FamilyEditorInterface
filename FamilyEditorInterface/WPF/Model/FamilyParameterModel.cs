@@ -11,6 +11,7 @@ namespace FamilyEditorInterface.WPF
         public RelayCommand TypeToInstanceCommand { get; private set; }
 
         private string _name;
+        private string _oldName;
         private double _value;
         private string _type;
         private string _typeOrInstance;
@@ -27,14 +28,26 @@ namespace FamilyEditorInterface.WPF
             TypeToInstanceCommand = new RelayCommand(o => TypeToInstance("TypeToInstance"));
         }
 
+        public string OldName
+        {
+            get { return _oldName; }
+            set
+            {
+                _oldName = value;
+                RaisePropertyChanged("OldName");
+            }
+        }
         public string Name
         {
             get { return _name; }
             set
             {
-                //Utils.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(_name, value));
-                _name = value;
-                RaisePropertyChanged("Name");
+                if(_name != value)
+                {
+                    OldName = _name;
+                    _name = value;
+                    RaisePropertyChanged("Name");
+                }
             }
         }
 

@@ -16,7 +16,7 @@ namespace FamilyEditorInterface.WPF
     {
         private Document doc;
         private string documentName;
-        internal bool IsClosed;
+        internal bool _isClosed;
         internal bool _enabled;
         public FamilyParameterView view;
         private SortedList<string, FamilyParameter> famParam;
@@ -233,7 +233,12 @@ namespace FamilyEditorInterface.WPF
         }
         void MyType_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Delete") return;
+            if(e.PropertyName == "Name")
+            {
+                string _name = (sender as FamilyParameterModel).Name;
+                string _oldName = (sender as FamilyParameterModel).OldName;
+                Utils.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(_oldName, _name));
+            }
         }
 
         /// <summary>
@@ -268,7 +273,7 @@ namespace FamilyEditorInterface.WPF
         internal void Close()
         {
             view.Close();
-            IsClosed = true;
+            _isClosed = true;
         }
         /// <summary>
         /// Show the Window, Start the Form
@@ -302,8 +307,23 @@ namespace FamilyEditorInterface.WPF
                     item.Value = randValue;
                     requestValues.Add(new Tuple<string, double>(item.Name, randValue));
                 }
-                if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
             }
+
+            foreach (var item in _builtInParameters)
+            {
+                if (item.Value != 0)
+                {
+                    double v = item.Value;
+                    double plus = (v + 0.25 * v);    // plus minus values - around the current value +-25%
+                    double minus = (v - 0.25 * v);
+                    double randValue = random.NextDouble() * (plus - minus) + minus;
+                    item.SuppressUpdate();
+                    item.Value = randValue;
+                    requestValues.Add(new Tuple<string, double>(item.Name, randValue));
+                }
+            }
+
+            if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
         }
         /// <summary>
         /// Change Precision
@@ -416,7 +436,7 @@ namespace FamilyEditorInterface.WPF
         internal void Dispose()
         {
             // This form is closed
-            IsClosed = true;
+            _isClosed = true;
             // Remove registered events
             view.Closed -= FormClosed;
             if (PresenterClosed != null)

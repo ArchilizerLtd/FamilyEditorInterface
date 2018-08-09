@@ -225,6 +225,23 @@ namespace FamilyEditorInterface.WPF
     #endregion
 
 
+    public class NameValidator : ValidationRule
+    {
+        public override ValidationResult Validate
+          (object value, System.Globalization.CultureInfo cultureInfo)
+        {
+            if (value == null)
+                return new ValidationResult(false, "value cannot be empty.");
+            else
+            {
+                if (!Utils.UnallowedChacarcters(value.ToString()))
+                    return new ValidationResult
+                    (false, "Cannot contain unallowed characters");
+            }
+            return ValidationResult.ValidResult;
+        }
+    }
+
     #region InputBindingsManager
 
     public static class InputBindingsManager

@@ -40,6 +40,8 @@ namespace FamilyEditorInterface
         
         public static UIApplication App;
 
+        //public static bool Update;
+
         // class instance
         internal static Application thisApp = null;
 
@@ -271,7 +273,6 @@ namespace FamilyEditorInterface
                 "Change Parameter Name",
                 "Project Units"
             };
-            if (!Started) return;
             if (_presenter != null && _presenter._enabled)
             {
                 IList<String> operations = e.GetTransactionNames();
@@ -330,7 +331,7 @@ namespace FamilyEditorInterface
                 _hWndRevit = new WindowHandle(h);
             }
 
-            if (_presenter == null || _presenter.IsClosed)
+            if (_presenter == null || _presenter._isClosed)
             {
                 if(!App.ActiveUIDocument.Document.IsFamilyDocument)
                 {
