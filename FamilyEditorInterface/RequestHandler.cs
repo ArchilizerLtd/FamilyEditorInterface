@@ -92,12 +92,14 @@ namespace FamilyEditorInterface
 
             return;
         }
-         /// <summary>
-         /// Executes on restore all values
-         /// </summary>
-         /// <param name="uiapp"></param>
-         /// <param name="text"></param>
-         /// <param name="values"></param>
+
+        #region Execute
+        /// <summary>
+        /// Executes on restore all values
+        /// </summary>
+        /// <param name="uiapp"></param>
+        /// <param name="text"></param>
+        /// <param name="values"></param>
         private void ExecuteParameterChange(UIApplication uiapp, String text, List<Tuple<string, string, double>> values)
         {
             UIDocument uidoc = uiapp.ActiveUIDocument;
@@ -381,6 +383,9 @@ namespace FamilyEditorInterface
             }
         }
     }
+    #endregion
+
+    #region Failure Handler
     public class FailureHandler : IFailuresPreprocessor
     {
         public string ErrorMessage { set; get; }
@@ -442,4 +447,5 @@ namespace FamilyEditorInterface
             return FailureProcessingResult.Continue;
         }
     }
+    #endregion
 }
