@@ -83,7 +83,8 @@ namespace FamilyEditorInterface.WPF
     {       
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return Math.Round(Utils.convertValueTO((double)value), Properties.Settings.Default.Precision);
+            //return Math.Round(Utils.convertValueTO((double)value), Properties.Settings.Default.Precision);
+            return Math.Round(Utils.convertValueTO((double)value), 0);
         }
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
@@ -127,7 +128,14 @@ namespace FamilyEditorInterface.WPF
             this.Loaded += new RoutedEventHandler(MyWindow_Loaded);
 
             InitializeMaterialDesign();
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
         private void InitializeMaterialDesign()
         {

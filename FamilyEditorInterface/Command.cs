@@ -25,12 +25,14 @@ namespace FamilyEditorInterface
           ExternalCommandData commandData,
           ref string message,
           ElementSet elements)
-        {            
+        {
+            if (Application.thisApp.Started) return Result.Succeeded;
+
             try
             {
                 Application.App = commandData.Application;
-                Application.thisApp.Started = true;
                 Application.thisApp.ShowForm();
+                Application.thisApp.Started = true;
                 return Result.Succeeded;
             }
             catch (Exception ex)

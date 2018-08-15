@@ -76,7 +76,7 @@
                         <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0 12 0 12" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Validation.ErrorTemplate="{StaticResource validationErrorTemplate}">
+                                    <Grid Margin="0 12 0 12" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
@@ -84,7 +84,6 @@
                                         </Grid.ColumnDefinitions>
                                         <!--The Name-->
                                         <TextBox ToolTip="{Binding Path=Name}" Style="{StaticResource EnterText}" Foreground="{Binding Path=Associated, Converter={StaticResource BoolToColorConverter}}">
-                                            
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>

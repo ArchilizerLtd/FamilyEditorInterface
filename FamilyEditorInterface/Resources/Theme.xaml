@@ -10,7 +10,9 @@
         <!-- accent resource -->
         <!-- change "Cobalt" to the accent color you want -->
 
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+        <!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />-->
+        <!-- change "BaseLight" to the theme you want -->
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
         
         <!--Material Design Templates-->
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
@@ -21,45 +23,6 @@
         <!--Flat Buttons-->
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
         <!-- theme resource -->
-        <!-- change "BaseLight" to the theme you want -->
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
     </ResourceDictionary.MergedDictionaries>
-    
-    <ControlTemplate x:Key="validationErrorTemplate">
-        <DockPanel>
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Grid Width="12" Height="12">
-                    <Ellipse Width="12" Height="12" 
-
-            Fill="Red" HorizontalAlignment="Center" 
-
-            VerticalAlignment="Center"
-
-                     
-
-                     ></Ellipse>
-                    <TextBlock Foreground="White" FontWeight="Heavy" 
-
-            FontSize="8" HorizontalAlignment="Center" 
-
-            VerticalAlignment="Center" TextAlignment="Center"
-
-                       ToolTip="{Binding ElementName=ErrorAdorner, 
-                       Path=AdornedElement.(Validation.Errors)[0].ErrorContent}"
-
-                       >X</TextBlock>
-                </Grid>
-                <TextBlock Foreground="Red" FontWeight="12" Margin="2,0,0,0" 
-
-                   Text="{Binding ElementName=ErrorAdorner, 
-                   Path=AdornedElement.(Validation.Errors)[0].ErrorContent}"
-
-                   ></TextBlock>
-            </StackPanel>
-            <AdornedElementPlaceholder 
-
-        x:Name="ErrorAdorner" ></AdornedElementPlaceholder>
-        </DockPanel>
-    </ControlTemplate>
-    
+        
 </ResourceDictionary>
