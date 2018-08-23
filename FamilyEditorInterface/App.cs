@@ -224,6 +224,7 @@ namespace FamilyEditorInterface
                 ShowForm();
                 return;
             }
+
             Document doc = e.CurrentActiveView.Document;
             
             // If the document is a Family Document, disable the UI
@@ -333,22 +334,22 @@ namespace FamilyEditorInterface
 
             if (_presenter == null || _presenter._isClosed)
             {
-                if(!App.ActiveUIDocument.Document.IsFamilyDocument)
-                {
-                    TaskDialog.Show("Error", "Usable only in Family Documents");
-                    return;
-                }
-                //new handler
-                handler = new RequestHandler();
-                //new event
-                exEvent = ExternalEvent.Create(handler);
-                // set current document
-
-                _document = App.ActiveUIDocument.Document;
-                _presenter = new FamilyParameterViewModel(_document);
-                
                 try
                 {
+                    if (!App.ActiveUIDocument.Document.IsFamilyDocument)
+                    {
+                        TaskDialog.Show("Error", "Usable only in Family Documents");
+                        return;
+                    }
+                    //new handler
+                    handler = new RequestHandler();
+                    //new event
+                    exEvent = ExternalEvent.Create(handler);
+                    // set current document
+
+                    _document = App.ActiveUIDocument.Document;
+                    _presenter = new FamilyParameterViewModel(_document);
+                
                     //pass parent (Revit) thread here
                     _presenter.Show(_hWndRevit);
                     _presenter.PresenterClosed += Stop;

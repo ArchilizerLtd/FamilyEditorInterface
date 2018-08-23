@@ -5,13 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FamilyEditorInterface.WPF"                     
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         TextElement.FontWeight="Light"
         TextElement.FontSize="12"
         TextOptions.TextFormattingMode="Ideal"
-        FontFamily="{DynamicResource MaterialDesignFont}"
         Title="Settings" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
         ContentRendered="Window_ContentRendered">
     <Window.Resources>
@@ -31,8 +30,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Label Margin="0 5 5 10
-" Name="lblWarningNumber" Grid.Column="1">Precision</Label>
+        <Label Margin="0 5 5 10" Name="lblWarningNumber" Grid.Column="1">Precision</Label>
         <TextBox Margin="5 0 0 0"  Padding="2" Name="txtAnswer" Grid.Column="1" Grid.Row="1" MinWidth="250" PreviewTextInput="txtAnswer_PreviewTextInput">Answer</TextBox>
         <WrapPanel Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,25,0,0">
             <Button IsDefault="True" Name="btnDialogOk" Click="btnDialogOk_Click" MinWidth="75" Margin="0,0,10,0" TextElement.FontSize="12">_Ok</Button>

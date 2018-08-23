@@ -17,6 +17,14 @@
         Closing="MainWindow_Closing">
     <Window.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/FamilyEditorInterface;component/Resources/Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:RevitToUnitConverter x:Key="ReverseUnitConverter"></local:RevitToUnitConverter>
+            <local:MultiplyConverter x:Key="MultiplyConverter"></local:MultiplyConverter>
+            <local:BoolToColorConverter x:Key="BoolToColorConverter"></local:BoolToColorConverter>
+            <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></local:BoolToVisibilityConverter>
+            <local:BoolToCheckedConverter x:Key="BoolToCheckedConverter"></local:BoolToCheckedConverter>
             <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}" x:Key="EnterText">
                 <Style.Setters>
                     <Setter Property="local:InputBindingsManager.UpdatePropertySourceWhenEnterPressed" Value="TextBox.Text"/>
@@ -27,24 +35,16 @@
                     <Setter Property="MaxWidth" Value="160"/>
                 </Style.Setters>
             </Style>            
-            <DataTemplate x:Key="expanderHeader">
+            <DataTemplate x:Key="ExpanderHeader">
                 <TextBlock Text="{Binding}" FontSize="12" FontWeight="Medium" Margin="-24 0 0 0"/>
             </DataTemplate>
-            <Style TargetType="{x:Type TextBlock}" x:Key="header">
+            <Style TargetType="{x:Type TextBlock}" x:Key="Header">
                 <Style.Setters>
                     <Setter Property="FontSize" Value="12"/>
                     <Setter Property="FontWeight" Value="Medium"/>
                     <Setter Property="TextTrimming" Value="WordEllipsis"/>
                 </Style.Setters>
             </Style>
-            <local:RevitToUnitConverter x:Key="ReverseUnitConverter"></local:RevitToUnitConverter>
-            <local:MultiplyConverter x:Key="MultiplyConverter"></local:MultiplyConverter>
-            <local:BoolToColorConverter x:Key="BoolToColorConverter"></local:BoolToColorConverter>
-            <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></local:BoolToVisibilityConverter>
-            <local:BoolToCheckedConverter x:Key="BoolToCheckedConverter"></local:BoolToCheckedConverter>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/FamilyEditorInterface;component/Resources/Theme.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
     <DockPanel Margin="20,20,20,20">
@@ -62,7 +62,7 @@
         </DockPanel>
         <!--Title-->
         <DockPanel DockPanel.Dock="Top" Margin="0 0 15 15">
-            <TextBlock Text="{Binding Path=_DocumentName, Mode=OneWay}" Style="{StaticResource header}" ToolTip="{Binding Path=_DocumentName, Mode=OneWay}"></TextBlock>
+            <TextBlock Text="{Binding Path=_DocumentName, Mode=OneWay}" Style="{StaticResource Header}" ToolTip="{Binding Path=_DocumentName, Mode=OneWay}"></TextBlock>
         </DockPanel>            
         <!--Parameters-->
         <ScrollViewer Controls:ScrollViewerHelper.VerticalScrollBarOnLeftSide="True" VerticalScrollBarVisibility="Auto"
@@ -71,7 +71,7 @@
                 <!--Value Parameters-->
                 <Expander Name="ValueParameters" ExpandDirection="Down" IsExpanded="True" DockPanel.Dock="Top"                          
                   Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" 
-                          HeaderTemplate="{StaticResource expanderHeader}" Header="Value Parameters">
+                          HeaderTemplate="{StaticResource ExpanderHeader}" Header="Value Parameters">
                     <Expander.Content>
                         <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
@@ -113,7 +113,7 @@
                 <!--BuiltIn Parameters-->
                 <Expander Name="BuiltInParameters" ExpandDirection="Down" IsExpanded="False" DockPanel.Dock="Top" Header="BuiltIn Parameters" 
                   Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" ScrollViewer.CanContentScroll="True" 
-                          HeaderTemplate="{StaticResource expanderHeader}">
+                          HeaderTemplate="{StaticResource ExpanderHeader}">
                     <Expander.Content>
                         <ItemsControl ItemsSource="{Binding BuiltInParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
@@ -142,7 +142,7 @@
                 <!--Yes/No Parameters-->
                 <Expander Name="YesNoParameters" ExpandDirection="Down" IsExpanded="False" DockPanel.Dock="Top" Header="Yes/No Parameters" 
                   Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" ScrollViewer.CanContentScroll="True"
-                          HeaderTemplate="{StaticResource expanderHeader}">
+                          HeaderTemplate="{StaticResource ExpanderHeader}">
                     <Expander.Content>
                         <ItemsControl ItemsSource="{Binding CheckParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
