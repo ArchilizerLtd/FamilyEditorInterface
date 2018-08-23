@@ -147,18 +147,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\family_editor_interface.png" />
-    <None Include="Resources\revitui_2017-1.png" />
-    <None Include="Resources\aecbaseres_14380-2.png" />
-    <None Include="Resources\aecbaseres_13442.png" />
-    <None Include="Resources\aecarchbaseres_15681-1.png" />
-    <None Include="Resources\RevitUI_2017.ico" />
-    <None Include="Resources\AecBaseRes_14380.ico" />
-    <None Include="Resources\AecBaseRes_13442.ico" />
-    <None Include="Resources\AecArchBaseRes_15681.ico" />
-    <None Include="Resources\if_reload_62243.png" />
-    <None Include="Resources\if_arrow_circle_left_62149.png" />
-    <None Include="Resources\if_save_62248.png" />
-    <EmbeddedResource Include="Resources\archilizer-01.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -83,8 +83,7 @@ namespace FamilyEditorInterface.WPF
     {       
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            //return Math.Round(Utils.convertValueTO((double)value), Properties.Settings.Default.Precision);
-            return Math.Round(Utils.convertValueTO((double)value), 0);
+            return Math.Round(Utils.convertValueTO((double)value), Properties.Settings.Default.Precision);
         }
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
