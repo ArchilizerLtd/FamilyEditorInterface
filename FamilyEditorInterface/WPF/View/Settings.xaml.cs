@@ -26,9 +26,16 @@ namespace FamilyEditorInterface.WPF
 
         public Settings()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+                txtAnswer.Text = Properties.Settings.Default.Precision.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
-            txtAnswer.Text = Properties.Settings.Default.Precision.ToString();
         }
 
         private void btnDialogOk_Click(object sender, RoutedEventArgs e)
