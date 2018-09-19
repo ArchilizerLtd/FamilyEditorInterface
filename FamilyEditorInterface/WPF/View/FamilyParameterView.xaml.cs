@@ -1,7 +1,4 @@
-﻿using MahApps.Metro.Controls;
-using MaterialDesignColors;
-using MaterialDesignThemes.Wpf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -116,17 +113,15 @@ namespace FamilyEditorInterface.WPF
     /// <summary>
     /// Interaction logic for FamilyParameterView.xaml
     /// </summary>
-    public partial class FamilyParameterView : MetroWindow
+    public partial class FamilyParameterView : Window
     {
         public FamilyParameterView(FamilyParameterViewModel vm)
         {
-            MahApps.Metro.Controls.SplitButton btn = new SplitButton();
             this.DataContext = vm;
 
             // Places the UI where it needs to go
             this.Loaded += new RoutedEventHandler(MyWindow_Loaded);
 
-            InitializeMaterialDesign();
             try
             {
                 InitializeComponent();
@@ -135,15 +130,6 @@ namespace FamilyEditorInterface.WPF
             {
                 MessageBox.Show(ex.Message);
             }
-        }
-        private void InitializeMaterialDesign()
-        {
-            // Create dummy objects to force the MaterialDesign assemblies to be loaded
-            // from this assembly, which causes the MaterialDesign assemblies to be searched
-            // relative to this assembly's path. Otherwise, the MaterialDesign assemblies
-            // are searched relative to Eclipse's path, so they're not found.
-            var card = new Card();
-            var hue = new Hue("Dummy", Colors.Black, Colors.White);
         }
         private void BtnDialogOk_Click(object sender, RoutedEventArgs e)
         {
