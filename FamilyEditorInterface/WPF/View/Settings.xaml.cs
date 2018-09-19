@@ -1,5 +1,4 @@
-﻿using MahApps.Metro.Controls;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +18,7 @@ namespace FamilyEditorInterface.WPF
     /// <summary>
     /// Interaction logic for Settings.xaml
     /// </summary>
-    public partial class Settings : MetroWindow
+    public partial class Settings : Window
     {
         // Only allow positive integers
         private static readonly Regex _regex = new Regex("[^0-9]+");

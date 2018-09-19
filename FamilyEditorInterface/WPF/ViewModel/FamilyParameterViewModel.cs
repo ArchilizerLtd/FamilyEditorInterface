@@ -285,7 +285,14 @@ namespace FamilyEditorInterface.WPF
             System.Windows.Interop.WindowInteropHelper x = new System.Windows.Interop.WindowInteropHelper(view);
             x.Owner = hWndRevit.Handle;
             view.Closed += FormClosed;
-            view.Show();
+            try
+            {
+                view.Show();
+            }
+            catch(Exception ex)
+            {
+                TaskDialog.Show("Error", ex.Message);
+            }
         }
         /// <summary>
         /// Shuffle parameter values
