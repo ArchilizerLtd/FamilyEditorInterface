@@ -51,7 +51,7 @@
         <Label Margin="0 5 5 10" Name="lblWarningNumber" Grid.Column="1">Precision</Label>
         <TextBox Style="{StaticResource EnterText}" Margin="0 0 0 0"  Padding="4" Name="txtAnswer" Grid.Column="1" Grid.Row="1" MinWidth="250" PreviewTextInput="txtAnswer_PreviewTextInput">Answer</TextBox>
         <WrapPanel Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,30,0,0">
-            <Button Style="{DynamicResource SimpleButtonStyle}" IsDefault="True">_Ok</Button>
+            <Button Style="{DynamicResource SimpleButtonStyle}" IsDefault="True" Name="btnDialogOk" Click="btnDialogOk_Click">_Ok</Button>
             <Button Style="{DynamicResource SimpleButtonStyle}" IsCancel="True" Margin="5,0,0,0" Height="25">_Cancel</Button>
         </WrapPanel>
     </Grid>

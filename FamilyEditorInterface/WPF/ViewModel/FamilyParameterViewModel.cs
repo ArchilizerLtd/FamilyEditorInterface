@@ -120,6 +120,11 @@ namespace FamilyEditorInterface.WPF
             
             FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
+
+            if(familyType == null)
+            {
+                familyType = CreateDefaultFamilyType(familyManager);
+            }
             
             Utils.Init(this.doc);
             double value = 0.0;
@@ -219,6 +224,26 @@ namespace FamilyEditorInterface.WPF
                     BuiltInParameters.Add(newItem);
                 }
             }            
+        }
+        /// <summary>
+        /// Creates defa7ot faj8oy ty0el
+        /// </summary>
+        /// <param name="familyManager"></param>
+        /// <returns></returns>
+        private FamilyType CreateDefaultFamilyType(FamilyManager familyManager)
+        {
+            FamilyType ftype = null;
+
+            TaskDialog td = new TaskDialog("No Family Type");
+
+            using (Transaction t = new Transaction(doc, "Create Family Type"))
+            {
+                t.Start();
+                ftype = familyManager.NewType("Default");
+                t.Commit();
+            }
+
+            return ftype;
         }
 
         private void ValueParameters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
