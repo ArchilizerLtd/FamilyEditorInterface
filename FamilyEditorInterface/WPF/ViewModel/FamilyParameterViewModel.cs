@@ -120,7 +120,12 @@ namespace FamilyEditorInterface.WPF
             
             FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
-            
+
+            if (familyType == null)
+            {
+                familyType = CreateDefaultFamilyType(familyManager);
+            }
+
             Utils.Init(this.doc);
             double value = 0.0;
 
@@ -450,6 +455,44 @@ namespace FamilyEditorInterface.WPF
                 PresenterClosed(this, new EventArgs());
         }
         #endregion
+
+        /// <summary>
+        /// Creates default family type.
+        /// </summary>
+        /// <param name="familyManager">The family manager.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception">Aborted by user.</exception>
+        private FamilyType CreateDefaultFamilyType(FamilyManager familyManager)
+        {
+            FamilyType familyType = null;
+
+            TaskDialog td = new TaskDialog("No Family Type");
+            td.MainInstruction = "Create Default Family Type.";
+            string s = "This might be a new Family with no existing Parameters or Family Types." + Environment.NewLine + Environment.NewLine +
+            "In order to use this plugin, you can either create a new Parameter/Family Type from the Family Types Dialog" +
+                " and restart the plugin or create a Default Family Type by accepting this message." + Environment.NewLine + Environment.NewLine +
+                    "You can always delete the Default Family Parameter later.";
+            td.MainContent = s;
+            td.CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
+
+            TaskDialogResult tResult = td.Show();
+
+            if (TaskDialogResult.Yes == tResult)
+            {
+                using (Transaction t = new Transaction(doc, "Create Family Type"))
+                {
+                    t.Start();
+                    familyType = familyManager.NewType("Default");
+                    t.Commit();
+                }
+            }
+            else
+            {
+                throw new Exception("Aborted by user.");
+            }
+
+            return familyType;
+        }
 
         protected void RaisePropertyChanged(string propertyName)
         {
