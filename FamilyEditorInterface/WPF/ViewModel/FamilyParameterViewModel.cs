@@ -121,11 +121,12 @@ namespace FamilyEditorInterface.WPF
             FamilyManager familyManager = doc.FamilyManager;
             FamilyType familyType = familyManager.CurrentType;
 
+
             if (familyType == null)
             {
                 familyType = CreateDefaultFamilyType(familyManager);
             }
-
+            
             Utils.Init(this.doc);
             double value = 0.0;
 
@@ -225,7 +226,6 @@ namespace FamilyEditorInterface.WPF
                 }
             }            
         }
-
         private void ValueParameters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)

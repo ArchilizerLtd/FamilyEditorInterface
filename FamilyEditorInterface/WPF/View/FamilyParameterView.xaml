@@ -188,7 +188,7 @@
                                             </TextBox.ContextMenu>
                                         </TextBox>
                                         <!--The Value Slider-->
-                                        <CheckBox IsChecked="{Binding Value, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,4,0"/>
+                                        <CheckBox IsChecked="{Binding Value, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,4,0" BorderThickness="0"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
