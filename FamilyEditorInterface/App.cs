@@ -23,6 +23,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using FamilyEditorInterface.WPF;
 using Autodesk.Revit.DB.Events;
+using Archilizer_Purge.Helpers;
 #endregion
 
 namespace FamilyEditorInterface
@@ -32,6 +33,9 @@ namespace FamilyEditorInterface
     /// </summary>
     class Application : IExternalApplication
     {
+        private static UIControlledApplication MyApplication { get; set; }
+        private static Assembly assembly;
+
         // windows Revit handle
         static WindowHandle _hWndRevit = null;
 
@@ -99,6 +103,7 @@ namespace FamilyEditorInterface
         /// <param name="application"></param>
         private void AddRibbonPanel(UIControlledApplication application)
         {
+            assembly = Assembly.GetExecutingAssembly();
             // Create a custom ribbon panel or use the existing one
             String tabName = "Archilizer";
             String panelName = "Family Document";
@@ -124,30 +129,11 @@ namespace FamilyEditorInterface
 
             // Get dll assembly path
             string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
-
-            //BitmapSource img32 = new BitmapImage (new Uri (@largeIcon));
-            //BitmapSource img16 = new BitmapImage (new Uri (@smallIcon));
-
-            //RibbonItem item = rvtRibbonPanel.AddItem(data);
-            //PushButton optionsBtn = item as PushButton;
-            //ContextualHelp ch = new ContextualHelp(ContextualHelpType.Url, "file:///C:/Users/adicted/AppData/Roaming/Autodesk/Revit/Addins/2015/Family Editor Interface _ AutoCAD _ Autodesk App Store.html");
             ContextualHelp ch = new ContextualHelp(ContextualHelpType.Url, @helpFile);
             
-            //PushButton familyEI = rvtRibbonPanel.AddItem(new PushButtonData("Family Editor", "Family Editor" + Environment.NewLine +  "Interface", path,
-            //    "FamilyEditorInterface.Command")) as PushButton;
-
-
             CreatePushButton(rvtRibbonPanel, String.Format("Family Editor" + Environment.NewLine + "Interface"), thisAssemblyPath, "FamilyEditorInterface.Command",
-                Message, "family_editor_interface.png", ch);
+                Message, "FamilyEditorInterface.Resources.icon_Families.png", ch);
 
-            //familyEI.Image = img16;
-            //familyEI.LargeImage = img32;
-            //familyEI.ToolTip = Message;
-            //familyEI.SetContextualHelp(ch);
-            //optionsBtn.AddPushButton(new PushButtonData("Automatic Dimensions", "AutoDim", path,
-            //    "AutomaticDimensions.AutoDim"));
-            //optionsBtn.AddPushButton(new PushButtonData("CAD|BIM", "CAD|BIM", path,
-            //    "BimpowAddIn.BimToCad"));
         }
 
         private static void CreatePushButton(RibbonPanel ribbonPanel, string name, string path, string command, string tooltip, string icon, ContextualHelp ch)
@@ -161,8 +147,15 @@ namespace FamilyEditorInterface
             PushButton pb = ribbonPanel.AddItem(pbData) as PushButton;
             pb.ToolTip = tooltip;
             pb.SetContextualHelp(ch);
-            BitmapImage pb2Image = new BitmapImage(new Uri(String.Format("pack://application:,,,/FamilyEditorInterface;component/Resources/{0}", icon)));
-            pb.LargeImage = pb2Image;
+
+            BitmapIcons bitmapIcons = new BitmapIcons(assembly, icon, MyApplication);
+            var largeImage = bitmapIcons.LargeBitmap();
+            var smallImage = bitmapIcons.SmallBitmap();
+            pb.LargeImage = largeImage;
+            pb.Image = smallImage;
+
+            //BitmapImage pb2Image = new BitmapImage(new Uri(String.Format("pack://application:,,,/FamilyEditorInterface;component/Resources/{0}", icon)));
+            //pb.LargeImage = pb2Image;
         }
         /// <summary>
         /// event handler that auto-rejects renaming of views
@@ -200,6 +193,7 @@ namespace FamilyEditorInterface
         public Result OnStartup(UIControlledApplication a)
         {
             ControlledApplication c_app = a.ControlledApplication;
+            MyApplication = a;
             AddRibbonPanel(a);
 
             thisApp = this;  // static access to this application instance

@@ -17,7 +17,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FamilyEditorInterface</RootNamespace>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
   </PropertyGroup>
@@ -57,11 +57,11 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="RevitAPI">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="Helpers\BitmapIcons.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -96,12 +97,12 @@
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
-    <Compile Include="WPF\Model\FamilyParameterModel.cs" />
-    <Compile Include="WPF\ViewModel\FamilyParameterViewModel.cs" />
-    <Compile Include="WPF\View\FamilyParameterView.xaml.cs">
+    <Compile Include="Resources\WPF\Model\FamilyParameterModel.cs" />
+    <Compile Include="Resources\WPF\ViewModel\FamilyParameterViewModel.cs" />
+    <Compile Include="Resources\WPF\View\FamilyParameterView.xaml.cs">
       <DependentUpon>FamilyParameterView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WPF\View\Settings.xaml.cs">
+    <Compile Include="Resources\WPF\View\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -126,22 +127,24 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\family_editor_interface.png" />
+    <EmbeddedResource Include="Resources\icon_Families.png" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Page Include="Resources\Theme.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WPF\View\FamilyParameterView.xaml">
+    <Page Include="Resources\WPF\View\FamilyParameterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WPF\View\Settings.xaml">
+    <Page Include="Resources\WPF\View\Settings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\WPF\icon_Families.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterClean">
@@ -152,5 +155,8 @@
     <PostBuildEvent>copy "$(ProjectDir)FamilyEditorInterface.addin" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"
 copy "$(ProjectDir)bin\debug\FamilyEditorInterface.bundle\*.dll" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"
 </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"</PreBuildEvent>
   </PropertyGroup>
 </Project>
