@@ -146,6 +146,9 @@
   <ItemGroup>
     <Resource Include="Resources\WPF\icon_Families.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="PackageContents.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterClean">
     <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2015\AutodeskRibbonTemplate.addin" />
@@ -153,7 +156,8 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>copy "$(ProjectDir)FamilyEditorInterface.addin" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"
-copy "$(ProjectDir)bin\debug\FamilyEditorInterface.bundle\*.dll" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"
+copy "$(ProjectDir)PackageContents.xml" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle"
+copy "$(ProjectDir)bin\Debug\FamilyEditorInterface.bundle\*.dll" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"
 </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
