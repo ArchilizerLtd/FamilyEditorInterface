@@ -1,33 +1,42 @@
-﻿using Autodesk.Revit.UI;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 
 namespace FamilyEditorInterface.WPF
 {
+    /// <summary>
+    /// Family Parameter Model
+    /// Inherits from INotifyPropertyChanged and can be used in WPF
+    /// </summary>
     public class FamilyParameterModel : INotifyPropertyChanged
     {
-        public RelayCommand DeleteCommand { get; private set; }
-        public RelayCommand TypeToInstanceCommand { get; private set; }
+        #region Properties & Constructors
+        public RelayCommand DeleteCommand { get; private set; } //Deletes the parameter
+        public RelayCommand TypeToInstanceCommand { get; private set; } //Toggles between type and instance
 
-        private string _name;
-        private string _oldName;
-        private double _value;
-        private string _type;
-        private string _typeOrInstance;
-        private bool _associated;
-        private bool _builtIn;
-        private bool _shared;
-        private int _precision;
-        private bool _visible;
-        private bool _suppres;
+        private string _name;   //private Name  
+        private string _oldName;    //private Old Name
+        private double _value;  //private Value
+        private string _type;   //private Type
+        private string _typeOrInstance; //private bool if it is a Type or an Instance parameter
+        private bool _associated;   //private bool if the paramter is associated 
+        private bool _builtIn;  //private bool if the parameter is Built-In (and cannot be deleted)
+        private bool _shared;   //private bool if hte parameter is Shared
+        private int _precision; //user defined precision
+        private bool _visible;  //private bool if hte parameter is visible
+        private bool _suppres;  //suppres request in case of shuffle or mass request
         
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public FamilyParameterModel()
         {
             DeleteCommand = new RelayCommand(o => Delete("DeleteTextBox"));
             TypeToInstanceCommand = new RelayCommand(o => TypeToInstance("TypeToInstance"));
         }
+        #endregion
 
+        #region Public Fields
+        //The old name of the Paramter, in case we rename it
         public string OldName
         {
             get { return _oldName; }
@@ -37,6 +46,7 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("OldName");
             }
         }
+        //Parameter Name
         public string Name
         {
             get { return _name; }
@@ -50,7 +60,7 @@ namespace FamilyEditorInterface.WPF
                 }
             }
         }
-
+        //Parameter Value (Revit generic value, can be any Unit type)
         public double Value
         {
             get { return _value; }
@@ -71,7 +81,7 @@ namespace FamilyEditorInterface.WPF
                 }
             }
         }
-
+        //???
         public int Precision
         {
             get { return _precision; }
@@ -81,7 +91,7 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("Precision");
             }
         }
-
+        //If it is a Type or an Instance parameter
         public string TypeOrInstance
         {
             get { return _typeOrInstance; }
@@ -91,7 +101,7 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("TypeOrInstance");
             }
         }
-
+        //If the Paramter is Visible (only through API)
         public bool Visible
         {
             get { return _visible; }
@@ -101,7 +111,7 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("Visible");
             }
         }
-
+        //Parameter Type
         public string Type
         {
             get { return _type; }
@@ -111,7 +121,7 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("Type");
             }
         }
-
+        //If the parameter is associated
         public bool Associated
         {
             get { return _associated; }
@@ -122,7 +132,7 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("Associated");
             }
         }
-
+        //If it's a built-in paramter
         public bool BuiltIn
         {
             get { return _builtIn; }
@@ -132,7 +142,7 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("BuiltIn");
             }
         }
-
+        //If it's a Shared parameter
         public bool Shared
         {
             get { return _shared; }
@@ -143,6 +153,28 @@ namespace FamilyEditorInterface.WPF
             }
         }
 
+        #endregion
+
+        #region Methods
+        //Makes a Delete Request to Delete the Parameter
+        private void Delete(object sender)
+        {
+            Utils.MakeRequest(RequestId.DeleteId, Name);
+        }
+        //Makes a TypeToInstance request to Toggle between the two
+        private void TypeToInstance(object sender)
+        {
+            TypeOrInstance = TypeOrInstance.Equals("Instance") ? "Type" : "Instance";
+            Utils.MakeRequest(RequestId.TypeToInstance, Name, Type);
+        }        
+        //Will force a suppres state
+        internal void SuppressUpdate()
+        {
+            this._suppres = true;
+        }
+        #endregion
+
+        #region Interface Implementation
         protected void RaisePropertyChanged(string propertyName)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
@@ -153,21 +185,6 @@ namespace FamilyEditorInterface.WPF
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-
-        private void Delete(object sender)
-        {
-            Utils.MakeRequest(RequestId.DeleteId, Name);
-        }
-        private void TypeToInstance(object sender)
-        {
-            TypeOrInstance = TypeOrInstance.Equals("Instance") ? "Type" : "Instance";
-            Utils.MakeRequest(RequestId.TypeToInstance, Name, Type);
-        }
-
-        internal void SuppressUpdate()
-        {
-            this._suppres = true;
-        }
+        #endregion
     }
 }
