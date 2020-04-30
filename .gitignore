@@ -5,6 +5,10 @@
 DesignTimeBuild/
 storage.ide-shm
 storage.ide-wal
+*.ide
+*.suo
+*.lock
+
 
 # Build results
 [Dd]ebug/
