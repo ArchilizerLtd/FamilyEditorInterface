@@ -22,6 +22,7 @@
             <local:BoolToColorConverter x:Key="BoolToColorConverter"></local:BoolToColorConverter>
             <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></local:BoolToVisibilityConverter>
             <local:BoolToCheckedConverter x:Key="BoolToCheckedConverter"></local:BoolToCheckedConverter>
+            <local:BoolToWidthConverter x:Key="BoolToWidthConverter"></local:BoolToWidthConverter>
             <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}" x:Key="EnterText">
                 <Style.Setters>
                     <Setter Property="local:InputBindingsManager.UpdatePropertySourceWhenEnterPressed" Value="TextBox.Text"/>
@@ -110,6 +111,9 @@
                                     <Grid Style="{StaticResource ItemControlGridStyle}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
@@ -127,11 +131,21 @@
                                                 </Binding.ValidationRules>
                                             </Binding>
                                         </TextBox>
+                                        <!--Tags-->
+                                        <Border CornerRadius="5" Grid.Column="1" Padding="3" Background="DarkSalmon" Margin="2" MaxHeight="12" Width="{Binding Shared, Converter={StaticResource BoolToWidthConverter}}">
+                                            <TextBlock Text="shared" FontSize="8" FontWeight="Regular" VerticalAlignment="Center" SnapsToDevicePixels="True"/>
+                                        </Border>
+                                        <Border CornerRadius="5" Grid.Column="2" Padding="3" Background="DarkGoldenrod" Margin="2" MaxHeight="12" Width="{Binding BuiltIn, Converter={StaticResource BoolToWidthConverter}}">
+                                            <TextBlock Text="built-in" FontSize="8" FontWeight="Regular" VerticalAlignment="Center" SnapsToDevicePixels="True"/>
+                                        </Border>
+                                        <Border CornerRadius="5" Grid.Column="3" Padding="3" Background="DarkKhaki" Margin="2" MaxHeight="12" Width="{Binding Associated, Converter={StaticResource BoolToWidthConverter}}">
+                                            <TextBlock Text="in use" FontSize="8" FontWeight="Regular" VerticalAlignment="Center" SnapsToDevicePixels="True"/>
+                                        </Border>
                                         <!--The Value Slider-->
                                         <Slider Style="{DynamicResource RoundSliderStyle}" Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
-                                    Maximum="{Binding Value, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="1" Margin="10 2 10 0" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}"/>
+                                    Maximum="{Binding Value, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="4" Margin="10 2 10 0" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}"/>
                                         <!--The Value-->
-                                        <TextBox Text="{Binding Value, Converter={StaticResource ReverseUnitConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="2" Style="{StaticResource EnterText}" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}"
+                                        <TextBox Text="{Binding Value, Converter={StaticResource ReverseUnitConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="5" Style="{StaticResource EnterText}" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}"
                                                        PreviewTextInput="txtAnswer_PreviewTextInput"/>
                                     </Grid>
                                 </DataTemplate>
