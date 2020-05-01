@@ -12,14 +12,23 @@ using System.Windows.Input;
 
 namespace FamilyEditorInterface.WPF
 {
+    /// <summary>
+    /// Family Editor Interface ViewModel Class
+    /// </summary>
     public class FamilyParameterViewModel : INotifyPropertyChanged
     {
-        private Document doc;
-        private string documentName;
-        internal bool _isClosed;
-        internal bool _enabled;
-        public FamilyParameterView view;
-        private SortedList<string, FamilyParameter> famParam;
+        #region Properties & Constructors
+        private Document doc;   //The curret Revit document (better has a family ;)
+        private string documentName;    //The document name
+        internal bool _isClosed;    //Keep track if the view is closed
+        internal bool _enabled; //Keep track if hte view is enabled
+        public FamilyParameterView view;    //The UI for the Plugin
+        private SortedList<string, FamilyParameter> famParam;   
+        private List<FamilyParameter> paramLabel;    //Parameters used as dimension drivers
+        private List<FamilyParameter> paramFormula;    //Parameters used as formula drivers
+        private FamilyManager familyManager;    //Family Manager contains all Parameter related stuff
+        private FamilyType familyType;  //The current Family Type (a family can have multiple Types)
+
         public EventHandler PresenterClosed;
 
         public ICommand ShuffleCommand { get; set; }
@@ -89,6 +98,10 @@ namespace FamilyEditorInterface.WPF
             }
         }
 
+        /// <summary>
+        /// The Constructor
+        /// </summary>
+        /// <param name="document">Current Revit Doument (better be a Family one)</param>
         public FamilyParameterViewModel(Document document)
         {
             Application.handler.EncounteredError += RollBackState;
@@ -103,129 +116,195 @@ namespace FamilyEditorInterface.WPF
             this.PopulateModel();
             this._enabled = true;
         }
+        #endregion
 
+        #region Main Methods
         // Force update in case of error
         private void RollBackState(object sender, EventArgs e)
         {
             PopulateModel();
         }
-
+        //A sequence of methods that set up the function and UI of the Plugin
+        //The main method of the View Model
         private void PopulateModel()
         {
+            Initialize();
+            InitializeFamilyManager();
+            PopulateFamilyParameters();
+            GetUsedDriverParameters();
+            GetUsedFormulaParameters();
+            PopulateUICollections();
+            ParameterIsUsedValue();
+        }
+        //Populate the IsUsed value of the parameter and the Visibility of the parameter in the UI
+        private void ParameterIsUsedValue()
+        {
+            foreach (var param in ValueParameters)
+            {
+                param.IsUsed = IsUsedParameter(param);  //Set the IsUsed property
+                param.Visible = param.IsUsed ? true : Properties.Settings.Default.AssociatedVisibility; //Set the visibility in the UI
+            }
+            foreach (var param in BuiltInParameters)
+            {
+                param.IsUsed = IsUsedParameter(param);  //Set the IsUsed property
+                param.Visible = param.IsUsed ? true : Properties.Settings.Default.AssociatedVisibility; //Set the visibility in the UI
+            }
+            foreach (var param in CheckParameters)
+            {
+                param.IsUsed = IsUsedParameter(param);  //Set the IsUsed property
+                param.Visible = param.IsUsed ? true : Properties.Settings.Default.AssociatedVisibility; //Set the visibility in the UI
+            }
+        }
+        //Determins if a parameter is used in this Family or not
+        private bool IsUsedParameter(FamilyParameterModel param)
+        {
+            if (param.Associated) return true;
+            if (param.Label) return true;
+            if (param.UsedInFormula) return true;
+            return false;
+        }
+        //Populate the UI Observable Collections
+        private void PopulateUICollections()
+        {
+            //List<ElementId> eId = new List<ElementId>();
+            double value = 0.0;
+
+            foreach (FamilyParameter fp in famParam.Values)
+            {
+                bool builtIn = fp.Id.IntegerValue < 0;
+
+                //yes-no parameters
+                if (fp.Definition.ParameterType.Equals(ParameterType.YesNo))
+                {
+                    if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
+
+                    CheckParameters.Add(FamilyParameterItem(fp, value));
+
+                    continue;
+                }
+
+                //slider parameters
+                if (fp.StorageType == StorageType.Double)
+                {
+                    value = Convert.ToDouble(familyType.AsDouble(fp));
+                }
+                else if (fp.StorageType == StorageType.Integer)
+                {
+                    value = Convert.ToDouble(familyType.AsInteger(fp));
+                }
+
+                //eId.Add(fp.Id);
+
+                //value parameters
+                if (!builtIn)
+                {
+                    ValueParameters.Add(FamilyParameterItem(fp, value));
+                }
+                //built-in parameters
+                else
+                {
+                    BuiltInParameters.Add(FamilyParameterItem(fp, value));
+                }
+            }
+        }
+        
+        //Populate the (sorted) list of FamilyParameters
+        private void PopulateFamilyParameters()
+        {
+            foreach (FamilyParameter fp in familyManager.Parameters)
+            {
+                // Do not duplicate existing parameters?
+                // TO DO: Set a better existing check based on ElementId
+                if (!famParam.ContainsKey(fp.Definition.Name)) famParam.Add(fp.Definition.Name, fp);
+                //if (!famEdit(fp, familyType)) continue;
+                //else
+                //{
+                //    if (!famParam.ContainsKey(fp.Definition.Name))
+                //        famParam.Add(fp.Definition.Name, fp);
+                //}
+            }
+        }
+        //Initialize the Family Manager for the current Document and the FamilyType
+        private void InitializeFamilyManager()
+        {
+            familyManager = doc.FamilyManager;    //Family Manager contains all Parameter related stuff
+            familyType = familyManager.CurrentType;  //The current Family Type (a family can have multiple Types)
+
+            //In case of a new Family, we will need a default Family Type
+            if (familyType == null)
+            {
+                familyType = CreateDefaultFamilyType(familyManager);
+            }
+        }
+        //Initialize all the collection variables
+        private void Initialize()
+        {
+            Utils.InitializeUnits(this.doc);    //Initializes the units (meters, feet, etc.
+
             ValueParameters = new ObservableCollection<FamilyParameterModel>();
             ValueParameters.CollectionChanged += ValueParameters_CollectionChanged;
             BuiltInParameters = new ObservableCollection<FamilyParameterModel>();
             CheckParameters = new ObservableCollection<FamilyParameterModel>();
             famParam = new SortedList<string, FamilyParameter>();
-            
-            FamilyManager familyManager = doc.FamilyManager;
-            FamilyType familyType = familyManager.CurrentType;
-
-
-            if (familyType == null)
-            {
-                familyType = CreateDefaultFamilyType(familyManager);
-            }
-            
-            Utils.Init(this.doc);
-            double value = 0.0;
-
-            foreach (FamilyParameter fp in familyManager.Parameters)
-            {
-                if (!famEdit(fp, familyType)) continue;
-                else
-                {
-                    if (!famParam.ContainsKey(fp.Definition.Name))
-                        famParam.Add(fp.Definition.Name, fp);
-                }
-            }
-
-            List<ElementId> eId = new List<ElementId>();
-
-            FilteredElementCollector collector = new FilteredElementCollector(doc);
-            List<Dimension> dimList = collector
+            paramLabel = new List<FamilyParameter>();
+            paramFormula = new List<FamilyParameter>();
+        }
+        //Populates the collection of Parameters that are used to drive dimensions
+        private void GetUsedDriverParameters()
+        {
+            List<Dimension> dimList = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_Dimensions)
                 .WhereElementIsNotElementType()
                 .Cast<Dimension>()
                 .ToList();
 
-            List<FamilyParameter> paramUsed = new List<FamilyParameter>();
-
             foreach (Dimension dim in dimList)
             {
                 try
                 {
-                    if (dim.FamilyLabel != null) paramUsed.Add(dim.FamilyLabel);
+                    if (dim.FamilyLabel != null) paramLabel.Add(dim.FamilyLabel);
                 }
                 catch (Exception)
                 {
 
                 }
             }
-
-            foreach (FamilyParameter fp in famParam.Values)
-            {
-                bool associated = !fp.AssociatedParameters.IsEmpty || paramUsed.Any(x => x.Definition.Name.Equals(fp.Definition.Name));
-                bool builtIn = fp.Id.IntegerValue < 0;
-                ///yes-no parameters
-                if (fp.Definition.ParameterType.Equals(ParameterType.YesNo))
-                {
-                    if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
-
-                    //eId.Add(fp.Id);
-
-                    FamilyParameterModel newItem = new FamilyParameterModel(); // collect data yes-no
-                    newItem.Precision = Properties.Settings.Default.Precision;
-                    newItem.Name = fp.Definition.Name;
-                    newItem.Value = value;
-                    newItem.Type = fp.Definition.ParameterType.ToString();
-                    newItem.Associated = associated;
-                    newItem.BuiltIn = fp.Id.IntegerValue < 0;
-                    newItem.Shared = fp.IsShared;
-                    newItem.Visible = associated ? true : Properties.Settings.Default.AssociatedVisibility;
-                    newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
-
-                    CheckParameters.Add(newItem);
-
-                    continue;
-                }
-                ///slider parameters
-                if (fp.StorageType == StorageType.Double) value = Convert.ToDouble(familyType.AsDouble(fp));
-                else if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
-                eId.Add(fp.Id);
-
-                if (!builtIn)
-                {
-                    FamilyParameterModel newItem = new FamilyParameterModel();  // collect data slider, value != 0
-                    newItem.Precision = Properties.Settings.Default.Precision;
-                    newItem.Name = fp.Definition.Name;
-                    newItem.Value = value;
-                    newItem.Type = fp.Definition.ParameterType.ToString();
-                    newItem.Associated = associated;
-                    newItem.BuiltIn = fp.Id.IntegerValue < 0;
-                    newItem.Shared = fp.IsShared;
-                    newItem.Visible = associated ? true : Properties.Settings.Default.AssociatedVisibility;
-                    newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
-
-                    ValueParameters.Add(newItem);
-                }
-                else
-                {
-                    FamilyParameterModel newItem = new FamilyParameterModel(); // collect data slider, value == 0
-                    newItem.Precision = Properties.Settings.Default.Precision;
-                    newItem.Name = fp.Definition.Name;
-                    newItem.Value = value;
-                    newItem.Type = fp.Definition.ParameterType.ToString();
-                    newItem.Associated = associated;
-                    newItem.BuiltIn = fp.Id.IntegerValue < 0;
-                    newItem.Shared = fp.IsShared;
-                    newItem.Visible = associated ? true : Properties.Settings.Default.AssociatedVisibility;
-                    newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
-
-                    BuiltInParameters.Add(newItem);
-                }
-            }            
         }
+        private void GetUsedFormulaParameters()
+        {
+            foreach(FamilyParameter fp in famParam.Values)
+            {
+                if (fp.Formula != null)
+                {
+                    //If the formula contains the name of the FamilyParameter, add it to the list
+                    string formula = fp.Formula;
+                    famParam.Keys.ToList().ForEach(x => { if (formula.Contains(x)) paramFormula.Add(famParam[x]); });   
+                }
+            }
+        }
+        //Create a checkbox FamilyParameterModel item
+        private FamilyParameterModel FamilyParameterItem(FamilyParameter fp, double value)
+        {
+            //Collect data depending on the type of paramter
+            FamilyParameterModel newItem = new FamilyParameterModel(); //Create new FamilyParamterModel
+            newItem.Precision = Properties.Settings.Default.Precision;  //The precision set by the User in the Settings
+            newItem.Name = fp.Definition.Name;  //The name of the Parameter
+            newItem.Value = value;  //The Value of the parameter (can be yes/no, double, integer, string, ...
+            newItem.Type = fp.Definition.ParameterType.ToString();  //The parameter type
+            newItem.Associated = !fp.AssociatedParameters.IsEmpty;    //If the parameter is being associated
+            newItem.BuiltIn = fp.Id.IntegerValue < 0;
+            newItem.Modifiable = fp.UserModifiable;
+            newItem.Formula = fp.IsDeterminedByFormula;
+            newItem.Label = paramLabel.Any(f => f.Id == fp.Id);
+            newItem.Reporting = fp.IsReporting;
+            newItem.UsedInFormula = paramFormula.Any(f => f.Id == fp.Id);
+            newItem.ReadOnly = fp.IsReadOnly;
+            newItem.Shared = fp.IsShared;
+            newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
+
+            return newItem;
+        }
+        //The collection has changed, notify the UI
         private void ValueParameters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
@@ -236,7 +315,8 @@ namespace FamilyEditorInterface.WPF
                 foreach (FamilyParameterModel item in e.OldItems)
                     item.PropertyChanged -= MyType_PropertyChanged;
         }
-        void MyType_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        //The delegate used for collection changed notification
+        private void MyType_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if(e.PropertyName == "Name")
             {
@@ -245,13 +325,7 @@ namespace FamilyEditorInterface.WPF
                 Utils.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(_oldName, _name));
             }
         }
-
-        /// <summary>
-        /// Check parameter conditions
-        /// </summary>
-        /// <param name="fp"></param>
-        /// <param name="ft"></param>
-        /// <returns></returns>
+        //Check parameter conditions
         private Boolean famEdit(FamilyParameter fp, FamilyType ft)
         {
             if (!fp.StorageType.ToString().Equals("Double") && !fp.StorageType.ToString().Equals("Integer"))
@@ -272,9 +346,12 @@ namespace FamilyEditorInterface.WPF
             }
             return true;
         }
-
+        #endregion
 
         #region ViewModel Maintenance
+        /// <summary>
+        /// Terminates the View
+        /// </summary>
         internal void Close()
         {
             view.Close();
@@ -299,9 +376,7 @@ namespace FamilyEditorInterface.WPF
                 TaskDialog.Show("Error", ex.Message);
             }
         }
-        /// <summary>
-        /// Shuffle parameter values
-        /// </summary>
+        // Shuffle parameter values
         private void Shuffle(object sender)
         {
             SingleRandom random = SingleRandom.Instance;
@@ -337,9 +412,7 @@ namespace FamilyEditorInterface.WPF
 
             if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
         }
-        /// <summary>
-        /// Change Precision
-        /// </summary>
+        // Change Precision
         private void Precision(object sender)
         {
             Settings settings = new Settings();
@@ -350,22 +423,19 @@ namespace FamilyEditorInterface.WPF
                     PopulateModel();
             }
         }
-        /// <summary>
-        /// Delete Unused Parameters
-        /// </summary>
-        /// <param name="sender"></param>
+        // Delete Unused Parameters
         private void DeleteUnused(object sender)
         {
             List<string> values = new List<string>();
 
             foreach(var item in ValueParameters)
             {
-                if (!item.Associated) values.Add(item.Name);
+                if (!item.IsUsed) values.Add(item.Name);
             }
 
             foreach (var item in CheckParameters)
             {
-                if (!item.Associated) values.Add(item.Name);
+                if (!item.IsUsed) values.Add(item.Name);
             }
 
             if (values.Count > 0)
@@ -374,10 +444,7 @@ namespace FamilyEditorInterface.WPF
                 MakeRequest(RequestId.DeleteId, values);
             }
         }
-        /// <summary>
-        /// Toggle Visibility of Parameters which are not associated
-        /// </summary>
-        /// <param name="sender"></param>
+        // Toggle Visibility of Parameters which are not associated
         private void ChangeVisibility(object sender)
         {
             Properties.Settings.Default.AssociatedVisibility = !Properties.Settings.Default.AssociatedVisibility;
@@ -394,6 +461,7 @@ namespace FamilyEditorInterface.WPF
                 if (!item.Associated)
                     item.Visible = Properties.Settings.Default.AssociatedVisibility;
         }
+        // Makes requiest, renames Parameters
         private void MakeRequest(RequestId request, List<string> values)
         {
             //MessageBox.Show("You are in the Control.Request event.");
@@ -401,6 +469,7 @@ namespace FamilyEditorInterface.WPF
             Application.handler.Request.Make(request);
             Application.exEvent.Raise();
         }
+        // Makes request, changes values
         private void MakeRequest(RequestId request, List<Tuple<string, double>> values)
         {
             //MessageBox.Show("You are in the Control.Request event.");
@@ -408,7 +477,9 @@ namespace FamilyEditorInterface.WPF
             Application.handler.Request.Make(request);
             Application.exEvent.Raise();
         }
-
+        /// <summary>
+        /// Activate the View
+        /// </summary>
         internal void Enable()
         {
             if(!_enabled)
@@ -418,7 +489,9 @@ namespace FamilyEditorInterface.WPF
                 view.Visibility = System.Windows.Visibility.Visible;
             }
         }
-
+        /// <summary>
+        /// Disactivate the View
+        /// </summary>
         internal void Disable()
         {
             if (_enabled)
@@ -428,18 +501,21 @@ namespace FamilyEditorInterface.WPF
                 view.Visibility = System.Windows.Visibility.Hidden;
             }
         }
-
+        /// <summary>
+        /// In case the document has changed, repopulate the model with the new Parameters
+        /// </summary>
         internal void ThisDocumentChanged()
         {
             this.PopulateModel();
         }
-
         // Notify that the form is closed and effectivelly close shop
         private void FormClosed(object sender, EventArgs e)
         {
             this.Dispose();
         }
-
+        /// <summary>
+        /// Again, the document has changed, repopulate the model with the new Parameters
+        /// </summary>
         internal void DocumentSwitched()
         {
             this.PopulateModel();
@@ -456,6 +532,7 @@ namespace FamilyEditorInterface.WPF
         }
         #endregion
 
+        #region Utility Methods
         /// <summary>
         /// Creates default family type.
         /// </summary>
@@ -493,14 +570,19 @@ namespace FamilyEditorInterface.WPF
 
             return familyType;
         }
+        #endregion
 
+        #region Interface Implementation
         protected void RaisePropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
     }
+
+    #region Commands
     /// <summary>
     /// The Command interface that will let us relay button events to view model methods
     /// </summary>
@@ -534,4 +616,5 @@ namespace FamilyEditorInterface.WPF
         }
 
     }
+    #endregion
 }

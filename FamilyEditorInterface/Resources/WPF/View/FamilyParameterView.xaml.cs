@@ -38,6 +38,20 @@ namespace FamilyEditorInterface.WPF
         }
     }
     /// <summary>
+    /// Boolean to Margin Converter
+    /// </summary>
+    public class BoolToMarginConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (bool)value ? "2" : "0";
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return null;
+        }
+    }
+    /// <summary>
     /// Boolean to Color Converter
     /// </summary>
     public class BoolToVisibilityConverter : IValueConverter

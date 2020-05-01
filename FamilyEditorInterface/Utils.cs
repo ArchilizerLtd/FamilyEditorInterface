@@ -28,7 +28,7 @@ namespace FamilyEditorInterface
         private static DisplayUnitType dut;
         public const double METERS_IN_FEET = 0.3048;
 
-        public static void Init(Document doc)
+        public static void InitializeUnits(Document doc)
         {
             dut = doc.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits;
             if(!_goUnits())
