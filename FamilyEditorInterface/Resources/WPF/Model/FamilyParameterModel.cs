@@ -24,7 +24,14 @@ namespace FamilyEditorInterface.WPF
         private int _precision; //user defined precision
         private bool _visible;  //private bool if hte parameter is visible
         private bool _suppres;  //suppres request in case of shuffle or mass request
-        
+        private bool _readOnly; //read-only parameter
+        private bool _modifiable;   //indicates if the itneractive user can modify the value of the parameter
+        private bool _formula;  //Is determined by a formula
+        private bool _reporting;    //If it is a reporting parameter
+        private bool _usedInFormula;    //If the parameter is used in any formulas
+        private bool _label;  //If the parameter is used to drive dimensions
+        private bool _isUsed;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -131,6 +138,26 @@ namespace FamilyEditorInterface.WPF
                 if (_associated && !Properties.Settings.Default.AssociatedVisibility) Visible = false;
                 RaisePropertyChanged("Associated");
             }
+        }        
+        //If it's a read-only paramter
+        public bool ReadOnly
+        {
+            get { return _readOnly; }
+            set
+            {
+                _readOnly = value;
+                RaisePropertyChanged("ReadOnly");
+            }
+        }
+        //If the paramter is modifiable
+        public bool Modifiable
+        {
+            get { return _modifiable; }
+            set
+            {
+                _modifiable = value;
+                RaisePropertyChanged("Modifiable");
+            }
         }
         //If it's a built-in paramter
         public bool BuiltIn
@@ -152,6 +179,57 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("Shared");
             }
         }
+        //If it's determined by formula
+        public bool Formula
+        {
+            get { return _formula; }
+            set
+            {
+                _formula = value;
+                RaisePropertyChanged("Formula");
+            }
+        }
+        //If it's determined by formula
+        public bool Reporting
+        {
+            get { return _reporting; }
+            set
+            {
+                _reporting = value;
+                RaisePropertyChanged("Reporting");
+            }
+        }
+        //If the parameter is used in any formulas
+        public bool UsedInFormula
+        {
+            get { return _usedInFormula; }
+            set
+            {
+                _usedInFormula = value;
+                RaisePropertyChanged("UsedInFormula");
+            }
+        }
+        //If the parameter is used to drive dimensions
+        public bool Label
+        {
+            get { return _label; }
+            set
+            {
+                _label = value;
+                RaisePropertyChanged("Label");
+            }
+        }
+        //Ultimately, if the parameter is in use
+        public bool IsUsed
+        {
+            get { return _isUsed; }
+            set
+            {
+                _isUsed = value;
+                RaisePropertyChanged("IsUsed");
+            }
+        }
+
 
         #endregion
 
