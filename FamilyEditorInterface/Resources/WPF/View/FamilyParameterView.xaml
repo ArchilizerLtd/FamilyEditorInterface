@@ -36,6 +36,7 @@
             <!--Tag Styles-->
             <Style TargetType="{x:Type Border}" x:Key="Tag">
                 <Style.Setters>
+                    <Setter Property="Tag" Value="Tag"/>
                     <Setter Property="CornerRadius" Value="5"/>
                     <Setter Property="Padding" Value="3"/>
                     <Setter Property="MaxHeight" Value="12"/>
@@ -107,10 +108,11 @@
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnDeleteAllUnused" Content="{StaticResource DeleteIcon}" Command="{Binding DeleteUnusedCommand}" ToolTip="Delete all unused Parameters"/>
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnViewBuiltIn" Content="{StaticResource ViewIcon}" Command="{Binding VisibilityCommand}" ToolTip="Toggle visibility of nonassociated Parameters"/>
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettings" Content="{StaticResource SettingsIcon}" Command="{Binding PrecisionCommand}" ToolTip="Settings"/>
+            <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettingsTest" Content="{StaticResource ToggleIcon}" Command="{Binding ToggleCommand}" ToolTip="Toggle Tags"/>
             <Button Style="{DynamicResource SimpleButtonStyle}" x:Name="btnDialogOk" Click="BtnDialogOk_Click" Content="Close" Width="95"/>
         </DockPanel>
         <!--Parameters-->
-        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}, Mode=FindAncestor}}" Margin="0,5,0,0">
+        <ScrollViewer x:Name="MainCanvas" VerticalScrollBarVisibility="Auto" MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}, Mode=FindAncestor}}" Margin="0,5,0,0">
             <DockPanel DockPanel.Dock="Top" Margin="0 0 10 0">
                 <Expander Visibility="Collapsed" Style="{StaticResource RightExpander}" x:Name="Debug" IsExpanded="True" Header="Test Expander">
                     <DockPanel FlowDirection="LeftToRight" LastChildFill="True">

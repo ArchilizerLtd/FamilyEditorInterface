@@ -38,37 +38,27 @@ namespace FamilyEditorInterface
 
         // windows Revit handle
         static WindowHandle _hWndRevit = null;
-
         public static RequestHandler handler;
-        public static ExternalEvent exEvent;
-        
+        public static ExternalEvent exEvent;        
         public static UIApplication App;
-
-        //public static bool Update;
-
+        
         // class instance
         internal static Application thisApp = null;
 
-        /// <summary>
-        /// Tooltip
-        /// </summary>
+        // Tooltip
         public const string Message = "Interactive interface for Family Editor.";
 
         private FamilyParameterViewModel _presenter;
         private Document _document;
-        private bool _started;
 
-        /// <summary>
-        /// Get absolute path to this assembly
-        /// </summary>
+        // Get absolute path to this assembly
         static string path = Assembly.GetExecutingAssembly().Location;
         static string contentPath = Path.GetDirectoryName(Path.GetDirectoryName(path)) + "/";
         static string helpFile = "file:///C:/ProgramData/Autodesk/ApplicationPlugins/FamilyEditorInterface.bundle/Content/Family%20Editor%20Interface%20_%20Revit%20_%20Autodesk%20App%20Store.html";
-        static string largeIcon = contentPath + "family_editor_interface.png";
-        static string smallIcon = contentPath + "familyeditorinterface16.png";
         private bool _disabled;
 
         // Marks if the Plugin has been started
+        private bool _started;
         public bool Started 
         {
             get { return _started; }
@@ -124,8 +114,6 @@ namespace FamilyEditorInterface
             {
                 rvtRibbonPanel = panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) as RibbonPanel;
             }
-            //PulldownButtonData data = new PulldownButtonData("Options", "Family Editor" + Environment.NewLine + "Interface");
-
 
             // Get dll assembly path
             string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
@@ -153,9 +141,6 @@ namespace FamilyEditorInterface
             var smallImage = bitmapIcons.SmallBitmap();
             pb.LargeImage = largeImage;
             pb.Image = smallImage;
-
-            //BitmapImage pb2Image = new BitmapImage(new Uri(String.Format("pack://application:,,,/FamilyEditorInterface;component/Resources/{0}", icon)));
-            //pb.LargeImage = pb2Image;
         }
         /// <summary>
         /// event handler that auto-rejects renaming of views

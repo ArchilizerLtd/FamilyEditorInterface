@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Autodesk.Revit.DB;
+using System;
 using System.ComponentModel;
 
 namespace FamilyEditorInterface.WPF
@@ -229,8 +230,8 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("IsUsed");
             }
         }
-
-
+        //Revit Display Unit Type to help us display the correct unit in the UI
+        public DisplayUnitType DisplayUnitType { get; internal set; }
         #endregion
 
         #region Methods

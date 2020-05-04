@@ -90,6 +90,7 @@
     </Compile>
     <Compile Include="Request.cs" />
     <Compile Include="RequestHandler.cs" />
+    <Compile Include="Resources\WPF\ViewModel\LabelsAndArrays.cs" />
     <Compile Include="Settings\Settings.cs">
       <SubType>Form</SubType>
     </Compile>

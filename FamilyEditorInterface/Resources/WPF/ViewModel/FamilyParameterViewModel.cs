@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using FamilyEditorInterface.Resources.WPF.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +9,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace FamilyEditorInterface.WPF
 {
@@ -35,6 +39,7 @@ namespace FamilyEditorInterface.WPF
         public ICommand PrecisionCommand { get; set; }
         public ICommand DeleteUnusedCommand { get; set; }
         public ICommand VisibilityCommand { get; set; }
+        public ICommand ToggleCommand { get; set; }
 
         private ObservableCollection<FamilyParameterModel> _valueParameters;
         private ObservableCollection<FamilyParameterModel> _builtInParameters;
@@ -98,6 +103,16 @@ namespace FamilyEditorInterface.WPF
             }
         }
 
+        private bool _toggleVisibility;
+        public bool ToggleVisibility
+        {
+            get { return _toggleVisibility; }
+            set
+            {
+                _toggleVisibility = value;
+                RaisePropertyChanged("ToggleVisibility");
+            }
+        }
         /// <summary>
         /// The Constructor
         /// </summary>
@@ -112,6 +127,7 @@ namespace FamilyEditorInterface.WPF
             PrecisionCommand = new RelayCommand(o => Precision("PrecisionButton"));
             DeleteUnusedCommand = new RelayCommand(o => DeleteUnused("DeleteUnusedButton"));
             VisibilityCommand = new RelayCommand(o => ChangeVisibility("ToggleVisibility"));
+            ToggleCommand = new RelayCommand(o => ToggleTags("ToggleVisibility"));
 
             this.PopulateModel();
             this._enabled = true;
@@ -133,7 +149,7 @@ namespace FamilyEditorInterface.WPF
             PopulateFamilyParameters();
             GetUsedDriverParameters();
             GetUsedFormulaParameters();
-            PopulateUICollections();
+            PopulateUICollections();    //HERE
             ParameterIsUsedValue();
         }
         //Populate the IsUsed value of the parameter and the Visibility of the parameter in the UI
@@ -252,23 +268,8 @@ namespace FamilyEditorInterface.WPF
         //Populates the collection of Parameters that are used to drive dimensions
         private void GetUsedDriverParameters()
         {
-            List<Dimension> dimList = new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_Dimensions)
-                .WhereElementIsNotElementType()
-                .Cast<Dimension>()
-                .ToList();
-
-            foreach (Dimension dim in dimList)
-            {
-                try
-                {
-                    if (dim.FamilyLabel != null) paramLabel.Add(dim.FamilyLabel);
-                }
-                catch (Exception)
-                {
-
-                }
-            }
+            LabelsAndArrays.GetDims(doc, ref paramLabel);
+            LabelsAndArrays.GetArrays(doc, ref paramLabel);
         }
         private void GetUsedFormulaParameters()
         {
@@ -301,6 +302,15 @@ namespace FamilyEditorInterface.WPF
             newItem.ReadOnly = fp.IsReadOnly;
             newItem.Shared = fp.IsShared;
             newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
+
+            try
+            {
+                newItem.DisplayUnitType = fp.DisplayUnitType;
+            }
+            catch (Exception)
+            {
+                
+            }
 
             return newItem;
         }
@@ -346,6 +356,19 @@ namespace FamilyEditorInterface.WPF
             }
             return true;
         }
+        //Remember user settings for Toggle Tags
+        private void SetToggleVisibility()
+        {
+            //ToggleVisibility = Properties.Settings.Default.ToggleVisibility;
+            if (Properties.Settings.Default.ToggleVisibility) return;
+            foreach (Border b in FindVisualChildren<Border>(view))
+            {
+                if (b.Tag != null && b.Tag.Equals("Tag"))
+                {
+                    b.Visibility = System.Windows.Visibility.Collapsed;
+                }
+            }
+        }
         #endregion
 
         #region ViewModel Maintenance
@@ -370,8 +393,9 @@ namespace FamilyEditorInterface.WPF
             try
             {
                 view.Show();
+                SetToggleVisibility();  //Set user-defined Tags visibility. The view show have been Initialized for this to work.
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TaskDialog.Show("Error", ex.Message);
             }
@@ -460,6 +484,18 @@ namespace FamilyEditorInterface.WPF
             foreach (var item in CheckParameters)
                 if (!item.Associated)
                     item.Visible = Properties.Settings.Default.AssociatedVisibility;
+        }
+        // Toggles Tags on/off
+        private void ToggleTags(object sender)
+        {
+            Properties.Settings.Default.ToggleVisibility = !Properties.Settings.Default.ToggleVisibility;   //Toggles the User-defined visibility
+            foreach (Border b in FindVisualChildren<Border>(view))
+            {
+                if (b.Tag != null && b.Tag.Equals("Tag"))
+                {
+                    b.Visibility = b.Visibility == System.Windows.Visibility.Visible ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+                }
+            }
         }
         // Makes requiest, renames Parameters
         private void MakeRequest(RequestId request, List<string> values)
@@ -569,6 +605,32 @@ namespace FamilyEditorInterface.WPF
             }
 
             return familyType;
+        }
+        /// <summary>
+        /// Retrieves WPF objects based on their type, super cool
+        /// https://stackoverflow.com/questions/974598/find-all-controls-in-wpf-window-by-type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="depObj"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
+            }
         }
         #endregion
 
