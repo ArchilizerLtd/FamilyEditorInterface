@@ -4,6 +4,14 @@ using System.ComponentModel;
 
 namespace FamilyEditorInterface.WPF
 {
+    public enum ParamType
+    {
+        YesNo,
+        Area,
+        Angle,
+        Material,
+        Supported
+    }
     /// <summary>
     /// Family Parameter Model
     /// Inherits from INotifyPropertyChanged and can be used in WPF
@@ -232,6 +240,8 @@ namespace FamilyEditorInterface.WPF
         }
         //Revit Display Unit Type to help us display the correct unit in the UI
         public DisplayUnitType DisplayUnitType { get; internal set; }
+        public ParamType ParamType { get; internal set; }
+        public StorageType StorageType { get; internal set; }
         #endregion
 
         #region Methods
