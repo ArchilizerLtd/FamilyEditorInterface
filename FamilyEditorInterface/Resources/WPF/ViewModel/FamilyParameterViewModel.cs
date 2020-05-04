@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using FamilyEditorInterface.Resources.WPF.Model;
 using FamilyEditorInterface.Resources.WPF.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,7 @@ namespace FamilyEditorInterface.WPF
         internal bool _enabled; //Keep track if hte view is enabled
         public FamilyParameterView view;    //The UI for the Plugin
         private SortedList<string, FamilyParameter> famParam;   
+        private SortedList<string, FamilyParameterModel> famParamModels;
         private List<FamilyParameter> paramLabel;    //Parameters used as dimension drivers
         private List<FamilyParameter> paramFormula;    //Parameters used as formula drivers
         private FamilyManager familyManager;    //Family Manager contains all Parameter related stuff
@@ -144,15 +146,49 @@ namespace FamilyEditorInterface.WPF
         //The main method of the View Model
         private void PopulateModel()
         {
-            Initialize();
-            InitializeFamilyManager();
+            Initialize();   //Routine initialization of all the variables 
+            InitializeFamilyManager();  //Get the Family Manager and Family Type
+            GetDriverAndFormulaParameters();  //Check which parameters are used in Dims and Arrays
             PopulateFamilyParameters();
-            GetUsedDriverParameters();
-            GetUsedFormulaParameters();
             PopulateUICollections();    //HERE
             ParameterIsUsedValue();
         }
+        //Initialize all the collection variables
+        private void Initialize()
+        {
+            Utils.InitializeUnits(this.doc);    //Initializes the units (meters, feet, etc.
+
+            ValueParameters = new ObservableCollection<FamilyParameterModel>();
+            ValueParameters.CollectionChanged += ValueParameters_CollectionChanged;
+            BuiltInParameters = new ObservableCollection<FamilyParameterModel>();
+            CheckParameters = new ObservableCollection<FamilyParameterModel>();
+            famParam = new SortedList<string, FamilyParameter>();
+            famParamModels = new SortedList<string, FamilyParameterModel>();
+            paramLabel = new List<FamilyParameter>();
+            paramFormula = new List<FamilyParameter>();
+        }
+        //Initialize the Family Manager for the current Document and the FamilyType
+        private void InitializeFamilyManager()
+        {
+            familyManager = doc.FamilyManager;    //Family Manager contains all Parameter related stuff
+            familyType = familyManager.CurrentType;  //The current Family Type (a family can have multiple Types)
+
+            //In case of a new Family, we will need a default Family Type
+            if (familyType == null)
+            {
+                familyType = CreateDefaultFamilyType(familyManager);
+            }
+        }
         //Populate the IsUsed value of the parameter and the Visibility of the parameter in the UI
+
+        //Populate the (sorted) list of FamilyParameters
+        private void PopulateFamilyParameters()
+        {
+            foreach (FamilyParameter fp in familyManager.Parameters)
+            {
+                famParamModels.Add(fp.Definition.Name, ItemRetriever.GetFamilyParameterModel(familyType, fp, paramLabel, paramFormula));
+            }
+        }
         private void ParameterIsUsedValue()
         {
             foreach (var param in ValueParameters)
@@ -182,192 +218,18 @@ namespace FamilyEditorInterface.WPF
         //Populate the UI Observable Collections
         private void PopulateUICollections()
         {
-            //List<ElementId> eId = new List<ElementId>();
-            double value = 0.0;
+            var getParameters = ItemRetriever.GetParameters(famParamModels.Values);
 
-            foreach (FamilyParameter fp in famParam.Values)
-            {
-                bool builtIn = fp.Id.IntegerValue < 0;
-
-                //yes-no parameters
-                if (fp.Definition.ParameterType.Equals(ParameterType.YesNo))
-                {
-                    if (fp.StorageType == StorageType.Integer) value = Convert.ToDouble(familyType.AsInteger(fp));
-
-                    CheckParameters.Add(FamilyParameterItem(fp, value));
-
-                    continue;
-                }
-
-                //slider parameters
-                if (fp.StorageType == StorageType.Double)
-                {
-                    value = Convert.ToDouble(familyType.AsDouble(fp));
-                }
-                else if (fp.StorageType == StorageType.Integer)
-                {
-                    value = Convert.ToDouble(familyType.AsInteger(fp));
-                }
-
-                //eId.Add(fp.Id);
-
-                //value parameters
-                if (!builtIn)
-                {
-                    ValueParameters.Add(FamilyParameterItem(fp, value));
-                }
-                //built-in parameters
-                else
-                {
-                    BuiltInParameters.Add(FamilyParameterItem(fp, value));
-                }
-            }
+            ValueParameters = new ObservableCollection<FamilyParameterModel>(getParameters.Item1);
+            BuiltInParameters = new ObservableCollection<FamilyParameterModel>(getParameters.Item2);
+            CheckParameters = new ObservableCollection<FamilyParameterModel>(getParameters.Item3);
         }
-        
-        //Populate the (sorted) list of FamilyParameters
-        private void PopulateFamilyParameters()
-        {
-            foreach (FamilyParameter fp in familyManager.Parameters)
-            {
-                // Do not duplicate existing parameters?
-                // TO DO: Set a better existing check based on ElementId
-                if (!famParam.ContainsKey(fp.Definition.Name)) famParam.Add(fp.Definition.Name, fp);
-                //if (!famEdit(fp, familyType)) continue;
-                //else
-                //{
-                //    if (!famParam.ContainsKey(fp.Definition.Name))
-                //        famParam.Add(fp.Definition.Name, fp);
-                //}
-            }
-        }
-        //Initialize the Family Manager for the current Document and the FamilyType
-        private void InitializeFamilyManager()
-        {
-            familyManager = doc.FamilyManager;    //Family Manager contains all Parameter related stuff
-            familyType = familyManager.CurrentType;  //The current Family Type (a family can have multiple Types)
-
-            //In case of a new Family, we will need a default Family Type
-            if (familyType == null)
-            {
-                familyType = CreateDefaultFamilyType(familyManager);
-            }
-        }
-        //Initialize all the collection variables
-        private void Initialize()
-        {
-            Utils.InitializeUnits(this.doc);    //Initializes the units (meters, feet, etc.
-
-            ValueParameters = new ObservableCollection<FamilyParameterModel>();
-            ValueParameters.CollectionChanged += ValueParameters_CollectionChanged;
-            BuiltInParameters = new ObservableCollection<FamilyParameterModel>();
-            CheckParameters = new ObservableCollection<FamilyParameterModel>();
-            famParam = new SortedList<string, FamilyParameter>();
-            paramLabel = new List<FamilyParameter>();
-            paramFormula = new List<FamilyParameter>();
-        }
-        //Populates the collection of Parameters that are used to drive dimensions
-        private void GetUsedDriverParameters()
+        //Populates the collection of Parameters that are used to drive dimensions, arrays or a used in formulas
+        private void GetDriverAndFormulaParameters()
         {
             LabelsAndArrays.GetDims(doc, ref paramLabel);
             LabelsAndArrays.GetArrays(doc, ref paramLabel);
-        }
-        private void GetUsedFormulaParameters()
-        {
-            foreach(FamilyParameter fp in famParam.Values)
-            {
-                if (fp.Formula != null)
-                {
-                    //If the formula contains the name of the FamilyParameter, add it to the list
-                    string formula = fp.Formula;
-                    famParam.Keys.ToList().ForEach(x => { if (formula.Contains(x)) paramFormula.Add(famParam[x]); });   
-                }
-            }
-        }
-        //Create a checkbox FamilyParameterModel item
-        private FamilyParameterModel FamilyParameterItem(FamilyParameter fp, double value)
-        {
-            //Collect data depending on the type of paramter
-            FamilyParameterModel newItem = new FamilyParameterModel(); //Create new FamilyParamterModel
-            newItem.Precision = Properties.Settings.Default.Precision;  //The precision set by the User in the Settings
-            newItem.Name = fp.Definition.Name;  //The name of the Parameter
-            newItem.Value = value;  //The Value of the parameter (can be yes/no, double, integer, string, ...
-            newItem.Type = fp.Definition.ParameterType.ToString();  //The parameter type
-            newItem.Associated = !fp.AssociatedParameters.IsEmpty;    //If the parameter is being associated
-            newItem.BuiltIn = fp.Id.IntegerValue < 0;
-            newItem.Modifiable = fp.UserModifiable;
-            newItem.Formula = fp.IsDeterminedByFormula;
-            newItem.Label = paramLabel.Any(f => f.Id == fp.Id);
-            newItem.Reporting = fp.IsReporting;
-            newItem.UsedInFormula = paramFormula.Any(f => f.Id == fp.Id);
-            newItem.ReadOnly = fp.IsReadOnly;
-            newItem.Shared = fp.IsShared;
-            newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
-
-            try
-            {
-                newItem.DisplayUnitType = fp.DisplayUnitType;
-            }
-            catch (Exception)
-            {
-                
-            }
-
-            return newItem;
-        }
-        //The collection has changed, notify the UI
-        private void ValueParameters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.NewItems != null)
-                foreach (FamilyParameterModel item in e.NewItems)
-                    item.PropertyChanged += MyType_PropertyChanged;
-
-            if (e.OldItems != null)
-                foreach (FamilyParameterModel item in e.OldItems)
-                    item.PropertyChanged -= MyType_PropertyChanged;
-        }
-        //The delegate used for collection changed notification
-        private void MyType_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if(e.PropertyName == "Name")
-            {
-                string _name = (sender as FamilyParameterModel).Name;
-                string _oldName = (sender as FamilyParameterModel).OldName;
-                Utils.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(_oldName, _name));
-            }
-        }
-        //Check parameter conditions
-        private Boolean famEdit(FamilyParameter fp, FamilyType ft)
-        {
-            if (!fp.StorageType.ToString().Equals("Double") && !fp.StorageType.ToString().Equals("Integer"))
-            {
-                return false;
-            }
-            else if (fp.IsDeterminedByFormula || fp.Formula != null)
-            {
-                return false;
-            }
-            else if (fp.IsReporting)
-            {
-                return false;
-            }
-            else if (fp.IsDeterminedByFormula)
-            {
-                return false;
-            }
-            return true;
-        }
-        //Remember user settings for Toggle Tags
-        private void SetToggleVisibility()
-        {
-            //ToggleVisibility = Properties.Settings.Default.ToggleVisibility;
-            if (Properties.Settings.Default.ToggleVisibility) return;
-            foreach (Border b in FindVisualChildren<Border>(view))
-            {
-                if (b.Tag != null && b.Tag.Equals("Tag"))
-                {
-                    b.Visibility = System.Windows.Visibility.Collapsed;
-                }
-            }
+            LabelsAndArrays.GetFormulas(doc, ref paramFormula);
         }
         #endregion
 
@@ -435,6 +297,40 @@ namespace FamilyEditorInterface.WPF
             }
 
             if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
+        }
+        //The collection has changed, notify the UI
+        private void ValueParameters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+                foreach (FamilyParameterModel item in e.NewItems)
+                    item.PropertyChanged += MyType_PropertyChanged;
+
+            if (e.OldItems != null)
+                foreach (FamilyParameterModel item in e.OldItems)
+                    item.PropertyChanged -= MyType_PropertyChanged;
+        }
+        //The delegate used for collection changed notification
+        private void MyType_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Name")
+            {
+                string _name = (sender as FamilyParameterModel).Name;
+                string _oldName = (sender as FamilyParameterModel).OldName;
+                Utils.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(_oldName, _name));
+            }
+        }
+        //Remember user settings for Toggle Tags
+        private void SetToggleVisibility()
+        {
+            //ToggleVisibility = Properties.Settings.Default.ToggleVisibility;
+            if (Properties.Settings.Default.ToggleVisibility) return;
+            foreach (Border b in FindVisualChildren<Border>(view))
+            {
+                if (b.Tag != null && b.Tag.Equals("Tag"))
+                {
+                    b.Visibility = System.Windows.Visibility.Collapsed;
+                }
+            }
         }
         // Change Precision
         private void Precision(object sender)

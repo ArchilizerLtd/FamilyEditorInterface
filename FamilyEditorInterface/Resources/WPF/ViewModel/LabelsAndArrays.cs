@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FamilyEditorInterface.Resources.WPF.ViewModel
 {
@@ -59,6 +57,36 @@ namespace FamilyEditorInterface.Resources.WPF.ViewModel
                 {
 
                 }
+            }
+        }
+        /// <summary>
+        /// A method that populates a list of FamilyPrameters that are used inside Formulas
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="paramFormula"></param>
+        internal static void GetFormulas(Document doc, ref List<FamilyParameter> paramFormula)
+        {
+            List<FamilyParameter> famParam = new List<FamilyParameter>();
+            List<FamilyParameter> outList = new List<FamilyParameter>();
+
+            foreach (FamilyParameter fp in doc.FamilyManager.Parameters)
+            {
+                famParam.Add(fp);   //Populate a list of FamilyParameters first
+            }
+
+            foreach (FamilyParameter fp in doc.FamilyManager.Parameters)
+            {
+                if (fp.Formula != null)
+                {
+                    //If the formula contains the name of the FamilyParameter, add it to the list
+                    string formula = fp.Formula;
+                    famParam.ForEach(x => { if (formula.Contains(x.Definition.Name)) outList.Add(x); });
+                }
+            }
+
+            if(outList.Any())
+            {
+                paramFormula = outList; //If the list contains any elements, return it to the main 
             }
         }
     }
