@@ -19,6 +19,7 @@
             </ResourceDictionary.MergedDictionaries>
             <local:RevitToUnitConverter x:Key="ReverseUnitConverter"></local:RevitToUnitConverter>
             <local:MultiplyConverter x:Key="MultiplyConverter"></local:MultiplyConverter>
+            <local:DoubleToStringConverter x:Key="DoubleToStringConverter"></local:DoubleToStringConverter>
             <local:BoolToColorConverter x:Key="BoolToColorConverter"></local:BoolToColorConverter>
             <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></local:BoolToVisibilityConverter>
             <local:BoolToCheckedConverter x:Key="BoolToCheckedConverter"></local:BoolToCheckedConverter>
@@ -106,7 +107,7 @@
         <DockPanel DockPanel.Dock="Bottom" Margin="0,20,0,0">
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnShuffle" Content="{StaticResource ShuffleIcon}" Command="{Binding ShuffleCommand}" ToolTip="Shuffle Parameter Values"/>
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnDeleteAllUnused" Content="{StaticResource DeleteIcon}" Command="{Binding DeleteUnusedCommand}" ToolTip="Delete all unused Parameters"/>
-            <Button Style="{StaticResource ToolbarButton}" x:Name="btnViewBuiltIn" Content="{StaticResource ViewIcon}" Command="{Binding VisibilityCommand}" ToolTip="Toggle visibility of nonassociated Parameters"/>
+            <!--<Button Style="{StaticResource ToolbarButton}" x:Name="btnViewBuiltIn" Content="{StaticResource ViewIcon}" Command="{Binding VisibilityCommand}" ToolTip="Toggle visibility of nonassociated Parameters"/>-->
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettings" Content="{StaticResource SettingsIcon}" Command="{Binding PrecisionCommand}" ToolTip="Settings"/>
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettingsTest" Content="{StaticResource ToggleIcon}" Command="{Binding ToggleCommand}" ToolTip="Toggle Tags"/>
             <Button Style="{DynamicResource SimpleButtonStyle}" x:Name="btnDialogOk" Click="BtnDialogOk_Click" Content="Close" Width="95"/>
@@ -131,7 +132,7 @@
                             <TextBox ToolTip="Name" Style="{StaticResource EnterText}" Text="Property Name" TextChanged="TextBox_TextChanged"/>
                             <!--The Value Slider-->
                             <Slider Style="{DynamicResource RoundSliderStyle}" Value="100" HorizontalContentAlignment="Center"
-                                Maximum="200" Grid.Column="1" Margin="10 2 10 0" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}"/>
+                                Maximum="200" Grid.Column="1" Margin="10 2 10 0" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"/>
                             <!--The Value-->
                             <Border Background="White" CornerRadius="15" Grid.Column="2">
                                 <Border.Effect>
@@ -162,7 +163,7 @@
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox ToolTip="{Binding Name}" Style="{StaticResource EnterText}" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}">
+                                        <TextBox ToolTip="{Binding Name}" Style="{StaticResource EnterText}" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}">
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
@@ -200,15 +201,16 @@
                                             </Border>
                                         </StackPanel>
                                         <!--The Value Slider-->
-                                        <Slider Style="{DynamicResource RoundSliderStyle}" Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
-                                    Maximum="{Binding Value, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}"/>
+                                        <!--Delay makes the UI responsive-->
+                                        <Slider Style="{DynamicResource RoundSliderStyle}" Value="{Binding UIValue, Delay=500}" HorizontalContentAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1"
+                                    Maximum="{Binding UIValue, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"/>
                                         <!--The Value-->
                                         <Border Background="White" CornerRadius="15" Grid.Column="3">
                                             <Border.Effect>
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox Text="{Binding UIValue, UpdateSourceTrigger=LostFocus}" Grid.Column="3" Style="{StaticResource EnterText}" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}"
+                                        <TextBox Text="{Binding UIValue, Converter={StaticResource DoubleToStringConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="3" Style="{StaticResource EnterText}" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"
                                                        PreviewTextInput="txtAnswer_PreviewTextInput"/>
                                     </Grid>
                                 </DataTemplate>
@@ -218,7 +220,7 @@
                 </Expander>
                 <Separator Style="{DynamicResource SimpleSeparatorStyle}"/>
                 <!--BuiltIn Parameters-->
-                <Expander Style="{StaticResource RightExpander}" x:Name="BuiltInParameters" IsExpanded="False" Header="BuiltIn Parameters">
+                <Expander Style="{StaticResource RightExpander}" x:Name="BuiltInParameters" IsExpanded="True" Header="BuiltIn Parameters">
                     <DockPanel FlowDirection="LeftToRight" LastChildFill="True">
                         <ItemsControl ItemsSource="{Binding BuiltInParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
@@ -236,7 +238,7 @@
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox Text="{Binding Name, Mode=OneWay}"  ToolTip="{Binding Name}" Style="{StaticResource EnterText}" IsReadOnly="True" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}"/>
+                                        <TextBox Text="{Binding Name, Mode=OneWay}"  ToolTip="{Binding Name}" Style="{StaticResource EnterText}" IsReadOnly="True" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"/>
                                         <!--Tags-->
                                         <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="2 0">
                                             <Border Background="{StaticResource shared}" Style="{StaticResource Tag}" Width="{Binding Shared, Converter={StaticResource B2WC}}" Margin="{Binding Shared, Converter={StaticResource B2MC}}">
@@ -263,14 +265,14 @@
                                         </StackPanel>
                                         <!--The Value Slider-->
                                         <Slider Style="{DynamicResource RoundSliderStyle}" Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
-                                        Maximum="{Binding Value, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}"/>
+                                        Maximum="{Binding Value, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"/>
                                         <!--The Value-->
                                         <Border Background="White" CornerRadius="15" Grid.Column="3">
                                             <Border.Effect>
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox Text="{Binding Value, Converter={StaticResource ReverseUnitConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="3" Style="{StaticResource EnterText}" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}"
+                                        <TextBox Text="{Binding Value, Converter={StaticResource ReverseUnitConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="3" Style="{StaticResource EnterText}" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"
                                                      PreviewTextInput="txtAnswer_PreviewTextInput"/>
                                     </Grid>
                                 </DataTemplate>
@@ -280,7 +282,7 @@
                 </Expander>
                 <Separator Style="{DynamicResource SimpleSeparatorStyle}"/>
                 <!--Yes/No Parameters-->
-                <Expander Style="{StaticResource RightExpander}" x:Name="YesNoParameters" IsExpanded="False" Header="Yes/No Parameters">
+                <Expander Style="{StaticResource RightExpander}" x:Name="YesNoParameters" IsExpanded="True" Header="Yes/No Parameters">
                     <DockPanel FlowDirection="LeftToRight" LastChildFill="True">
                         <ItemsControl ItemsSource="{Binding CheckParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
@@ -297,7 +299,7 @@
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"  ToolTip="{Binding Name}" Style="{StaticResource EnterText}" Foreground="{Binding Associated, Converter={StaticResource BoolToColorConverter}}">
+                                        <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"  ToolTip="{Binding Name}" Style="{StaticResource EnterText}" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}">
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
@@ -329,8 +331,8 @@
                                                 <TextBlock Text="label" Style="{StaticResource TagText}"/>
                                             </Border>
                                         </StackPanel>
-                                        <!--The Value Slider-->
-                                        <CheckBox IsChecked="{Binding Value, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,4,0" BorderThickness="0"/>
+                                        <!--The CheckBox-->
+                                        <CheckBox IsChecked="{Binding UIValue, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,4,0" BorderThickness="0"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

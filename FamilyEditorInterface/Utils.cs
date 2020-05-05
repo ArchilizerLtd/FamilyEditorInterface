@@ -38,17 +38,17 @@ namespace FamilyEditorInterface
                 DUT = DisplayUnitType.DUT_DECIMAL_FEET;
             }
         }
-        //forward conversion of project to unit values
+        //UI to Revit internal unit values
         public static double convertValueTO(double p)
         {
             return GetDutValueTo(DUT, p);
         }
-        //reverse the unit transformation to project units
+        //Revit to UI units
         public static double convertValueFROM(double p)
         {
             return GetDutValueFrom(DUT, p);
         }
-        //forward conversion of project to unit values
+        //UI to Revit internal unit values
         public static double GetDutValueTo(DisplayUnitType dut, double p)
         {
             switch (dut)
@@ -67,10 +67,12 @@ namespace FamilyEditorInterface
                     return p * METERS_IN_FEET * 1000;
                 case DisplayUnitType.DUT_DECIMETERS:
                     return p * METERS_IN_FEET * 10;
+                case DisplayUnitType.DUT_DECIMAL_DEGREES:
+                    return ToDegrees(p);
             }
             return p;
         }
-        //reverse the unit transformation to project units
+        //Revit to UI units
         public static double GetDutValueFrom(DisplayUnitType dut, double p)
         {
             switch (dut)
@@ -89,6 +91,8 @@ namespace FamilyEditorInterface
                     return p / METERS_IN_FEET / 1000;
                 case DisplayUnitType.DUT_DECIMETERS:
                     return p / METERS_IN_FEET / 10;
+                case DisplayUnitType.DUT_DECIMAL_DEGREES:
+                    return ToRadians(p);
             }
             return p;
         }        
@@ -110,8 +114,24 @@ namespace FamilyEditorInterface
             if (DUT.Equals(DisplayUnitType.DUT_FRACTIONAL_INCHES)) return false;
             return true;
         }
-
-
+        /// <summary>
+        /// Convert to Radians.
+        /// </summary>
+        /// <param name="val">The value to convert to radians</param>
+        /// <returns>The value in radians</returns>
+        public static double ToRadians(double val)
+        {
+            return (Math.PI / 180) * val;
+        }
+        /// <summary>
+        /// Convert to Degrees.
+        /// </summary>
+        /// <param name="val">The value to convert to radians</param>
+        /// <returns>The value in radians</returns>
+        public static double ToDegrees(double val)
+        {
+            return (180 * val) / Math.PI;
+        }
         /// <summary>
         /// truncate string and add '..' at the end
         /// </summary>

@@ -92,12 +92,6 @@
     <Compile Include="RequestHandler.cs" />
     <Compile Include="Resources\WPF\Model\ItemRetriever.cs" />
     <Compile Include="Resources\WPF\ViewModel\LabelsAndArrays.cs" />
-    <Compile Include="Settings\Settings.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Settings\Settings.Designer.cs">
-      <DependentUpon>Settings.cs</DependentUpon>
-    </Compile>
     <Compile Include="Utils.cs" />
     <Compile Include="Resources\WPF\Model\FamilyParameterModel.cs" />
     <Compile Include="Resources\WPF\ViewModel\FamilyParameterViewModel.cs" />
@@ -109,9 +103,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\.editorconfig">
-      <Link>.editorconfig</Link>
-    </None>
     <None Include="app.config" />
     <None Include="FamilyEditorInterface.addin">
       <SubType>Designer</SubType>
@@ -126,9 +117,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Settings\Settings.resx">
-      <DependentUpon>Settings.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

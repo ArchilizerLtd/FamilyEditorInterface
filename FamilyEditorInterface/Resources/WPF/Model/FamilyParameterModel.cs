@@ -26,7 +26,7 @@ namespace FamilyEditorInterface.WPF
         private string _name;   //private Name  
         private string _oldName;    //private Old Name
         private double _value;  //private Value - the internal Revit value (in feet)
-        private string _uivalue;  //private UIValue - will be used in the WPF UI Window
+        private double _uivalue;  //private UIValue - will be used in the WPF UI Window
         private string _type;   //private Type
         private string _typeOrInstance; //private bool if it is a Type or an Instance parameter
         private bool _associated;   //private bool if the paramter is associated 
@@ -90,7 +90,7 @@ namespace FamilyEditorInterface.WPF
             }
         }
         //UI Friendly Value
-        public string UIValue
+        public double UIValue
         {
             get { return _uivalue; }
             set
@@ -108,13 +108,13 @@ namespace FamilyEditorInterface.WPF
             {
                 //From UI to Revit
                 conversion = true;
-                double revitValue = Utils.convertValueFROM(Double.Parse(UIValue));
+
+                var revitValue = (StorageType == StorageType.Integer) ? UIValue : Utils.GetDutValueFrom(DisplayUnitType, UIValue); //If integer, don't convert
                 Value = revitValue;
 
                 // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
                 if (!_suppres) Utils.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, revitValue));
                 else _suppres = false;
-
             }
             else
             {
@@ -128,7 +128,7 @@ namespace FamilyEditorInterface.WPF
             {
                 //From Revit to UI
                 conversion = true;
-                UIValue = Utils.convertValueTO(Value).ToString();
+                UIValue = (StorageType == StorageType.Integer) ? Math.Round(Value, Precision) : Math.Round(Utils.GetDutValueTo(DisplayUnitType, Value), Precision);   //If integer, don't convert
             }
             else
             {

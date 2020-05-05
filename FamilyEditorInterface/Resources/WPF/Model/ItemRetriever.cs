@@ -26,8 +26,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.Name = fp.Definition.Name;  //The name of the Parameter
             newItem.StorageType = fp.StorageType;
             newItem.ParamType = GetParameterType(fp);
-            newItem.Value = GetParameterValue(ft, fp) ;  //The Value of the parameter (can be yes/no, double, integer, string, ...
-            newItem.DisplayUnitType = GetDisplayUnitType(fp);
+            newItem.DisplayUnitType = GetDisplayUnitType(fp);   //Set the DisplayUnitType for this parameter
             newItem.Type = fp.Definition.ParameterType.ToString();  //The parameter type
             newItem.Associated = !fp.AssociatedParameters.IsEmpty;    //If the parameter is being associated
             newItem.BuiltIn = fp.Id.IntegerValue < 0;
@@ -39,7 +38,10 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.ReadOnly = fp.IsReadOnly;
             newItem.Shared = fp.IsShared;
             newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
-                        
+            newItem.IsUsed = (newItem.Associated || newItem.Label || newItem.UsedInFormula);    //Used if any of the three is true
+            newItem.Visible = newItem.IsUsed ? true : Properties.Settings.Default.AssociatedVisibility; //Set the visibility in the UI
+            newItem.Value = GetParameterValue(ft, fp) ;  //The Value of the parameter (can be yes/no, double, integer, string, ...
+
             return newItem;
         }
         //Get the Display Unit Type

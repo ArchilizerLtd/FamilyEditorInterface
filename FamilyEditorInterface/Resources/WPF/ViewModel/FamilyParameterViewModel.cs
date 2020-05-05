@@ -148,12 +148,11 @@ namespace FamilyEditorInterface.WPF
             GetDriverAndFormulaParameters();  //Check which parameters are used in Dims and Arrays
             PopulateFamilyParameters();
             PopulateUICollections();    //HERE
-            ParameterIsUsedValue();
         }
         //Initialize all the collection variables
         private void Initialize()
         {
-            Utils.InitializeUnits(this.doc);    //Initializes the units (meters, feet, etc.
+            Utils.InitializeUnits(this.doc);    //Initializes the units (meters, feet, etc.)
 
             ValueParameters = new ObservableCollection<FamilyParameterModel>();
             ValueParameters.CollectionChanged += ValueParameters_CollectionChanged;
@@ -181,39 +180,12 @@ namespace FamilyEditorInterface.WPF
         {
             foreach (FamilyParameter fp in familyManager.Parameters)
             {
-                //For now, only allow intagers and doubles
+                //For now, only allow integers and doubles
                 if (fp.StorageType == StorageType.Double || fp.StorageType == StorageType.Integer)   
                 {
                     famParamModels.Add(fp.Definition.Name, ItemRetriever.GetFamilyParameterModel(familyType, fp, paramLabel, paramFormula));
                 }
             }
-        }
-        //Populate the IsUsed value of the parameter and the Visibility of the parameter in the UI
-        private void ParameterIsUsedValue()
-        {
-            foreach (var param in ValueParameters)
-            {
-                param.IsUsed = IsUsedParameter(param);  //Set the IsUsed property
-                param.Visible = param.IsUsed ? true : Properties.Settings.Default.AssociatedVisibility; //Set the visibility in the UI
-            }
-            foreach (var param in BuiltInParameters)
-            {
-                param.IsUsed = IsUsedParameter(param);  //Set the IsUsed property
-                param.Visible = param.IsUsed ? true : Properties.Settings.Default.AssociatedVisibility; //Set the visibility in the UI
-            }
-            foreach (var param in CheckParameters)
-            {
-                param.IsUsed = IsUsedParameter(param);  //Set the IsUsed property
-                param.Visible = param.IsUsed ? true : Properties.Settings.Default.AssociatedVisibility; //Set the visibility in the UI
-            }
-        }
-        //Determins if a parameter is used in this Family or not
-        private bool IsUsedParameter(FamilyParameterModel param)
-        {
-            if (param.Associated) return true;
-            if (param.Label) return true;
-            if (param.UsedInFormula) return true;
-            return false;
         }
         //Populate the UI Observable Collections
         private void PopulateUICollections()
@@ -233,7 +205,7 @@ namespace FamilyEditorInterface.WPF
         }
         #endregion
 
-        #region ViewModel Maintenance
+        #region View
         /// <summary>
         /// Terminates the View
         /// </summary>
@@ -262,6 +234,9 @@ namespace FamilyEditorInterface.WPF
                 TaskDialog.Show("Error", ex.Message);
             }
         }
+        #endregion
+
+        #region Requests
         // Shuffle parameter values
         private void Shuffle(object sender)
         {
@@ -275,7 +250,7 @@ namespace FamilyEditorInterface.WPF
                     double v = item.Value;
                     double plus = (v + 0.25 * v);    // plus minus values - around the current value +-25%
                     double minus = (v - 0.25 * v);
-                    double randValue = random.NextDouble() * (plus - minus) + minus;
+                    double randValue = Math.Round(random.NextDouble() * (plus - minus) + minus);
                     item.SuppressUpdate();
                     item.Value = randValue;
                     requestValues.Add(new Tuple<string, double>(item.Name, randValue));
@@ -289,7 +264,7 @@ namespace FamilyEditorInterface.WPF
                     double v = item.Value;
                     double plus = (v + 0.25 * v);    // plus minus values - around the current value +-25%
                     double minus = (v - 0.25 * v);
-                    double randValue = random.NextDouble() * (plus - minus) + minus;
+                    double randValue = Math.Round(random.NextDouble() * (plus - minus) + minus);
                     item.SuppressUpdate();
                     item.Value = randValue;
                     requestValues.Add(new Tuple<string, double>(item.Name, randValue));
