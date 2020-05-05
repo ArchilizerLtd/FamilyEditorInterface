@@ -10,7 +10,8 @@ namespace FamilyEditorInterface.WPF
         Area,
         Angle,
         Material,
-        Supported
+        Supported,
+        Length
     }
     /// <summary>
     /// Family Parameter Model
@@ -24,7 +25,8 @@ namespace FamilyEditorInterface.WPF
 
         private string _name;   //private Name  
         private string _oldName;    //private Old Name
-        private double _value;  //private Value
+        private double _value;  //private Value - the internal Revit value (in feet)
+        private string _uivalue;  //private UIValue - will be used in the WPF UI Window
         private string _type;   //private Type
         private string _typeOrInstance; //private bool if it is a Type or an Instance parameter
         private bool _associated;   //private bool if the paramter is associated 
@@ -40,6 +42,7 @@ namespace FamilyEditorInterface.WPF
         private bool _usedInFormula;    //If the parameter is used in any formulas
         private bool _label;  //If the parameter is used to drive dimensions
         private bool _isUsed;
+        private bool conversion = false;    //We need to stop the  circular reference during Value and UIValue change
 
         /// <summary>
         /// Constructor
@@ -82,20 +85,57 @@ namespace FamilyEditorInterface.WPF
             get { return _value; }
             set
             {
-                if(value <= 0 && Type != Autodesk.Revit.DB.ParameterType.YesNo.ToString())
+                _value = value;
+                RaisePropertyChanged("Value");
+            }
+        }
+        //UI Friendly Value
+        public string UIValue
+        {
+            get { return _uivalue; }
+            set
+            {
+                if (_uivalue != value)
                 {
-                    // Reset the value
-                    RaisePropertyChanged("Value");
-                }
-                else
-                {
-                    // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
-                    if (!_suppres) Utils.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, value));
-                    else _suppres = false;
-                    _value = value;
-                    RaisePropertyChanged("Value");
+                    _uivalue = value;
+                    RaisePropertyChanged("UIValue");
                 }
             }
+        }
+        private void ChangeUIValue()
+        {
+            if (!conversion)
+            {
+                //From UI to Revit
+                conversion = true;
+                double revitValue = Utils.convertValueFROM(Double.Parse(UIValue));
+                Value = revitValue;
+
+                // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
+                if (!_suppres) Utils.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, revitValue));
+                else _suppres = false;
+
+            }
+            else
+            {
+                //From Revit to UI
+                conversion = false;
+            }
+        }
+        private void ChangeValue()
+        {
+            if (!conversion)
+            {
+                //From Revit to UI
+                conversion = true;
+                UIValue = Utils.convertValueTO(Value).ToString();
+            }
+            else
+            {
+                //From UI to Revit
+                conversion = false;
+            }
+            
         }
         //???
         public int Precision
@@ -271,6 +311,15 @@ namespace FamilyEditorInterface.WPF
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }
+            if (propertyName.Equals("Value"))
+            {
+                ChangeValue();
+            }
+            if (propertyName.Equals("UIValue"))
+            {
+                ChangeUIValue();
+            }
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

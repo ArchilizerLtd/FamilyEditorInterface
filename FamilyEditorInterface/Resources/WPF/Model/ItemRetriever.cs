@@ -25,8 +25,9 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.Precision = Properties.Settings.Default.Precision;  //The precision set by the User in the Settings
             newItem.Name = fp.Definition.Name;  //The name of the Parameter
             newItem.StorageType = fp.StorageType;
-            newItem.ParamType = ParameterType(fp);
+            newItem.ParamType = GetParameterType(fp);
             newItem.Value = GetParameterValue(ft, fp) ;  //The Value of the parameter (can be yes/no, double, integer, string, ...
+            newItem.DisplayUnitType = GetDisplayUnitType(fp);
             newItem.Type = fp.Definition.ParameterType.ToString();  //The parameter type
             newItem.Associated = !fp.AssociatedParameters.IsEmpty;    //If the parameter is being associated
             newItem.BuiltIn = fp.Id.IntegerValue < 0;
@@ -38,20 +39,22 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.ReadOnly = fp.IsReadOnly;
             newItem.Shared = fp.IsShared;
             newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
-
-            /*
+                        
+            return newItem;
+        }
+        //Get the Display Unit Type
+        private static DisplayUnitType GetDisplayUnitType(FamilyParameter fp)
+        {
             try
             {
-                newItem.DisplayUnitType = fp.DisplayUnitType;
+                var dut = fp.DisplayUnitType;
+                return dut;
             }
             catch (Exception)
             {
-
+                return DisplayUnitType.DUT_MILLIMETERS;
             }
-            */
-            return newItem;
         }
-
         //Get the parameter value as Double
         private static double GetParameterValue(FamilyType ft, FamilyParameter fp)
         {
@@ -65,6 +68,12 @@ namespace FamilyEditorInterface.Resources.WPF.Model
                 case (StorageType.Integer):
                     value = Convert.ToDouble(ft.AsInteger(fp));
                     break;
+                case (StorageType.String):
+                    value = 0.0;
+                    break;
+                case (StorageType.ElementId):
+                    value = 0.0;
+                    break;
                 default:
                     break;
             }
@@ -72,7 +81,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             return value;
         }
         //Get the ParameterType
-        private static ParamType ParameterType(FamilyParameter fp)
+        private static ParamType GetParameterType(FamilyParameter fp)
         {
             ParamType type;
             switch (fp.Definition.ParameterType)
@@ -86,8 +95,8 @@ namespace FamilyEditorInterface.Resources.WPF.Model
                 case (Autodesk.Revit.DB.ParameterType.Area):
                     type = ParamType.Area;
                     break;
-                case (Autodesk.Revit.DB.ParameterType.Material):
-                    type = ParamType.Material;
+                case (Autodesk.Revit.DB.ParameterType.Length):
+                    type = ParamType.Length;
                     break;
                 default:
                     type = ParamType.Supported;
@@ -111,6 +120,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
 
             foreach (var fpm in famParamModels)
             {
+                if (fpm.StorageType != StorageType.Double && fpm.StorageType != StorageType.Integer) continue;  //Skip anything that isn't numerical
                 if (fpm.ParamType == ParamType.YesNo) l3.Add(fpm);  //Yes/No    
                 else if (fpm.BuiltIn == true) l2.Add(fpm);  //Built-In
                 else l1.Add(fpm);   //Value

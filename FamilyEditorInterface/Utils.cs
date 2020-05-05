@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using FamilyEditorInterface.WPF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,24 +26,30 @@ namespace FamilyEditorInterface
     }
     public static class Utils
     {
-        private static DisplayUnitType dut;
+        private static DisplayUnitType DUT;
         public const double METERS_IN_FEET = 0.3048;
 
         public static void InitializeUnits(Document doc)
         {
-            dut = doc.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits;
+            DUT = doc.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits;
             if(!_goUnits())
             {
-                NotSupported(dut);
-                dut = DisplayUnitType.DUT_DECIMAL_FEET;
+                NotSupported(DUT);
+                DUT = DisplayUnitType.DUT_DECIMAL_FEET;
             }
         }
-        /// <summary>
-        /// forward conversion of project to unit values
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
+        //forward conversion of project to unit values
         public static double convertValueTO(double p)
+        {
+            return GetDutValueTo(DUT, p);
+        }
+        //reverse the unit transformation to project units
+        public static double convertValueFROM(double p)
+        {
+            return GetDutValueFrom(DUT, p);
+        }
+        //forward conversion of project to unit values
+        public static double GetDutValueTo(DisplayUnitType dut, double p)
         {
             switch (dut)
             {
@@ -63,12 +70,8 @@ namespace FamilyEditorInterface
             }
             return p;
         }
-        /// <summary>
-        /// reverse the unit transformation to project units
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        public static double convertValueFROM(double p)
+        //reverse the unit transformation to project units
+        public static double GetDutValueFrom(DisplayUnitType dut, double p)
         {
             switch (dut)
             {
@@ -88,7 +91,7 @@ namespace FamilyEditorInterface
                     return p / METERS_IN_FEET / 10;
             }
             return p;
-        }
+        }        
         /// <summary>
         /// Throw exception on unsupported dut type
         /// </summary>
@@ -103,10 +106,12 @@ namespace FamilyEditorInterface
         /// <returns></returns>
         public static Boolean _goUnits()
         {
-            if (dut.Equals(DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES)) return false;
-            if (dut.Equals(DisplayUnitType.DUT_FRACTIONAL_INCHES)) return false;
+            if (DUT.Equals(DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES)) return false;
+            if (DUT.Equals(DisplayUnitType.DUT_FRACTIONAL_INCHES)) return false;
             return true;
         }
+
+
         /// <summary>
         /// truncate string and add '..' at the end
         /// </summary>

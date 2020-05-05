@@ -7,9 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -179,16 +176,19 @@ namespace FamilyEditorInterface.WPF
                 familyType = CreateDefaultFamilyType(familyManager);
             }
         }
-        //Populate the IsUsed value of the parameter and the Visibility of the parameter in the UI
-
         //Populate the (sorted) list of FamilyParameters
         private void PopulateFamilyParameters()
         {
             foreach (FamilyParameter fp in familyManager.Parameters)
             {
-                famParamModels.Add(fp.Definition.Name, ItemRetriever.GetFamilyParameterModel(familyType, fp, paramLabel, paramFormula));
+                //For now, only allow intagers and doubles
+                if (fp.StorageType == StorageType.Double || fp.StorageType == StorageType.Integer)   
+                {
+                    famParamModels.Add(fp.Definition.Name, ItemRetriever.GetFamilyParameterModel(familyType, fp, paramLabel, paramFormula));
+                }
             }
         }
+        //Populate the IsUsed value of the parameter and the Visibility of the parameter in the UI
         private void ParameterIsUsedValue()
         {
             foreach (var param in ValueParameters)
