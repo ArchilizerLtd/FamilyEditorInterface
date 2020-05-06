@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
@@ -21,8 +16,7 @@ namespace FamilyEditorInterface
         // The value of the latest request made by the modeless form 
         private Request m_request = new Request();
         // Encountered Error, notify the View Model to roll back (update)
-        public event EventHandler EncounteredError;
-                
+        public event EventHandler EncounteredError;                
         /// <summary>
         /// A public property to access the current request value
         /// </summary>
@@ -84,10 +78,6 @@ namespace FamilyEditorInterface
             {
                 if (EncounteredError != null)
                     EncounteredError(this, null);
-            }
-            finally
-            {
-                Application.thisApp.WakeFormUp();
             }
 
             return;

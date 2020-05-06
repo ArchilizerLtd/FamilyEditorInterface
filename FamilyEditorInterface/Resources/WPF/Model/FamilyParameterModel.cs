@@ -102,14 +102,18 @@ namespace FamilyEditorInterface.WPF
                 }
             }
         }
+        //Executes after RaisePropertyChange of UIValue
         private void ChangeUIValue()
         {
             if (!conversion)
             {
                 //From UI to Revit
                 conversion = true;
+                double revitValue = 0.0;
 
-                var revitValue = (StorageType == StorageType.Integer) ? UIValue : Utils.GetDutValueFrom(DisplayUnitType, UIValue); //If integer, don't convert
+                revitValue = (StorageType == StorageType.Integer) ? UIValue : Utils.GetDutValueFrom(DisplayUnitType, UIValue); //If integer, don't convert
+                revitValue = (ParamType != ParamType.YesNo) ? UIValue : Utils.GetYesNoValue(UIValue);   //If it's a check box, give 0 or 1 instead of -1 or 1
+
                 Value = revitValue;
 
                 // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
@@ -122,6 +126,7 @@ namespace FamilyEditorInterface.WPF
                 conversion = false;
             }
         }
+        //Executes after RaisePropertyChange of Value
         private void ChangeValue()
         {
             if (!conversion)

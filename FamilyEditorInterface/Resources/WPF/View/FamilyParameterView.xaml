@@ -332,7 +332,12 @@
                                             </Border>
                                         </StackPanel>
                                         <!--The CheckBox-->
-                                        <CheckBox IsChecked="{Binding UIValue, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,4,0" BorderThickness="0"/>
+                                        <CheckBox IsChecked="{Binding UIValue, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="2" HorizontalAlignment="Right" Margin="0,10,-5,0" BorderThickness="0">
+                                            <CheckBox.Effect>
+                                                <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="2" Opacity="0.25"/>
+                                            </CheckBox.Effect>
+                                        </CheckBox>
+                                        <!--<CheckBox IsChecked="{Binding UIValue, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,4,0" BorderThickness="0"/>-->
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

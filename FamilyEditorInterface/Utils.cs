@@ -115,6 +115,15 @@ namespace FamilyEditorInterface
             return true;
         }
         /// <summary>
+        /// Returns 1 or 0 instead of 1 or -1
+        /// </summary>
+        /// <param name="val">Expects 1 or -1</param>
+        /// <returns></returns>
+        public static double GetYesNoValue(double val)
+        {
+            return val == 1 ? 1 : 0;
+        }
+        /// <summary>
         /// Convert to Radians.
         /// </summary>
         /// <param name="val">The value to convert to radians</param>
@@ -181,45 +190,45 @@ namespace FamilyEditorInterface
         // Toggle Type to Instance and vica verse
         public static void MakeRequest(RequestId request, string name, string type)
         {
-            Application.handler.Request.TypeToInstance(new List<string>() { name });
-            Application.handler.Request.Make(request);
-            Application.exEvent.Raise();
+            Application.Control.handler.Request.TypeToInstance(new List<string>() { name });
+            Application.Control.handler.Request.Make(request);
+            Application.Control.exEvent.Raise();
         }
 
         // Rename Parameter
         public static void MakeRequest(RequestId request, Tuple<string, string> renameValue)
         {
-            Application.handler.Request.RenameValue(new List<Tuple<string, string>>() { renameValue });
-            Application.handler.Request.Make(request);
-            Application.exEvent.Raise();
+            Application.Control.handler.Request.RenameValue(new List<Tuple<string, string>>() { renameValue });
+            Application.Control.handler.Request.Make(request);
+            Application.Control.exEvent.Raise();
         }
         // Change Parameter Value of Multiple
         public static void MakeRequest(RequestId request, List<Tuple<string, double>> values)
         {
-            Application.handler.Request.Value(values);
-            Application.handler.Request.Make(request);
-            Application.exEvent.Raise();
+            Application.Control.handler.Request.Value(values);
+            Application.Control.handler.Request.Make(request);
+            Application.Control.exEvent.Raise();
         }
         // Delete Parameter
         public static void MakeRequest(RequestId request, string deleteValue)
         {
-            Application.handler.Request.DeleteValue(new List<string>() { deleteValue });
-            Application.handler.Request.Make(request);
-            Application.exEvent.Raise();
+            Application.Control.handler.Request.DeleteValue(new List<string>() { deleteValue });
+            Application.Control.handler.Request.Make(request);
+            Application.Control.exEvent.Raise();
         }
         // Change Parameter Value
         public static void MakeRequest(RequestId request, Tuple<string, double> value)
         {
-            Application.handler.Request.Value(new List<Tuple<string, double>>() { value });
-            Application.handler.Request.Make(request);
-            Application.exEvent.Raise();
+            Application.Control.handler.Request.Value(new List<Tuple<string, double>>() { value });
+            Application.Control.handler.Request.Make(request);
+            Application.Control.exEvent.Raise();
         }
         // Change all values
         public static void MakeRequest(RequestId request, List<Tuple<string, string, double>> value)
         {
-            Application.handler.Request.AllValues(value);
-            Application.handler.Request.Make(request);
-            Application.exEvent.Raise();
+            Application.Control.handler.Request.AllValues(value);
+            Application.Control.handler.Request.Make(request);
+            Application.Control.exEvent.Raise();
         }
         #endregion
     }

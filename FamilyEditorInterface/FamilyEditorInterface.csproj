@@ -91,6 +91,7 @@
     <Compile Include="Request.cs" />
     <Compile Include="RequestHandler.cs" />
     <Compile Include="Resources\WPF\Model\ItemRetriever.cs" />
+    <Compile Include="Resources\WPF\ViewModel\AppControl.cs" />
     <Compile Include="Resources\WPF\ViewModel\LabelsAndArrays.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Resources\WPF\Model\FamilyParameterModel.cs" />

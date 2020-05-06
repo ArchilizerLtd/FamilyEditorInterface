@@ -118,7 +118,7 @@ namespace FamilyEditorInterface.WPF
         /// <param name="document">Current Revit Doument (better be a Family one)</param>
         public FamilyParameterViewModel(Document document)
         {
-            Application.handler.EncounteredError += RollBackState;
+            Application.Control.handler.EncounteredError += RollBackState;
 
             this._Document = document;
 
@@ -372,17 +372,17 @@ namespace FamilyEditorInterface.WPF
         private void MakeRequest(RequestId request, List<string> values)
         {
             //MessageBox.Show("You are in the Control.Request event.");
-            Application.handler.Request.DeleteValue(values);
-            Application.handler.Request.Make(request);
-            Application.exEvent.Raise();
+            Application.Control.handler.Request.DeleteValue(values);
+            Application.Control.handler.Request.Make(request);
+            Application.Control.exEvent.Raise();
         }
         // Makes request, changes values
         private void MakeRequest(RequestId request, List<Tuple<string, double>> values)
         {
             //MessageBox.Show("You are in the Control.Request event.");
-            Application.handler.Request.Value(values);
-            Application.handler.Request.Make(request);
-            Application.exEvent.Raise();
+            Application.Control.handler.Request.Value(values);
+            Application.Control.handler.Request.Make(request);
+            Application.Control.exEvent.Raise();
         }
         /// <summary>
         /// Activate the View

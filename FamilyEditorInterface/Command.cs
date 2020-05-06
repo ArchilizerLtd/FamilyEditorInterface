@@ -20,13 +20,13 @@ namespace FamilyEditorInterface
           ref string message,
           ElementSet elements)
         {
-            if (Application.thisApp.Started) return Result.Succeeded;
+            if (Application.Started) return Result.Succeeded;
 
             try
             {
                 Application.App = commandData.Application;
-                Application.thisApp.ShowForm();
-                Application.thisApp.Started = true;
+                Application.Control.ShowForm();
+                Application.Started = true;
                 return Result.Succeeded;
             }
             catch (Exception ex)

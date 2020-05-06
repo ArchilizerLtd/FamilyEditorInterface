@@ -11,55 +11,48 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
-using System.Windows.Media.Imaging;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
-using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
-using System.Windows.Forms;
 using System.Diagnostics;
 using FamilyEditorInterface.WPF;
 using Autodesk.Revit.DB.Events;
 using Archilizer_Purge.Helpers;
+using FamilyEditorInterface.Resources.WPF.ViewModel;
 #endregion
 
 namespace FamilyEditorInterface
-{   
+{
     /// <summary>
     /// Implements the Revit add-in interface IExternalApplication
     /// </summary>
     class Application : IExternalApplication
     {
-        private static UIControlledApplication MyApplication { get; set; }
-        private static Assembly assembly;
-
-        // windows Revit handle
-        static WindowHandle _hWndRevit = null;
-        public static RequestHandler handler;
-        public static ExternalEvent exEvent;        
-        public static UIApplication App;
-        
+        #region Prpoerties & Fields
         // class instance
         internal static Application thisApp = null;
+
+        private static UIControlledApplication MyApplication { get; set; }
+        private static Assembly assembly;    
+        public static UIApplication App;
 
         // Tooltip
         public const string Message = "Interactive interface for Family Editor.";
 
-        private FamilyParameterViewModel _presenter;
-        private Document _document;
+        public static AppControl Control;
 
         // Get absolute path to this assembly
         static string path = Assembly.GetExecutingAssembly().Location;
         static string contentPath = Path.GetDirectoryName(Path.GetDirectoryName(path)) + "/";
         static string helpFile = "file:///C:/ProgramData/Autodesk/ApplicationPlugins/FamilyEditorInterface.bundle/Content/Family%20Editor%20Interface%20_%20Revit%20_%20Autodesk%20App%20Store.html";
-        private bool _disabled;
+
 
         // Marks if the Plugin has been started
-        private bool _started;
-        public bool Started 
+        private static bool _started;
+        public static bool Started 
         {
             get { return _started; }
             set
@@ -67,63 +60,30 @@ namespace FamilyEditorInterface
                 _started = value;
             }
         }
+        #endregion
         
         #region Ribbon
-        /// <summary>
-        /// Use embedded image to load as an icon for the ribbon
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        static private BitmapSource GetEmbeddedImage(string name)
-        {
-            try
-            {
-                Assembly a = Assembly.GetExecutingAssembly();
-                Stream s = a.GetManifestResourceStream(name);
-                return BitmapFrame.Create(s);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-        /// <summary>
-        /// Add ribbon panel 
-        /// </summary>
-        /// <param name="application"></param>
+        //Add ribbon panel 
         private void AddRibbonPanel(UIControlledApplication application)
         {
-            assembly = Assembly.GetExecutingAssembly();
+            string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;   // Get dll assembly path
+
             // Create a custom ribbon panel or use the existing one
             String tabName = "Archilizer";
             String panelName = "Family Document";
+
             try
             {
                 application.CreateRibbonTab(tabName);
             }
             catch (Autodesk.Revit.Exceptions.ArgumentException) { }
 
-            List<RibbonPanel> panels = application.GetRibbonPanels();
-            RibbonPanel rvtRibbonPanel = null;
-            // Pick the correct panel
-            if (panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) == null)
-            {
-                rvtRibbonPanel = application.CreateRibbonPanel(tabName, panelName); 
-            }
-            else
-            {
-                rvtRibbonPanel = panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) as RibbonPanel;
-            }
-
-            // Get dll assembly path
-            string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
+            RibbonPanel rvtRibbonPanel = PickPanel(application, panelName, tabName);
             ContextualHelp ch = new ContextualHelp(ContextualHelpType.Url, @helpFile);
             
-            CreatePushButton(rvtRibbonPanel, String.Format("Family Editor" + Environment.NewLine + "Interface"), thisAssemblyPath, "FamilyEditorInterface.Command",
-                Message, "FamilyEditorInterface.Resources.icon_Families.png", ch);
-
+            CreatePushButton(rvtRibbonPanel, String.Format("Family Editor" + Environment.NewLine + "Interface"), thisAssemblyPath, "FamilyEditorInterface.Command", Message, "FamilyEditorInterface.Resources.icon_Families.png", ch);
         }
-
+        //Create a pushbutton
         private static void CreatePushButton(RibbonPanel ribbonPanel, string name, string path, string command, string tooltip, string icon, ContextualHelp ch)
         {
             PushButtonData pbData = new PushButtonData(
@@ -142,46 +102,35 @@ namespace FamilyEditorInterface
             pb.LargeImage = largeImage;
             pb.Image = smallImage;
         }
-        /// <summary>
-        /// event handler that auto-rejects renaming of views
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void a_DialogBoxShowing(
-            object sender,
-            DialogBoxShowingEventArgs e)
+        //Pick existing or new panel
+        private RibbonPanel PickPanel(UIControlledApplication application, string panelName, string tabName)
         {
-            TaskDialogShowingEventArgs e2
-                = e as TaskDialogShowingEventArgs;
+            List<RibbonPanel> panels = application.GetRibbonPanels();
+            RibbonPanel panel = null;
 
-            string s = string.Empty;
-
-            if (null != e2)
+            // Pick the correct panel
+            if (panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) == null)
             {
-                s = string.Format(", dialog id {0}, message '{1}'",
-                    e2.DialogId, e2.Message);
-
-                bool isConfirm = e2.Message.Contains("Would you like to rename corresponding level and views?");
-
-                if (isConfirm)
-                {
-                    e2.OverrideResult(
-                        (int)System.Windows.Forms.DialogResult.No);
-
-                    s += ", auto-confirmed.";
-                }
+                panel = application.CreateRibbonPanel(tabName, panelName);
             }
+            else
+            {
+                panel = panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) as RibbonPanel;
+            }
+            return panel;
         }
         #endregion
 
         #region Revit Hooks
+        //On Revit Started, attach all handle hooks and init the needed elements
         public Result OnStartup(UIControlledApplication a)
         {
             ControlledApplication c_app = a.ControlledApplication;
             MyApplication = a;
             AddRibbonPanel(a);
 
-            thisApp = this;  // static access to this application instance
+            thisApp = this;  //static access to this application instance
+            Control = new AppControl(); //Create new app control 
 
             c_app.DocumentChanged += new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(c_app_DocumentChanged);
             c_app.DocumentClosed += new EventHandler<Autodesk.Revit.DB.Events.DocumentClosedEventArgs>(c_app_DocumentClosed);
@@ -189,89 +138,7 @@ namespace FamilyEditorInterface
 
             return Result.Succeeded;
         }
-        /// <summary>
-        /// On Document Switched
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnViewActivated(object sender, ViewActivatedEventArgs e)
-        {
-            if (!Started) return;  // only do if the plugin is active
-
-            if (_presenter == null)
-            {
-                ShowForm();
-                return;
-            }
-
-            Document doc = e.CurrentActiveView.Document;
-            
-            // If the document is a Family Document, disable the UI
-            if (!doc.IsFamilyDocument)
-            {
-                if (!_disabled)
-                {
-                    _presenter.Disable();
-                    _disabled = true;
-                }
-                return;
-            }
-            else
-            {
-                if (_disabled)
-                {
-                    _presenter.Enable();
-                    _disabled = false;
-                }
-            }
-            if (_document.Title != doc.Title)
-            {
-                _document = doc;
-                _presenter._Document = doc;
-                _presenter.DocumentSwitched();
-            }
-        }
-        /// <summary>
-        /// On document change, update Family Parameters
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void c_app_DocumentChanged(object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e)
-        {
-            if (!Started) return;  // only do if the plugin is active
-
-            List<string> commands = new List<string>()
-            {
-                "param",
-                "Modify element attributes",
-                "Family Types",
-                "Add Parameter",
-                "Delete Selection",
-                "Delete Parameter",
-                "Parameter Delete",
-                "Parameter Change",
-                "Change Parameter Name",
-                "Project Units"
-            };
-            if (_presenter != null && _presenter._enabled)
-            {
-                IList<String> operations = e.GetTransactionNames();
-                if (commands.Any(operations.Contains))
-                {
-                    _presenter.ThisDocumentChanged();
-                }
-            }
-        }
-        private void c_app_DocumentClosed(object sender, DocumentClosedEventArgs e)
-        {
-            if (!Started) return;  // only do if the plugin is active
-
-            if (App.ActiveUIDocument == null && Started && _presenter != null)
-            {
-                _presenter.Close();
-                _presenter = null;
-            }
-        }
+        //On Revit Shutdown, detach all handle hooks
         public Result OnShutdown(UIControlledApplication a)
         {
             ControlledApplication c_app = a.ControlledApplication;
@@ -280,101 +147,30 @@ namespace FamilyEditorInterface
             c_app.DocumentClosed -= new EventHandler<Autodesk.Revit.DB.Events.DocumentClosedEventArgs>(c_app_DocumentClosed);
             a.ViewActivated -= new EventHandler<Autodesk.Revit.UI.Events.ViewActivatedEventArgs>(OnViewActivated);
 
-            if(Started) Started = false;
-
-            if (_presenter != null)
-            {
-                _presenter.Close();
-            }
+            if (Started) Started = false;
+            Control.Close();
 
             return Result.Succeeded;
         }
-        #endregion
-
-        #region Show Form
-        /// <summary>
-        /// De-facto the command is here.
-        /// </summary>
-        /// <param name="uiapp"></param>
-        public void ShowForm()
+        //On Document Switched
+        private void OnViewActivated(object sender, ViewActivatedEventArgs e)
         {
-            _presenter = null;
-            
-            // get the isntance of Revit Thread
-            // to pass it to the Windows Form later
-            if (null == _hWndRevit)
-            {
-                Process process
-                  = Process.GetCurrentProcess();
-
-                IntPtr h = process.MainWindowHandle;
-                _hWndRevit = new WindowHandle(h);
-            }
-
-            if (_presenter == null || _presenter._isClosed)
-            {
-                try
-                {
-                    if (!App.ActiveUIDocument.Document.IsFamilyDocument)
-                    {
-                        TaskDialog.Show("Error", "Usable only in Family Documents");
-                        return;
-                    }
-                    //new handler
-                    handler = new RequestHandler();
-                    //new event
-                    exEvent = ExternalEvent.Create(handler);
-                    // set current document
-
-                    _document = App.ActiveUIDocument.Document;
-                    _presenter = new FamilyParameterViewModel(_document);
-                
-                    //pass parent (Revit) thread here
-                    _presenter.Show(_hWndRevit);
-                    _presenter.PresenterClosed += Stop;
-                }
-                catch (Exception ex)
-                {
-                    TaskDialog.Show("Error", ex.Message);
-                    _presenter.Dispose();
-                    _presenter = null;
-                }
-            }
+            if (!Started) return;  // only do if the plugin is active
+            Control.Show(e);
         }
-        private void Stop(object sender, EventArgs e)
+        //On document change, update Family Parameters
+        private void c_app_DocumentChanged(object sender, Autodesk.Revit.DB.Events.DocumentChangedEventArgs e)
         {
-            Started = false;
+            if (!Started) return;  // only do if the plugin is active
+            Control.DocumentChanged(e);
+
         }
-        public void WakeFormUp()
+        //On document closed, close the ViewModel
+        private void c_app_DocumentClosed(object sender, DocumentClosedEventArgs e)
         {
-            //if (m_MyForm != null)
-            //{
-            //    m_MyForm.WakeUp();
-            //}
+            if (!Started) return;  // only do if the plugin is active
+            Control.DocumentClosed();
         }
         #endregion
-    }
-    /// <summary>
-    /// Retrieve Revit Windows thread in order to pass it to the form as it's owner
-    /// </summary>
-    public class WindowHandle : IWin32Window
-    {
-      IntPtr _hwnd;
- 
-      public WindowHandle( IntPtr h )
-      {
-        Debug.Assert( IntPtr.Zero != h,
-          "expected non-null window handle" );
- 
-        _hwnd = h;
-      }
- 
-      public IntPtr Handle
-      {
-        get
-        {
-          return _hwnd;
-        }
-      }
     }
 }
