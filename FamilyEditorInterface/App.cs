@@ -66,7 +66,8 @@ namespace FamilyEditorInterface
         //Add ribbon panel 
         private void AddRibbonPanel(UIControlledApplication application)
         {
-            string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;   // Get dll assembly path
+            assembly = Assembly.GetExecutingAssembly();
+            string thisAssemblyPath = assembly.Location;   // Get dll assembly path
 
             // Create a custom ribbon panel or use the existing one
             String tabName = "Archilizer";

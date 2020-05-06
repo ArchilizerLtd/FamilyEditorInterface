@@ -40,7 +40,7 @@ namespace FamilyEditorInterface.Resources.WPF.ViewModel
             GetRevitHandle();
 
             _presenter = null;
-            if (_presenter._isClosed)
+            if (_presenter == null || _presenter._isClosed)
             {
                 try
                 {

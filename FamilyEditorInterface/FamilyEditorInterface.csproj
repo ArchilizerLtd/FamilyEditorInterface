@@ -88,18 +88,18 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Request.cs" />
-    <Compile Include="RequestHandler.cs" />
-    <Compile Include="Resources\WPF\Model\ItemRetriever.cs" />
-    <Compile Include="Resources\WPF\ViewModel\AppControl.cs" />
-    <Compile Include="Resources\WPF\ViewModel\LabelsAndArrays.cs" />
-    <Compile Include="Utils.cs" />
-    <Compile Include="Resources\WPF\Model\FamilyParameterModel.cs" />
-    <Compile Include="Resources\WPF\ViewModel\FamilyParameterViewModel.cs" />
-    <Compile Include="Resources\WPF\View\FamilyParameterView.xaml.cs">
+    <Compile Include="Requests\Request.cs" />
+    <Compile Include="Requests\RequestHandler.cs" />
+    <Compile Include="WPF\Model\ItemRetriever.cs" />
+    <Compile Include="WPF\ViewModel\AppControl.cs" />
+    <Compile Include="WPF\ViewModel\LabelsAndArrays.cs" />
+    <Compile Include="Helpers\Utils.cs" />
+    <Compile Include="WPF\Model\FamilyParameterModel.cs" />
+    <Compile Include="WPF\ViewModel\FamilyParameterViewModel.cs" />
+    <Compile Include="WPF\View\FamilyParameterView.xaml.cs">
       <DependentUpon>FamilyParameterView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Resources\WPF\View\Settings.xaml.cs">
+    <Compile Include="WPF\View\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -128,17 +128,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Resources\WPF\View\FamilyParameterView.xaml">
+    <Page Include="WPF\View\FamilyParameterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Resources\WPF\View\Settings.xaml">
+    <Page Include="WPF\View\Settings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\WPF\icon_Families.png" />
+    <Resource Include="WPF\icon_Families.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="PackageContents.xml" />
