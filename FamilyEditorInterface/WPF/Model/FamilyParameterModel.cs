@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using FamilyEditorInterface.Requests;
 using System;
 using System.ComponentModel;
 
@@ -101,47 +102,7 @@ namespace FamilyEditorInterface.WPF
                     RaisePropertyChanged("UIValue");
                 }
             }
-        }
-        //Executes after RaisePropertyChange of UIValue
-        private void ChangeUIValue()
-        {
-            if (!conversion)
-            {
-                //From UI to Revit
-                conversion = true;
-                double revitValue = 0.0;
-
-                revitValue = (StorageType == StorageType.Integer) ? UIValue : Utils.GetDutValueFrom(DisplayUnitType, UIValue); //If integer, don't convert
-                revitValue = (ParamType != ParamType.YesNo) ? UIValue : Utils.GetYesNoValue(UIValue);   //If it's a check box, give 0 or 1 instead of -1 or 1
-
-                Value = revitValue;
-
-                // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
-                if (!_suppres) Utils.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, revitValue));
-                else _suppres = false;
-            }
-            else
-            {
-                //From Revit to UI
-                conversion = false;
-            }
-        }
-        //Executes after RaisePropertyChange of Value
-        private void ChangeValue()
-        {
-            if (!conversion)
-            {
-                //From Revit to UI
-                conversion = true;
-                UIValue = (StorageType == StorageType.Integer) ? Math.Round(Value, Precision) : Math.Round(Utils.GetDutValueTo(DisplayUnitType, Value), Precision);   //If integer, don't convert
-            }
-            else
-            {
-                //From UI to Revit
-                conversion = false;
-            }
-            
-        }
+        }       
         //???
         public int Precision
         {
@@ -289,17 +250,65 @@ namespace FamilyEditorInterface.WPF
         public StorageType StorageType { get; internal set; }
         #endregion
 
+        #region RequestChanges
+        //Executes after RaisePropertyChange of UIValue
+        private void ChangeUIValue()
+        {
+            if (!conversion)
+            {
+                //From UI to Revit
+                conversion = true;
+                double revitValue = 0.0;
+
+                revitValue = (StorageType == StorageType.Integer) ? UIValue : Utils.GetDutValueFrom(DisplayUnitType, UIValue); //If integer, don't convert
+                revitValue = (ParamType != ParamType.YesNo) ? UIValue : Utils.GetYesNoValue(UIValue);   //If it's a check box, give 0 or 1 instead of -1 or 1
+
+                Value = revitValue;
+
+                // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
+                if (!_suppres) RequestHandling.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, revitValue));
+                else _suppres = false;
+            }
+            else
+            {
+                //From Revit to UI
+                conversion = false;
+            }
+        }
+        //Executes after RaisePropertyChange of Value
+        private void ChangeValue()
+        {
+            if (!conversion)
+            {
+                //From Revit to UI
+                conversion = true;
+                UIValue = (StorageType == StorageType.Integer) ? Math.Round(Value, Precision) : Math.Round(Utils.GetDutValueTo(DisplayUnitType, Value), Precision);   //If integer, don't convert
+            }
+            else
+            {
+                //From UI to Revit
+                conversion = false;
+            }
+
+        }
+        //Changes the Name of the Parameter
+        private void ChangeName()
+        {
+            RequestHandling.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(OldName, Name));
+        }
+        #endregion
+
         #region Methods
         //Makes a Delete Request to Delete the Parameter
         private void Delete(object sender)
         {
-            Utils.MakeRequest(RequestId.DeleteId, Name);
+            RequestHandling.MakeRequest(RequestId.DeleteId, Name);
         }
         //Makes a TypeToInstance request to Toggle between the two
         private void TypeToInstance(object sender)
         {
             TypeOrInstance = TypeOrInstance.Equals("Instance") ? "Type" : "Instance";
-            Utils.MakeRequest(RequestId.TypeToInstance, Name, Type);
+            RequestHandling.MakeRequest(RequestId.TypeToInstance, Name, Type);
         }        
         //Will force a suppres state
         internal void SuppressUpdate()
@@ -324,7 +333,10 @@ namespace FamilyEditorInterface.WPF
             {
                 ChangeUIValue();
             }
-
+            if (propertyName.Equals("Name"))
+            {
+                if(OldName != null) ChangeName();
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

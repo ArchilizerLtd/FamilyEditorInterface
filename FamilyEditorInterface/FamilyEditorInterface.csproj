@@ -90,6 +90,7 @@
     </Compile>
     <Compile Include="Requests\Request.cs" />
     <Compile Include="Requests\RequestHandler.cs" />
+    <Compile Include="Requests\RequestHandling.cs" />
     <Compile Include="WPF\Model\ItemRetriever.cs" />
     <Compile Include="WPF\ViewModel\AppControl.cs" />
     <Compile Include="WPF\ViewModel\LabelsAndArrays.cs" />

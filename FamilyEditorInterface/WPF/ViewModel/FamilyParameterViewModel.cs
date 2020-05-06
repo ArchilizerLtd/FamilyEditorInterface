@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using FamilyEditorInterface.Requests;
 using FamilyEditorInterface.Resources.WPF.Model;
 using FamilyEditorInterface.Resources.WPF.ViewModel;
 using System;
@@ -291,7 +292,7 @@ namespace FamilyEditorInterface.WPF
             {
                 string _name = (sender as FamilyParameterModel).Name;
                 string _oldName = (sender as FamilyParameterModel).OldName;
-                Utils.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(_oldName, _name));
+                RequestHandling.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(_oldName, _name));
             }
         }
         //Remember user settings for Toggle Tags
