@@ -84,6 +84,7 @@ namespace FamilyEditorInterface.WPF
                 if (doc != value)
                 {
                     doc = value;
+                    DocumentName = doc.Title.Replace(".rfa", "");
                 }
             }
         }
@@ -98,7 +99,7 @@ namespace FamilyEditorInterface.WPF
                 if (documentName != value)
                 {
                     documentName = value;
-                    RaisePropertyChanged("_DocumentName");
+                    RaisePropertyChanged("DocumentName");
                 }
             }
         }
@@ -114,17 +115,6 @@ namespace FamilyEditorInterface.WPF
             }
         }
 
-        private long _familySize;
-        public long FamilySize 
-        {  
-            get{ return _familySize; } 
-            set
-            {
-                _familySize = value;
-                DocumentName = $"{doc.Title.Replace(".rfa", "")} {value.ToString()}"; 
-                RaisePropertyChanged("FamilySize");
-            } 
-        }
         /// <summary>
         /// The Constructor
         /// </summary>
@@ -161,7 +151,6 @@ namespace FamilyEditorInterface.WPF
             GetDriverAndFormulaParameters();  //Check which parameters are used in Dims and Arrays
             PopulateFamilyParameters();
             PopulateUICollections();    //HERE
-            PopulateFamilyFileSize();
         }
 
 
@@ -218,11 +207,6 @@ namespace FamilyEditorInterface.WPF
             ValueParameters = new ObservableCollection<FamilyParameterModel>(getParameters.Item1);
             BuiltInParameters = new ObservableCollection<FamilyParameterModel>(getParameters.Item2);
             CheckParameters = new ObservableCollection<FamilyParameterModel>(getParameters.Item3);
-        }
-        //Retrieves the family size of the current family document
-        private void PopulateFamilyFileSize()
-        {
-            FamilySize = FamilyFileSize.GetFileSize(Document);
         }
         #endregion
 

@@ -15,5 +15,10 @@ namespace FamilyEditorInterface.Requests
         {
             TaskDialog.Show("Error", ErrorLog);
         }
+
+        internal static void Reset()
+        {
+            ErrorLog = "";
+        }
     }
 }

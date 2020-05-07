@@ -84,8 +84,11 @@ namespace FamilyEditorInterface
             }
             finally
             {
-                if(!string.IsNullOrEmpty(RequestError.ErrorLog))
+                if (!string.IsNullOrEmpty(RequestError.ErrorLog))
+                {
                     RequestError.ReprotError();
+                    RequestError.Reset();
+                }
             }
 
             return;
@@ -143,7 +146,7 @@ namespace FamilyEditorInterface
                             {
                                 if (EncounteredError != null)
                                 {
-                                    RequestError.ErrorLog += $"Parameter :{fp.Definition.Name}{Environment.NewLine}";
+                                    RequestError.ErrorLog += $"{failureHandler.ErrorMessage} for parameter: {fp.Definition.Name}{Environment.NewLine}";
                                     EncounteredError(this, null);
                                 }
                             }
@@ -207,7 +210,7 @@ namespace FamilyEditorInterface
                                 {
                                     if (EncounteredError != null)
                                     {
-                                        RequestError.ErrorLog += $"Parameter :{fp.Definition.Name}{Environment.NewLine}";
+                                        RequestError.ErrorLog += $"{failureHandler.ErrorMessage} for parameter: {fp.Definition.Name}{Environment.NewLine}";
                                         EncounteredError(this, null);
                                     }
                                 }
@@ -273,7 +276,7 @@ namespace FamilyEditorInterface
                         {
                             if (EncounteredError != null)
                             {
-                                RequestError.ErrorLog += $"Parameter :{failureHandler.ErrorMessage}{Environment.NewLine}";
+                                RequestError.ErrorLog += $"{failureHandler.ErrorMessage}{Environment.NewLine}";
                                 EncounteredError(this, null);
                             }
                         }
@@ -331,7 +334,7 @@ namespace FamilyEditorInterface
                         {
                             if (EncounteredError != null)
                             {
-                                RequestError.ErrorLog += $"Parameter :{failureHandler.ErrorMessage}{Environment.NewLine}";
+                                RequestError.ErrorLog += $"{failureHandler.ErrorMessage}{Environment.NewLine}";
                                 EncounteredError(this, null);
                             }
                         }
@@ -388,7 +391,7 @@ namespace FamilyEditorInterface
                     {
                         if (EncounteredError != null)
                         {
-                            RequestError.ErrorLog += $"Parameter :{failureHandler.ErrorMessage}{Environment.NewLine}";
+                            RequestError.ErrorLog += $"{failureHandler.ErrorMessage}{Environment.NewLine}";
                             EncounteredError(this, null);
                         }
                     }
@@ -421,7 +424,6 @@ namespace FamilyEditorInterface
             {
                 // We're just deleting all of the warning level 
                 // failures and rolling back any others
-
                 FailureDefinitionId id = failureMessageAccessor
                   .GetFailureDefinitionId();
 
