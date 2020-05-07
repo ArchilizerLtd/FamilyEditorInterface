@@ -92,7 +92,6 @@
     <Compile Include="Requests\RequestError.cs" />
     <Compile Include="Requests\RequestHandler.cs" />
     <Compile Include="Requests\RequestHandling.cs" />
-    <Compile Include="WPF\ViewModel\FamilyFileSize.cs" />
     <Compile Include="WPF\Model\ItemRetriever.cs" />
     <Compile Include="WPF\ViewModel\AppControl.cs" />
     <Compile Include="WPF\ViewModel\LabelsAndArrays.cs" />

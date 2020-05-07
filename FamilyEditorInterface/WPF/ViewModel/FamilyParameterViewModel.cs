@@ -3,7 +3,6 @@ using Autodesk.Revit.UI;
 using FamilyEditorInterface.Requests;
 using FamilyEditorInterface.Resources.WPF.Model;
 using FamilyEditorInterface.Resources.WPF.ViewModel;
-using FamilyEditorInterface.WPF.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
