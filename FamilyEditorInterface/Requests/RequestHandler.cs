@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using FamilyEditorInterface.Requests;
 
 namespace FamilyEditorInterface
 {
@@ -77,7 +78,14 @@ namespace FamilyEditorInterface
             catch(Exception)
             {
                 if (EncounteredError != null)
+                {
                     EncounteredError(this, null);
+                }
+            }
+            finally
+            {
+                if(!string.IsNullOrEmpty(RequestError.ErrorLog))
+                    RequestError.ReprotError();
             }
 
             return;
@@ -134,7 +142,10 @@ namespace FamilyEditorInterface
                             if (failureHandler.ErrorMessage != "")
                             {
                                 if (EncounteredError != null)
+                                {
+                                    RequestError.ErrorLog += $"Parameter :{fp.Definition.Name}{Environment.NewLine}";
                                     EncounteredError(this, null);
+                                }
                             }
                         }
                     }
@@ -195,7 +206,10 @@ namespace FamilyEditorInterface
                                 if (failureHandler.ErrorMessage != "")
                                 {
                                     if (EncounteredError != null)
+                                    {
+                                        RequestError.ErrorLog += $"Parameter :{fp.Definition.Name}{Environment.NewLine}";
                                         EncounteredError(this, null);
+                                    }
                                 }
                             }
                         }
@@ -258,7 +272,10 @@ namespace FamilyEditorInterface
                         if (failureHandler.ErrorMessage != "")
                         {
                             if (EncounteredError != null)
+                            {
+                                RequestError.ErrorLog += $"Parameter :{failureHandler.ErrorMessage}{Environment.NewLine}";
                                 EncounteredError(this, null);
+                            }
                         }
                     }
                     tg.Assimilate();
@@ -313,7 +330,10 @@ namespace FamilyEditorInterface
                         if (failureHandler.ErrorMessage != "")
                         {
                             if (EncounteredError != null)
+                            {
+                                RequestError.ErrorLog += $"Parameter :{failureHandler.ErrorMessage}{Environment.NewLine}";
                                 EncounteredError(this, null);
+                            }
                         }
                     }
                     tg.Assimilate();
@@ -367,7 +387,10 @@ namespace FamilyEditorInterface
                     if (failureHandler.ErrorMessage != "")
                     {
                         if (EncounteredError != null)
+                        {
+                            RequestError.ErrorLog += $"Parameter :{failureHandler.ErrorMessage}{Environment.NewLine}";
                             EncounteredError(this, null);
+                        }
                     }
                 }
             }

@@ -106,7 +106,7 @@ namespace FamilyEditorInterface.Resources.WPF.ViewModel
             if (_document.Title != doc.Title)
             {
                 _document = doc;
-                _presenter._Document = doc;
+                _presenter.Document = doc;
                 _presenter.DocumentSwitched();
             }
         }

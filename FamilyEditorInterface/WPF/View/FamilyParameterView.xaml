@@ -101,7 +101,7 @@
     <DockPanel Margin="25,25,20,25">
         <!--Control Bar-->
         <DockPanel DockPanel.Dock="Top" Margin="0,5,0,15">
-            <TextBlock Text="{Binding _DocumentName, Mode=OneWay}" Style="{StaticResource Header}" ToolTip="{Binding _DocumentName, Mode=OneWay}" FontSize="16" HorizontalAlignment="Center" FontWeight="Medium"/>
+            <TextBlock Text="{Binding DocumentName, Mode=OneWay}" Style="{StaticResource Header}" ToolTip="{Binding _DocumentName, Mode=OneWay}" FontSize="16" HorizontalAlignment="Center" FontWeight="Medium"/>
         </DockPanel>
         <!--Control Bar-->
         <DockPanel DockPanel.Dock="Bottom" Margin="0,20,0,0">

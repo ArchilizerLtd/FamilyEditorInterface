@@ -296,9 +296,6 @@ namespace FamilyEditorInterface.WPF
         {
             RequestHandling.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(OldName, Name));
         }
-        #endregion
-
-        #region Methods
         //Makes a Delete Request to Delete the Parameter
         private void Delete(object sender)
         {

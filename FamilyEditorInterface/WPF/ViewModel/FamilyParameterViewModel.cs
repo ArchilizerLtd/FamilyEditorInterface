@@ -3,6 +3,7 @@ using Autodesk.Revit.UI;
 using FamilyEditorInterface.Requests;
 using FamilyEditorInterface.Resources.WPF.Model;
 using FamilyEditorInterface.Resources.WPF.ViewModel;
+using FamilyEditorInterface.WPF.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,7 +27,7 @@ namespace FamilyEditorInterface.WPF
         internal bool _isClosed;    //Keep track if the view is closed
         internal bool _enabled; //Keep track if hte view is enabled
         public FamilyParameterView view;    //The UI for the Plugin
-        private SortedList<string, FamilyParameter> famParam;   
+        private SortedList<string, FamilyParameter> famParam;
         private SortedList<string, FamilyParameterModel> famParamModels;
         private List<FamilyParameter> paramLabel;    //Parameters used as dimension drivers
         private List<FamilyParameter> paramFormula;    //Parameters used as formula drivers
@@ -71,8 +72,8 @@ namespace FamilyEditorInterface.WPF
                 _checkParameters = value;
                 RaisePropertyChanged("CheckParameters");
             }
-        }        
-        public Document _Document
+        }
+        public Document Document
         {
             get
             {
@@ -83,11 +84,10 @@ namespace FamilyEditorInterface.WPF
                 if (doc != value)
                 {
                     doc = value;
-                    _DocumentName = doc.Title.Replace(".rfa","");
                 }
             }
         }
-        public string _DocumentName
+        public string DocumentName
         {
             get
             {
@@ -113,6 +113,18 @@ namespace FamilyEditorInterface.WPF
                 RaisePropertyChanged("ToggleVisibility");
             }
         }
+
+        private long _familySize;
+        public long FamilySize 
+        {  
+            get{ return _familySize; } 
+            set
+            {
+                _familySize = value;
+                DocumentName = $"{doc.Title.Replace(".rfa", "")} {value.ToString()}"; 
+                RaisePropertyChanged("FamilySize");
+            } 
+        }
         /// <summary>
         /// The Constructor
         /// </summary>
@@ -121,7 +133,7 @@ namespace FamilyEditorInterface.WPF
         {
             Application.Control.handler.EncounteredError += RollBackState;
 
-            this._Document = document;
+            this.Document = document;
 
             ShuffleCommand = new RelayCommand(o => Shuffle("ShuffleButton"));
             PrecisionCommand = new RelayCommand(o => Precision("PrecisionButton"));
@@ -149,7 +161,10 @@ namespace FamilyEditorInterface.WPF
             GetDriverAndFormulaParameters();  //Check which parameters are used in Dims and Arrays
             PopulateFamilyParameters();
             PopulateUICollections();    //HERE
+            PopulateFamilyFileSize();
         }
+
+
         //Initialize all the collection variables
         private void Initialize()
         {
@@ -176,6 +191,13 @@ namespace FamilyEditorInterface.WPF
                 familyType = CreateDefaultFamilyType(familyManager);
             }
         }
+        //Populates the collection of Parameters that are used to drive dimensions, arrays or a used in formulas
+        private void GetDriverAndFormulaParameters()
+        {
+            LabelsAndArrays.GetDims(doc, ref paramLabel);
+            LabelsAndArrays.GetArrays(doc, ref paramLabel);
+            LabelsAndArrays.GetFormulas(doc, ref paramFormula);
+        }
         //Populate the (sorted) list of FamilyParameters
         private void PopulateFamilyParameters()
         {
@@ -197,12 +219,10 @@ namespace FamilyEditorInterface.WPF
             BuiltInParameters = new ObservableCollection<FamilyParameterModel>(getParameters.Item2);
             CheckParameters = new ObservableCollection<FamilyParameterModel>(getParameters.Item3);
         }
-        //Populates the collection of Parameters that are used to drive dimensions, arrays or a used in formulas
-        private void GetDriverAndFormulaParameters()
+        //Retrieves the family size of the current family document
+        private void PopulateFamilyFileSize()
         {
-            LabelsAndArrays.GetDims(doc, ref paramLabel);
-            LabelsAndArrays.GetArrays(doc, ref paramLabel);
-            LabelsAndArrays.GetFormulas(doc, ref paramFormula);
+            FamilySize = FamilyFileSize.GetFileSize(Document);
         }
         #endregion
 
