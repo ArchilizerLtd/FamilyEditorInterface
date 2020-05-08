@@ -76,6 +76,19 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="Dialog\Alerts\AlertDialogView.xaml.cs">
+      <DependentUpon>AlertDialogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Alerts\AlertDialogViewModel.cs" />
+    <Compile Include="Dialog\DialogResults.cs" />
+    <Compile Include="Dialog\Service\DataTemplateCreation.cs" />
+    <Compile Include="Dialog\Service\DialogSerivce.cs" />
+    <Compile Include="Dialog\Service\DialogViewModelBase.cs" />
+    <Compile Include="Dialog\Service\DialogWindow.xaml.cs">
+      <DependentUpon>DialogWIndow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Service\IDialogService.cs" />
+    <Compile Include="Dialog\Service\IDialogWindow.cs" />
     <Compile Include="Helpers\BitmapIcons.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -126,6 +139,14 @@
     <EmbeddedResource Include="Resources\icon_Families.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Dialog\Alerts\AlertDialogView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\Service\DialogWIndow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\Theme.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

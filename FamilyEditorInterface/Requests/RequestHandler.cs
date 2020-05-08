@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Dialog.Alerts;
+using Dialog.Service;
 using FamilyEditorInterface.Requests;
 
 namespace FamilyEditorInterface
@@ -24,6 +26,22 @@ namespace FamilyEditorInterface
         public Request Request
         {
             get { return m_request; }
+        }
+
+        private IDialogService _dialogService;  //Our custom-made DialogBox
+
+        public RequestHandler()
+        {
+            var manager = new DataTemplateManager();    //The DataTempalte boilerplate for our custom DialogBox
+            manager.RegisterDataTemplate<AlertDialogViewModel, AlertDialogView>();
+
+            _dialogService = new DialogService();
+        }
+        
+        private void Alert(string title, string message)
+        {
+            var dialog = new AlertDialogViewModel(title, message);
+            var result = _dialogService.OpenDialog(dialog);
         }
 
         /// <summary>
@@ -86,7 +104,8 @@ namespace FamilyEditorInterface
             {
                 if (!string.IsNullOrEmpty(RequestError.ErrorLog))
                 {
-                    RequestError.ReprotError();
+                    Alert("Alert!", RequestError.ErrorLog);
+                    //RequestError.ReprotError();
                     RequestError.Reset();
                 }
             }
