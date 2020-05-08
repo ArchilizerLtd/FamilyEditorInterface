@@ -1,5 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Dialog.Alerts;
+using Dialog.Service;
 using FamilyEditorInterface.Requests;
 using FamilyEditorInterface.Resources.WPF.Model;
 using FamilyEditorInterface.Resources.WPF.ViewModel;
@@ -34,6 +36,8 @@ namespace FamilyEditorInterface.WPF
         private FamilyType familyType;  //The current Family Type (a family can have multiple Types)
 
         public EventHandler PresenterClosed;
+        private static IDialogService _dialogService;
+
 
         public ICommand ShuffleCommand { get; set; }
         public ICommand PrecisionCommand { get; set; }
@@ -132,6 +136,18 @@ namespace FamilyEditorInterface.WPF
 
             this.PopulateModel();
             this._enabled = true;
+
+            //var manager = new DataTemplateManager();
+            //manager.RegisterDataTemplate<AlertDialogViewModel, AlertDialogView>();
+
+            _dialogService = new DialogService();
+
+        }
+        
+        public static void Alert(string title, string message)
+        {
+            var dialog = new AlertDialogViewModel(title, message);
+            var result = _dialogService.OpenDialog(dialog);
         }
         #endregion
 

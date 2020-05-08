@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Dialog.Alerts;
+using Dialog.Service;
 using FamilyEditorInterface.Requests;
 
 namespace FamilyEditorInterface
@@ -25,6 +27,7 @@ namespace FamilyEditorInterface
         {
             get { return m_request; }
         }
+
 
         /// <summary>
         ///   A method to identify this External Event Handler
