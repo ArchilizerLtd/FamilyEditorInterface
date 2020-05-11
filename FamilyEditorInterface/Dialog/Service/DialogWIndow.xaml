@@ -9,5 +9,11 @@
         WindowStartupLocation="CenterScreen"
         Background="#FAFAFA"
         Title="{Binding Title}" Height="300" Width="300">
+    <Window.CommandBindings>
+        <CommandBinding Command="Close" Executed="OnCloseExecuted" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Command="Close" Key="Esc" />
+    </Window.InputBindings>
     <ContentControl x:Name="ContentPresenter" Content="{Binding}"/>
 </Window>

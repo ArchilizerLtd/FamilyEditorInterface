@@ -18,14 +18,17 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="{Binding Message}" Grid.Row="0" 
+        <StackPanel Orientation="Horizontal">
+            <Rectangle Width="5" Fill="YellowGreen"/>
+            <TextBlock Text="{Binding Message}" Grid.Row="0" 
                    HorizontalAlignment="Center" VerticalAlignment="Center" 
                    Margin="20"
-                   TextWrapping="Wrap"/>
-        <Button Content="OK" Grid.Row="1" 
+                   TextWrapping="Wrap"/>        
+        <!--<Button Content="OK" Grid.Row="1" 
                 Command="{Binding OKCommand}" 
                 CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window}}"
                 HorizontalAlignment="Stretch" Height="30" Margin="20"
-                Style="{DynamicResource SimpleButtonStyle}"/>
+                Style="{DynamicResource SimpleButtonStyle}"/>-->
+        </StackPanel>
     </Grid>
 </UserControl>

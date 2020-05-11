@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace Dialog.Service
 {
@@ -11,6 +12,10 @@ namespace Dialog.Service
         {
             InitializeComponent();
         }
-
+        // ESC Button pressed triggers Window close        
+        private void OnCloseExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }
