@@ -28,21 +28,6 @@ namespace FamilyEditorInterface
             get { return m_request; }
         }
 
-        private IDialogService _dialogService;  //Our custom-made DialogBox
-
-        public RequestHandler()
-        {
-            var manager = new DataTemplateManager();    //The DataTempalte boilerplate for our custom DialogBox
-            manager.RegisterDataTemplate<AlertDialogViewModel, AlertDialogView>();
-
-            _dialogService = new DialogService();
-        }
-        
-        private void Alert(string title, string message)
-        {
-            var dialog = new AlertDialogViewModel(title, message);
-            var result = _dialogService.OpenDialog(dialog);
-        }
 
         /// <summary>
         ///   A method to identify this External Event Handler
@@ -104,8 +89,7 @@ namespace FamilyEditorInterface
             {
                 if (!string.IsNullOrEmpty(RequestError.ErrorLog))
                 {
-                    Alert("Alert!", RequestError.ErrorLog);
-                    //RequestError.ReprotError();
+                    RequestError.ReprotError();
                     RequestError.Reset();
                 }
             }

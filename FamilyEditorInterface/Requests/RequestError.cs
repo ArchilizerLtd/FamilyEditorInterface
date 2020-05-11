@@ -1,9 +1,12 @@
 ﻿using Autodesk.Revit.UI;
+using Dialog.Alerts;
+using Dialog.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FamilyEditorInterface.WPF;
 
 namespace FamilyEditorInterface.Requests
 {
@@ -13,7 +16,7 @@ namespace FamilyEditorInterface.Requests
 
         public static void ReprotError()
         {
-            TaskDialog.Show("Error", ErrorLog);
+            FamilyParameterViewModel.Alert("Alert", ErrorLog);
         }
 
         internal static void Reset()

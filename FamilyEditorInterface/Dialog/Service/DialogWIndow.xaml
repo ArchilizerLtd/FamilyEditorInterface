@@ -4,13 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dialog.Service"
+        xmlns:alert="clr-namespace:Dialog.Alerts"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterScreen"
         Background="#FAFAFA"
         Title="{Binding Title}" Height="300" Width="300">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type alert:AlertDialogViewModel}">
+            <alert:AlertDialogView/>
+        </DataTemplate>
+    </Window.Resources>
     <Window.CommandBindings>
-        <CommandBinding Command="Close" Executed="OnCloseExecuted" />
+    <CommandBinding Command="Close" Executed="OnCloseExecuted" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Command="Close" Key="Esc" />
