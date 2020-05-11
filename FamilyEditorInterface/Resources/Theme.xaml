@@ -4,6 +4,8 @@
 
     <!--Icon Color-->
     <SolidColorBrush x:Key="IconColorTextBrush" Color="#303030"/>
+    <SolidColorBrush x:Key="ButtonColorTextBrush" Color="#6F6F6F"/>
+    <SolidColorBrush x:Key="WarningColorBrush" Color="#FFBB00"/>
 
     <!--Icons-->
     <Viewbox x:Key="ShuffleIcon" Width="18" Height="18">
@@ -31,6 +33,27 @@
             <Path Data="M5.5,9A1.5,1.5 0 0,0 7,7.5A1.5,1.5 0 0,0 5.5,6A1.5,1.5 0 0,0 4,7.5A1.5,1.5 0 0,0 5.5,9M17.41,11.58C17.77,11.94 18,12.44 18,13C18,13.55 17.78,14.05 17.41,14.41L12.41,19.41C12.05,19.77 11.55,20 11,20C10.45,20 9.95,19.78 9.58,19.41L2.59,12.42C2.22,12.05 2,11.55 2,11V6C2,4.89 2.89,4 4,4H9C9.55,4 10.05,4.22 10.41,4.58L17.41,11.58M13.54,5.71L14.54,4.71L21.41,11.58C21.78,11.94 22,12.45 22,13C22,13.55 21.78,14.05 21.42,14.41L16.04,19.79L15.04,18.79L20.75,13L13.54,5.71Z" Fill="{StaticResource IconColorTextBrush}"/>
         </Canvas>
     </Viewbox>
+    <Viewbox x:Key="WarningIcon" Width="24" Height="24">
+        <Canvas Width="24" Height="24">
+            <Path Data="M13,10H11V6H13M13,14H11V12H13M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" Fill="{StaticResource WarningColorBrush}"/>
+        </Canvas>
+    </Viewbox>
+    <Viewbox x:Key="CloseIcon" Width="14" Height="14">
+        <Canvas Width="24" Height="24">
+            <Path Data="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z" Fill="{StaticResource ButtonColorTextBrush}"/>
+        </Canvas>
+    </Viewbox>
+    
+    <!--Textblock Styles-->
+    <Style x:Key="MessageTextBlockStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontFamily" Value="Lato"/>
+        <Setter Property="LineHeight" Value="24"/>
+        <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
+        <Setter Property="Foreground" Value="{StaticResource ButtonColorTextBrush}"/>
+    </Style>
 
     <!--UI Buttons-->
     <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>

@@ -1,4 +1,4 @@
-﻿<Window x:Class="Dialog.Service.DialogWindow"
+<Window x:Class="Dialog.Service.DialogWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,6 +7,7 @@
         xmlns:alert="clr-namespace:Dialog.Alerts"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
+        WindowStyle="None" MouseDown="Window_MouseDown"
         WindowStartupLocation="CenterScreen"
         Background="#FAFAFA"
         Title="{Binding Title}" Height="300" Width="300">
@@ -16,7 +17,7 @@
         </DataTemplate>
     </Window.Resources>
     <Window.CommandBindings>
-    <CommandBinding Command="Close" Executed="OnCloseExecuted" />
+        <CommandBinding Command="Close" Executed="OnCloseExecuted" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Command="Close" Key="Esc" />

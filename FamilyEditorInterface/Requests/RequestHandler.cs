@@ -87,7 +87,7 @@ namespace FamilyEditorInterface
             }
             finally
             {
-                if (!string.IsNullOrEmpty(RequestError.ErrorLog))
+                if (RequestError.ErrorLog.Count > 0)
                 {
                     RequestError.ReprotError();
                     RequestError.Reset();
@@ -149,7 +149,7 @@ namespace FamilyEditorInterface
                             {
                                 if (EncounteredError != null)
                                 {
-                                    RequestError.ErrorLog += $"{failureHandler.ErrorMessage} for parameter: {fp.Definition.Name}{Environment.NewLine}";
+                                    RequestError.ErrorLog.Add(new Message(fp.Definition.Name, failureHandler.ErrorMessage));
                                     EncounteredError(this, null);
                                 }
                             }
@@ -213,7 +213,7 @@ namespace FamilyEditorInterface
                                 {
                                     if (EncounteredError != null)
                                     {
-                                        RequestError.ErrorLog += $"{failureHandler.ErrorMessage} for parameter: {fp.Definition.Name}{Environment.NewLine}";
+                                        RequestError.ErrorLog.Add(new Message(fp.Definition.Name, failureHandler.ErrorMessage));
                                         EncounteredError(this, null);
                                     }
                                 }
@@ -279,7 +279,7 @@ namespace FamilyEditorInterface
                         {
                             if (EncounteredError != null)
                             {
-                                RequestError.ErrorLog += $"{failureHandler.ErrorMessage}{Environment.NewLine}";
+                                RequestError.ErrorLog.Add(new Message("", failureHandler.ErrorMessage));
                                 EncounteredError(this, null);
                             }
                         }
@@ -337,7 +337,7 @@ namespace FamilyEditorInterface
                         {
                             if (EncounteredError != null)
                             {
-                                RequestError.ErrorLog += $"{failureHandler.ErrorMessage}{Environment.NewLine}";
+                                RequestError.ErrorLog.Add(new Message("", failureHandler.ErrorMessage));
                                 EncounteredError(this, null);
                             }
                         }
@@ -394,7 +394,7 @@ namespace FamilyEditorInterface
                     {
                         if (EncounteredError != null)
                         {
-                            RequestError.ErrorLog += $"{failureHandler.ErrorMessage}{Environment.NewLine}";
+                            RequestError.ErrorLog.Add(new Message("", failureHandler.ErrorMessage));
                             EncounteredError(this, null);
                         }
                     }

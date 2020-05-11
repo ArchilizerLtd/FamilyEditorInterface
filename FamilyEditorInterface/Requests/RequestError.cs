@@ -12,7 +12,7 @@ namespace FamilyEditorInterface.Requests
 {
     public static class RequestError
     {
-        public static string ErrorLog;
+        public static List<Message> ErrorLog = new List<Message>();
 
         public static void ReprotError()
         {
@@ -21,7 +21,7 @@ namespace FamilyEditorInterface.Requests
 
         internal static void Reset()
         {
-            ErrorLog = "";
+            ErrorLog = new List<Message>();
         }
     }
 }

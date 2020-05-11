@@ -15,20 +15,25 @@
     </UserControl.Resources>
     <Grid Background="#FAFAFA">
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal">
-            <Rectangle Width="5" Fill="YellowGreen"/>
-            <TextBlock Text="{Binding Message}" Grid.Row="0" 
-                   HorizontalAlignment="Center" VerticalAlignment="Center" 
-                   Margin="20"
-                   TextWrapping="Wrap"/>        
-        <!--<Button Content="OK" Grid.Row="1" 
-                Command="{Binding OKCommand}" 
-                CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window}}"
-                HorizontalAlignment="Stretch" Height="30" Margin="20"
-                Style="{DynamicResource SimpleButtonStyle}"/>-->
+        <Rectangle Width="5" Fill="{StaticResource WarningColorBrush}" HorizontalAlignment="Left" Grid.RowSpan="2"/>
+        <Button x:Name="Close" IsCancel="True" Grid.Row="0"
+                Content="{StaticResource CloseIcon}" Style="{StaticResource ToolbarButton}"
+                VerticalAlignment="Top" HorizontalAlignment="Right" />
+        <StackPanel Orientation="Horizontal" Grid.Row="1" VerticalAlignment="Top" Margin="20 0">
+            <Label x:Name="warningIcon" Content="{StaticResource WarningIcon}" VerticalAlignment="Top"/>
+            <ItemsControl ItemsSource="{Binding Note}" VerticalAlignment="Top" Margin="15 5 5 15" MinWidth="300">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" Margin="0 0 0 10">
+                            <TextBlock Text="{Binding Bold}" Style="{StaticResource MessageTextBlockStyle}" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Body}" Style="{StaticResource MessageTextBlockStyle}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
     </Grid>
 </UserControl>

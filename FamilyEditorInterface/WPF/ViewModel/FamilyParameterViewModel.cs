@@ -144,9 +144,9 @@ namespace FamilyEditorInterface.WPF
 
         }
         
-        public static void Alert(string title, string message)
+        public static void Alert(string title, List<Message> note)
         {
-            var dialog = new AlertDialogViewModel(title, message);
+            var dialog = new AlertDialogViewModel(title, note);
             var result = _dialogService.OpenDialog(dialog);
         }
         #endregion
