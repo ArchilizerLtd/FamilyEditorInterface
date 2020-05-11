@@ -39,7 +39,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.Shared = fp.IsShared;
             newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
             newItem.IsUsed = (newItem.Associated || newItem.Label || newItem.UsedInFormula);    //Used if any of the three is true
-            newItem.Visible = newItem.IsUsed ? true : Properties.Settings.Default.AssociatedVisibility; //Set the visibility in the UI
+            newItem.Visible = Properties.Settings.Default.ToggleVisibility; //Set the visibility in the UI (user defined Tag property for all Tags, regardless of their specific conditions)
             newItem.Value = GetParameterValue(ft, fp) ;  //The Value of the parameter (can be yes/no, double, integer, string, ...
 
             return newItem;

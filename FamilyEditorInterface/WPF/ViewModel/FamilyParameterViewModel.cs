@@ -42,7 +42,6 @@ namespace FamilyEditorInterface.WPF
         public ICommand ShuffleCommand { get; set; }
         public ICommand PrecisionCommand { get; set; }
         public ICommand DeleteUnusedCommand { get; set; }
-        public ICommand VisibilityCommand { get; set; }
         public ICommand ToggleCommand { get; set; }
 
         private ObservableCollection<FamilyParameterModel> _valueParameters;
@@ -131,7 +130,6 @@ namespace FamilyEditorInterface.WPF
             ShuffleCommand = new RelayCommand(o => Shuffle("ShuffleButton"));
             PrecisionCommand = new RelayCommand(o => Precision("PrecisionButton"));
             DeleteUnusedCommand = new RelayCommand(o => DeleteUnused("DeleteUnusedButton"));
-            VisibilityCommand = new RelayCommand(o => ChangeVisibility("ToggleVisibility"));
             ToggleCommand = new RelayCommand(o => ToggleTags("ToggleVisibility"));
 
             this.PopulateModel();
@@ -247,7 +245,7 @@ namespace FamilyEditorInterface.WPF
             try
             {
                 view.Show();
-                SetToggleVisibility();  //Set user-defined Tags visibility. The view show have been Initialized for this to work.
+                //SetToggleVisibility();  //Set user-defined Tags visibility. The view show have been Initialized for this to work.
             }
             catch (Exception ex)
             {
@@ -314,19 +312,6 @@ namespace FamilyEditorInterface.WPF
                 RequestHandling.MakeRequest(RequestId.ChangeParamName, new Tuple<string, string>(_oldName, _name));
             }
         }
-        //Remember user settings for Toggle Tags
-        private void SetToggleVisibility()
-        {
-            //ToggleVisibility = Properties.Settings.Default.ToggleVisibility;
-            if (Properties.Settings.Default.ToggleVisibility) return;
-            foreach (Border b in FindVisualChildren<Border>(view))
-            {
-                if (b.Tag != null && b.Tag.Equals("Tag"))
-                {
-                    b.Visibility = System.Windows.Visibility.Collapsed;
-                }
-            }
-        }
         // Change Precision
         private void Precision(object sender)
         {
@@ -359,34 +344,42 @@ namespace FamilyEditorInterface.WPF
                 MakeRequest(RequestId.DeleteId, values);
             }
         }
-        // Toggle Visibility of Parameters which are not associated
-        private void ChangeVisibility(object sender)
+        //Remember user settings for Toggle Tags
+        private void SetToggleVisibility()
         {
-            Properties.Settings.Default.AssociatedVisibility = !Properties.Settings.Default.AssociatedVisibility;
-
-            foreach (var item in ValueParameters)
-                if (!item.Associated)
-                    item.Visible = Properties.Settings.Default.AssociatedVisibility;
-
-            foreach (var item in BuiltInParameters)
-                if (!item.Associated)
-                    item.Visible = Properties.Settings.Default.AssociatedVisibility;
-
-            foreach (var item in CheckParameters)
-                if (!item.Associated)
-                    item.Visible = Properties.Settings.Default.AssociatedVisibility;
+            //ToggleVisibility = Properties.Settings.Default.ToggleVisibility;
+            if (Properties.Settings.Default.ToggleVisibility) return;
+            //foreach (Border b in FindVisualChildren<Border>(view))
+            //{
+            //    if (b.Tag != null && b.Tag.Equals("Tag"))
+            //    {
+            //        b.Visibility = System.Windows.Visibility.Collapsed;
+            //    }
+            //}
         }
         // Toggles Tags on/off
         private void ToggleTags(object sender)
         {
             Properties.Settings.Default.ToggleVisibility = !Properties.Settings.Default.ToggleVisibility;   //Toggles the User-defined visibility
-            foreach (Border b in FindVisualChildren<Border>(view))
+            foreach (var param in ValueParameters)
             {
-                if (b.Tag != null && b.Tag.Equals("Tag"))
-                {
-                    b.Visibility = b.Visibility == System.Windows.Visibility.Visible ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
-                }
+                param.Visible = Properties.Settings.Default.ToggleVisibility;
             }
+            foreach (var param in BuiltInParameters)
+            {
+                param.Visible = Properties.Settings.Default.ToggleVisibility;
+            }
+            foreach (var param in CheckParameters)
+            {
+                param.Visible = Properties.Settings.Default.ToggleVisibility;
+            }
+            //foreach (Border b in FindVisualChildren<Border>(view))
+            //{
+            //    if (b.Tag != null && b.Tag.Equals("Tag"))
+            //    {
+            //        b.Visibility = b.Visibility == System.Windows.Visibility.Visible ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+            //    }
+            //}
         }
         // Makes requiest, renames Parameters
         private void MakeRequest(RequestId request, List<string> values)

@@ -107,7 +107,6 @@
         <DockPanel DockPanel.Dock="Bottom" Margin="0,20,0,0">
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnShuffle" Content="{StaticResource ShuffleIcon}" Command="{Binding ShuffleCommand}" ToolTip="Shuffle Parameter Values"/>
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnDeleteAllUnused" Content="{StaticResource DeleteIcon}" Command="{Binding DeleteUnusedCommand}" ToolTip="Delete all unused Parameters"/>
-            <!--<Button Style="{StaticResource ToolbarButton}" x:Name="btnViewBuiltIn" Content="{StaticResource ViewIcon}" Command="{Binding VisibilityCommand}" ToolTip="Toggle visibility of nonassociated Parameters"/>-->
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettings" Content="{StaticResource SettingsIcon}" Command="{Binding PrecisionCommand}" ToolTip="Settings"/>
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettingsTest" Content="{StaticResource ToggleIcon}" Command="{Binding ToggleCommand}" ToolTip="Toggle Tags"/>
             <Button Style="{DynamicResource SimpleButtonStyle}" x:Name="btnDialogOk" Click="BtnDialogOk_Click" Content="Close" Width="95"/>
@@ -150,7 +149,7 @@
                         <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Style="{StaticResource ItemControlGridStyle}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Grid Style="{StaticResource ItemControlGridStyle}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
@@ -178,25 +177,25 @@
                                         </TextBox>
                                         <!--Tags-->
                                         <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="2 0">
-                                            <Border Background="{StaticResource shared}" Style="{StaticResource Tag}" Width="{Binding Shared, Converter={StaticResource B2WC}}" Margin="{Binding Shared, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource shared}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Shared, Converter={StaticResource B2WC}}" Margin="{Binding Shared, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="shared" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource built-in}" Style="{StaticResource Tag}" Width="{Binding BuiltIn, Converter={StaticResource B2WC}}" Margin="{Binding BuiltIn, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource built-in}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding BuiltIn, Converter={StaticResource B2WC}}" Margin="{Binding BuiltIn, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="built-in" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource in-use}" Style="{StaticResource Tag}" Width="{Binding IsUsed, Converter={StaticResource B2WC}}" Margin="{Binding IsUsed, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource in-use}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding IsUsed, Converter={StaticResource B2WC}}" Margin="{Binding IsUsed, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="in use" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource fromF}" Style="{StaticResource Tag}" Width="{Binding Formula, Converter={StaticResource B2WC}}" Margin="{Binding Formula, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource fromF}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Formula, Converter={StaticResource B2WC}}" Margin="{Binding Formula, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="dF" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource inF}" Style="{StaticResource Tag}" Width="{Binding UsedInFormula, Converter={StaticResource B2WC}}" Margin="{Binding UsedInFormula, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource inF}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding UsedInFormula, Converter={StaticResource B2WC}}" Margin="{Binding UsedInFormula, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="uF" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource report}" Style="{StaticResource Tag}" Width="{Binding Reporting, Converter={StaticResource B2WC}}" Margin="{Binding Reporting, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource report}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Reporting, Converter={StaticResource B2WC}}" Margin="{Binding Reporting, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="report" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource label}" Style="{StaticResource Tag}" Width="{Binding Label, Converter={StaticResource B2WC}}" Margin="{Binding Label, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource label}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Label, Converter={StaticResource B2WC}}" Margin="{Binding Label, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="label" Style="{StaticResource TagText}"/>
                                             </Border>
                                         </StackPanel>
@@ -225,7 +224,7 @@
                         <ItemsControl ItemsSource="{Binding BuiltInParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Style="{StaticResource ItemControlGridStyle}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Grid Style="{StaticResource ItemControlGridStyle}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
@@ -241,25 +240,25 @@
                                         <TextBox Text="{Binding Name, Mode=OneWay}"  ToolTip="{Binding Name}" Style="{StaticResource EnterText}" IsReadOnly="True" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"/>
                                         <!--Tags-->
                                         <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="2 0">
-                                            <Border Background="{StaticResource shared}" Style="{StaticResource Tag}" Width="{Binding Shared, Converter={StaticResource B2WC}}" Margin="{Binding Shared, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource shared}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Shared, Converter={StaticResource B2WC}}" Margin="{Binding Shared, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="shared" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource built-in}" Style="{StaticResource Tag}" Width="{Binding BuiltIn, Converter={StaticResource B2WC}}" Margin="{Binding BuiltIn, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource built-in}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding BuiltIn, Converter={StaticResource B2WC}}" Margin="{Binding BuiltIn, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="built-in" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource in-use}" Style="{StaticResource Tag}" Width="{Binding IsUsed, Converter={StaticResource B2WC}}" Margin="{Binding IsUsed, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource in-use}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding IsUsed, Converter={StaticResource B2WC}}" Margin="{Binding IsUsed, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="in use" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource fromF}" Style="{StaticResource Tag}" Width="{Binding Formula, Converter={StaticResource B2WC}}" Margin="{Binding Formula, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource fromF}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Formula, Converter={StaticResource B2WC}}" Margin="{Binding Formula, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="dF" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource inF}" Style="{StaticResource Tag}" Width="{Binding UsedInFormula, Converter={StaticResource B2WC}}" Margin="{Binding UsedInFormula, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource inF}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding UsedInFormula, Converter={StaticResource B2WC}}" Margin="{Binding UsedInFormula, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="uF" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource report}" Style="{StaticResource Tag}" Width="{Binding Reporting, Converter={StaticResource B2WC}}" Margin="{Binding Reporting, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource report}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Reporting, Converter={StaticResource B2WC}}" Margin="{Binding Reporting, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="report" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource label}" Style="{StaticResource Tag}" Width="{Binding Label, Converter={StaticResource B2WC}}" Margin="{Binding Label, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource label}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Label, Converter={StaticResource B2WC}}" Margin="{Binding Label, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="label" Style="{StaticResource TagText}"/>
                                             </Border>
                                         </StackPanel>
@@ -287,7 +286,7 @@
                         <ItemsControl ItemsSource="{Binding CheckParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Style="{StaticResource ItemControlGridStyle}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Grid Style="{StaticResource ItemControlGridStyle}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
@@ -309,25 +308,25 @@
                                         </TextBox>
                                         <!--Tags-->
                                         <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="2 0">
-                                            <Border Background="{StaticResource shared}" Style="{StaticResource Tag}" Width="{Binding Shared, Converter={StaticResource B2WC}}" Margin="{Binding Shared, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource shared}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Shared, Converter={StaticResource B2WC}}" Margin="{Binding Shared, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="shared" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource built-in}" Style="{StaticResource Tag}" Width="{Binding BuiltIn, Converter={StaticResource B2WC}}" Margin="{Binding BuiltIn, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource built-in}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding BuiltIn, Converter={StaticResource B2WC}}" Margin="{Binding BuiltIn, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="built-in" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource in-use}" Style="{StaticResource Tag}" Width="{Binding IsUsed, Converter={StaticResource B2WC}}" Margin="{Binding IsUsed, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource in-use}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding IsUsed, Converter={StaticResource B2WC}}" Margin="{Binding IsUsed, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="in use" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource fromF}" Style="{StaticResource Tag}" Width="{Binding Formula, Converter={StaticResource B2WC}}" Margin="{Binding Formula, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource fromF}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Formula, Converter={StaticResource B2WC}}" Margin="{Binding Formula, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="dF" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource inF}" Style="{StaticResource Tag}" Width="{Binding UsedInFormula, Converter={StaticResource B2WC}}" Margin="{Binding UsedInFormula, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource inF}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding UsedInFormula, Converter={StaticResource B2WC}}" Margin="{Binding UsedInFormula, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="uF" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource report}" Style="{StaticResource Tag}" Width="{Binding Reporting, Converter={StaticResource B2WC}}" Margin="{Binding Reporting, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource report}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Reporting, Converter={StaticResource B2WC}}" Margin="{Binding Reporting, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="report" Style="{StaticResource TagText}"/>
                                             </Border>
-                                            <Border Background="{StaticResource label}" Style="{StaticResource Tag}" Width="{Binding Label, Converter={StaticResource B2WC}}" Margin="{Binding Label, Converter={StaticResource B2MC}}">
+                                            <Border Background="{StaticResource label}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource Tag}" Width="{Binding Label, Converter={StaticResource B2WC}}" Margin="{Binding Label, Converter={StaticResource B2MC}}">
                                                 <TextBlock Text="label" Style="{StaticResource TagText}"/>
                                             </Border>
                                         </StackPanel>
