@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="Dialog.Alerts.AlertDialogView"
+﻿<UserControl x:Class="Dialog.Alerts.NotifyDialogView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Dialog.Alerts"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="200">
+             d:DesignHeight="120" d:DesignWidth="300">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -18,22 +18,18 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Rectangle Width="5" Fill="{StaticResource WarningColorBrush}" HorizontalAlignment="Left" Grid.RowSpan="2"/>
+        <Rectangle Width="5" Fill="{StaticResource NotifyColorBrush}" HorizontalAlignment="Left" Grid.RowSpan="2"/>
         <Button x:Name="Close" IsCancel="True" Grid.Row="0"
                 Content="{StaticResource CloseIcon}" Style="{StaticResource ToolbarButton}"
                 VerticalAlignment="Top" HorizontalAlignment="Right" />
-        <StackPanel Orientation="Horizontal" Grid.Row="1" VerticalAlignment="Top" Margin="20 0">
-            <Label x:Name="warningIcon" Content="{StaticResource WarningIcon}" VerticalAlignment="Top"/>
-            <ItemsControl ItemsSource="{Binding Note}" VerticalAlignment="Top" Margin="15 5 5 15" MinWidth="300">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="0 0 0 10">
-                            <TextBlock Text="{Binding Bold}" Style="{StaticResource MessageTextBlockStyle}" FontWeight="Bold" FontSize="14"/>
-                            <TextBlock Text="{Binding Body}" Style="{StaticResource MessageTextBlockStyle}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" VerticalAlignment="Top" Margin="20 0 20 20">
+            <Label x:Name="warningIcon" Content="{StaticResource NotifyIcon}" VerticalAlignment="Top"/>
+            <TextBlock Text="{Binding Message}" Style="{StaticResource MessageTextBlockStyle}" MinWidth="300" Margin="20 10" TextWrapping="WrapWithOverflow"/>
         </StackPanel>
+        <!--<Button Content="OK" Grid.Row="1" 
+            Command="{Binding OKCommand}" 
+            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window}}"
+            HorizontalAlignment="Stretch" Height="30" Margin="20"
+            Style="{DynamicResource SimpleButtonStyle}"/>-->
     </Grid>
 </UserControl>

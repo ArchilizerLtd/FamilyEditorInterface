@@ -74,12 +74,16 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dialog\Alerts\NotifyDialogView.cs">
+      <DependentUpon>NotifyDialogView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="App.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Dialog\Alerts\AlertDialogView.xaml.cs">
       <DependentUpon>AlertDialogView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialog\Alerts\AlertDialogViewModel.cs" />
+    <Compile Include="Dialog\Alerts\NotifyDialogViewModel.cs" />
     <Compile Include="Dialog\DialogResults.cs" />
     <Compile Include="Dialog\Service\DataTemplateCreation.cs" />
     <Compile Include="Dialog\Service\DialogSerivce.cs" />
@@ -139,6 +143,10 @@
     <EmbeddedResource Include="Resources\icon_Families.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Dialog\Alerts\NotifyDialogView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Dialog\Alerts\AlertDialogView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

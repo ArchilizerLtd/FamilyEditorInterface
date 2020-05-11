@@ -90,8 +90,12 @@ namespace FamilyEditorInterface
                 if (RequestError.ErrorLog.Count > 0)
                 {
                     RequestError.ReprotError();
-                    RequestError.Reset();
                 }
+                if(!String.IsNullOrEmpty(RequestError.NotifyLog))
+                {
+                    RequestError.Notify();
+                }
+                RequestError.Reset();
             }
 
             return;
@@ -267,7 +271,8 @@ namespace FamilyEditorInterface
                                 {
                                     mgr.MakeType(fp);
                                 }
-                                else {
+                                else
+                                {
                                     mgr.MakeInstance(fp);
                                 };
                             }
@@ -340,6 +345,10 @@ namespace FamilyEditorInterface
                                 RequestError.ErrorLog.Add(new Message("", failureHandler.ErrorMessage));
                                 EncounteredError(this, null);
                             }
+                        }
+                        else
+                        {
+                            RequestError.NotifyLog += $"Successfully purged {values.Count.ToString()} unused parameters.";
                         }
                     }
                     tg.Assimilate();

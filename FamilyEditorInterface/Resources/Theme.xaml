@@ -6,6 +6,7 @@
     <SolidColorBrush x:Key="ButtonPressedColor" Color="#111111"/>
     <SolidColorBrush x:Key="ButtonColor" Color="#444444"/>
     <SolidColorBrush x:Key="WarningColorBrush" Color="#FFBB00"/>
+    <SolidColorBrush x:Key="NotifyColorBrush" Color="#40BB00"/>
 
     <!--Icons-->
     <!--https://materialdesignicons.com/-->
@@ -56,7 +57,11 @@
             <Path Data="M13,10H11V6H13M13,14H11V12H13M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" Fill="{StaticResource WarningColorBrush}"/>
         </Canvas>
     </Viewbox>
-
+    <Viewbox x:Key="NotifyIcon" Width="24" Height="24">
+        <Canvas Width="24" Height="24">
+            <Path Data= "M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" Fill="{StaticResource NotifyColorBrush}"/>
+        </Canvas>
+    </Viewbox>
 
 
 
@@ -64,8 +69,9 @@
     <Style x:Key="MessageTextBlockStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="12"/>
         <Setter Property="FontFamily" Value="Lato"/>
+        <Setter Property="FontWeight" Value="Light"/>
         <Setter Property="LineHeight" Value="24"/>
         <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
         <Setter Property="Foreground" Value="{StaticResource ButtonColor}"/>

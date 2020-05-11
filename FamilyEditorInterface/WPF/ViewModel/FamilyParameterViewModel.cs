@@ -147,6 +147,11 @@ namespace FamilyEditorInterface.WPF
             var dialog = new AlertDialogViewModel(title, note);
             var result = _dialogService.OpenDialog(dialog);
         }
+        public static void Notify(string title, string message)
+        {
+            var dialog = new NotifyDialogViewModel(title, message);
+            var result = _dialogService.OpenDialog(dialog);
+        }
         #endregion
 
         #region Main Methods
@@ -245,7 +250,6 @@ namespace FamilyEditorInterface.WPF
             try
             {
                 view.Show();
-                //SetToggleVisibility();  //Set user-defined Tags visibility. The view show have been Initialized for this to work.
             }
             catch (Exception ex)
             {
@@ -340,22 +344,10 @@ namespace FamilyEditorInterface.WPF
 
             if (values.Count > 0)
             {
-                System.Windows.Forms.MessageBox.Show(string.Format("{0} Parameters will be removed.", values.Count.ToString()));
+                Alert("Alert", new List<Message>() { new Message("Warning!", $"{values.Count.ToString()} Parameters will be removed.")});
+                //System.Windows.Forms.MessageBox.Show(string.Format());
                 MakeRequest(RequestId.DeleteId, values);
             }
-        }
-        //Remember user settings for Toggle Tags
-        private void SetToggleVisibility()
-        {
-            //ToggleVisibility = Properties.Settings.Default.ToggleVisibility;
-            if (Properties.Settings.Default.ToggleVisibility) return;
-            //foreach (Border b in FindVisualChildren<Border>(view))
-            //{
-            //    if (b.Tag != null && b.Tag.Equals("Tag"))
-            //    {
-            //        b.Visibility = System.Windows.Visibility.Collapsed;
-            //    }
-            //}
         }
         // Toggles Tags on/off
         private void ToggleTags(object sender)
@@ -373,13 +365,6 @@ namespace FamilyEditorInterface.WPF
             {
                 param.Visible = Properties.Settings.Default.ToggleVisibility;
             }
-            //foreach (Border b in FindVisualChildren<Border>(view))
-            //{
-            //    if (b.Tag != null && b.Tag.Equals("Tag"))
-            //    {
-            //        b.Visibility = b.Visibility == System.Windows.Visibility.Visible ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
-            //    }
-            //}
         }
         // Makes requiest, renames Parameters
         private void MakeRequest(RequestId request, List<string> values)

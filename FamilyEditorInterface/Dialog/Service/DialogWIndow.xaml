@@ -15,6 +15,9 @@
         <DataTemplate DataType="{x:Type alert:AlertDialogViewModel}">
             <alert:AlertDialogView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type alert:NotifyDialogViewModel}">
+            <alert:NotifyDialogView/>
+        </DataTemplate>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="Close" Executed="OnCloseExecuted" />
