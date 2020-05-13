@@ -2,6 +2,7 @@
 using System;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using FamilyEditorInterface.Associate;
 #endregion
 
 namespace FamilyEditorInterface
@@ -38,10 +39,20 @@ namespace FamilyEditorInterface
     /// Implements the Revit add-in interface IExternalCommand
     /// Associates parameter between two families
     /// </summary>
+    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
+    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
     public class CommandAssociateParameters : IExternalCommand
     {
         public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            UIApplication uiapp = commandData.Application;
+            Autodesk.Revit.ApplicationServices.Application App = uiapp.Application;
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Document doc = uidoc.Document;
+
+            WireParameters wire = new WireParameters(uidoc, doc);
+            wire.Wire();
+
             return Result.Succeeded;
         }
     }
@@ -49,6 +60,8 @@ namespace FamilyEditorInterface
     /// Implements the Revit add-in interface IExternalCommand
     /// Push parameters from the current family into a nested family
     /// </summary>
+    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
+    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
     public class CommandPushParameters : IExternalCommand
     {
         public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
@@ -60,6 +73,8 @@ namespace FamilyEditorInterface
     /// Implements the Revit add-in interface IExternalCommand
     /// Pulls Parameters from a nested family into the current family
     /// </summary>
+    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
+    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
     public class CommandPullParameters : IExternalCommand
     {
         public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
