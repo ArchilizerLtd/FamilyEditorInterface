@@ -15,10 +15,7 @@ namespace FamilyEditorInterface
     {
         public static String global_message;
 
-        public virtual Result Execute(
-          ExternalCommandData commandData,
-          ref string message,
-          ElementSet elements)
+        public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             if (Application.Started) return Result.Succeeded;
 
@@ -35,6 +32,39 @@ namespace FamilyEditorInterface
                 message = ex.Message;
                 return Result.Failed;
             }
+        }
+    }
+    /// <summary>
+    /// Implements the Revit add-in interface IExternalCommand
+    /// Associates parameter between two families
+    /// </summary>
+    public class CommandAssociateParameters : IExternalCommand
+    {
+        public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        {
+            return Result.Succeeded;
+        }
+    }
+    /// <summary>
+    /// Implements the Revit add-in interface IExternalCommand
+    /// Push parameters from the current family into a nested family
+    /// </summary>
+    public class CommandPushParameters : IExternalCommand
+    {
+        public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        {
+            return Result.Succeeded;
+        }
+    }
+    /// <summary>
+    /// Implements the Revit add-in interface IExternalCommand
+    /// Pulls Parameters from a nested family into the current family
+    /// </summary>
+    public class CommandPullParameters : IExternalCommand
+    {
+        public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        {
+            return Result.Succeeded;
         }
     }
 }

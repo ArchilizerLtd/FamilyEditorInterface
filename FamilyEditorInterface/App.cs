@@ -17,6 +17,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
+using AW = Autodesk.Windows;
 using System.Diagnostics;
 using FamilyEditorInterface.WPF;
 using Autodesk.Revit.DB.Events;
@@ -81,8 +82,60 @@ namespace FamilyEditorInterface
 
             RibbonPanel rvtRibbonPanel = PickPanel(application, panelName, tabName);
             ContextualHelp ch = new ContextualHelp(ContextualHelpType.Url, @helpFile);
-            
+                        
+            var buttons = GetStackButtons(ch); //Create the stack buttons
+
             CreatePushButton(rvtRibbonPanel, String.Format("Family Editor" + Environment.NewLine + "Interface"), thisAssemblyPath, "FamilyEditorInterface.Command", Message, "FamilyEditorInterface.Resources.icon_Families.png", ch);
+            CreateStackButtons(tabName, panelName, rvtRibbonPanel, buttons, thisAssemblyPath);
+        }
+        //Creates the local stack buttons for this application
+        private List<Button> GetStackButtons(ContextualHelp ch)
+        {
+            var buttons = new List<Button>()
+            {
+                new Button(){Name = "Associate Parameters",
+                    Image = "FamilyEditorInterface.Resources.icon_Associate Parameters.png",
+                    ToolTip = "Associate Parameters between two Families",
+                    ContextualHelp = ch,
+                    Text = "Associate Parameters",
+                    Command = "FamilyEditorInterface.CommandAssociateParameters"},
+
+                new Button(){Name = "Pull Parameters",
+                    Image = "FamilyEditorInterface.Resources.icon_Pull Parameters.png",
+                    ToolTip = "Pulls Parameters from a nested family into the current family",
+                    ContextualHelp = ch,
+                    Text = "Pull Parameters",
+                    Command = "FamilyEditorInterface.CommandPullParameters"},
+
+                new Button(){Name = "Push Parameters",
+                    Image = "FamilyEditorInterface.Resources.icon_Push Parameters.png",
+                    ToolTip = "Push parameters from the current family into a nested family",
+                    ContextualHelp = ch,
+                    Text = "Push Parameters",
+                    Command = "FamilyEditorInterface.CommandPushParameters"}
+            };
+
+            return buttons;
+        }
+        #endregion
+
+        #region Ribbon Helper Methods
+        //Pick existing or new panel
+        private RibbonPanel PickPanel(UIControlledApplication application, string panelName, string tabName)
+        {
+            List<RibbonPanel> panels = application.GetRibbonPanels();
+            RibbonPanel panel = null;
+
+            // Pick the correct panel
+            if (panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) == null)
+            {
+                panel = application.CreateRibbonPanel(tabName, panelName);
+            }
+            else
+            {
+                panel = panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) as RibbonPanel;
+            }
+            return panel;
         }
         //Create a pushbutton
         private static void CreatePushButton(RibbonPanel ribbonPanel, string name, string path, string command, string tooltip, string icon, ContextualHelp ch)
@@ -103,22 +156,73 @@ namespace FamilyEditorInterface
             pb.LargeImage = largeImage;
             pb.Image = smallImage;
         }
-        //Pick existing or new panel
-        private RibbonPanel PickPanel(UIControlledApplication application, string panelName, string tabName)
+        //Create stack column
+        private IList<RibbonItem> CreateStackButtons(string tabName, string panelName, RibbonPanel ribbonPanel, List<Button> buttons, string path)
         {
-            List<RibbonPanel> panels = application.GetRibbonPanels();
-            RibbonPanel panel = null;
+            PushButtonData[] buttonData = new PushButtonData[3];
+            string [] buttonNames = new string[3];
 
-            // Pick the correct panel
-            if (panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) == null)
+            int index = 0;
+
+            foreach (var button in buttons)
             {
-                panel = application.CreateRibbonPanel(tabName, panelName);
+                PushButtonData data = new PushButtonData(button.Name, button.Text, path, button.Command);
+                data.ToolTip = button.ToolTip;
+                data.SetContextualHelp(button.ContextualHelp);
+
+                BitmapIcons bitmapIcons = new BitmapIcons(assembly, button.Image, MyApplication);
+                var largeImage = bitmapIcons.LargeBitmap();
+                var smallImage = bitmapIcons.SmallBitmap();
+                data.LargeImage = largeImage;
+                data.Image = smallImage;
+
+                buttonData[index] = data;
+                buttonNames[index] = button.Name;
+
+                index++;
             }
-            else
+
+            IList<RibbonItem> ribbonItem = ribbonPanel.AddStackedItems(buttonData[0], buttonData[1], buttonData[2]);
+            SupressStackButtonText(tabName, panelName, buttonNames);
+
+            return ribbonItem;
+        }
+        //This is hacky and experimental method to suppors the Text of stack buttons
+        private void SupressStackButtonText(string tab, string panel, string [] buttonNames)
+        {
+            // Find Autodes.Windows.RibbonItems
+            var btnTest1 = GetButton(tab, panel, buttonNames[0]);
+            var btnTest2 = GetButton(tab, panel, buttonNames[1]);
+            var btnTest3 = GetButton(tab, panel, buttonNames[2]);
+
+            // Set Size and Text Visibility
+            btnTest1.Size = AW.RibbonItemSize.Standard;
+            btnTest1.ShowText = false;
+            btnTest2.Size = AW.RibbonItemSize.Standard;
+            btnTest2.ShowText = false;
+            btnTest3.Size = AW.RibbonItemSize.Standard;
+            btnTest3.ShowText = false;
+        }
+        //Hacky way to get a ribbon item, not supported officially
+        public AW.RibbonItem GetButton(string tabName, string panelName, string itemName)
+        {
+            AW.RibbonControl ribbon = AW.ComponentManager.Ribbon;
+            foreach (AW.RibbonTab tab in ribbon.Tabs)
             {
-                panel = panels.FirstOrDefault(x => x.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) as RibbonPanel;
+                if (tab.Name == tabName)
+                {
+                    foreach (AW.RibbonPanel panel in tab.Panels)
+                    {
+                        if (panel.Source.Title == panelName)
+                        {
+                            return panel.FindItem("CustomCtrl_%CustomCtrl_%"
+                              + tabName + "%" + panelName + "%" + itemName,
+                              true) as AW.RibbonItem;
+                        }
+                    }
+                }
             }
-            return panel;
+            return null;
         }
         #endregion
 
@@ -173,5 +277,15 @@ namespace FamilyEditorInterface
             Control.DocumentClosed();
         }
         #endregion
+    }
+
+    public class Button
+    {
+        public string Name { get; set; }
+        public string Image { get; set; }
+        public string Text { get; internal set; }
+        public string Command { get; internal set; }
+        public string ToolTip { get; internal set; }
+        public ContextualHelp ContextualHelp { get; internal set; }
     }
 }
