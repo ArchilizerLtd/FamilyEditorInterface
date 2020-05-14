@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace FamilyEditorInterface
@@ -79,6 +80,24 @@ namespace FamilyEditorInterface
             }
             return p;
         }
+        /// <summary>
+        /// Retuns human-readable ParameterGroup name
+        /// </summary>
+        /// <param name="parameterGroup"></param>
+        /// <returns></returns>
+        internal static string GetReadableGroupName(BuiltInParameterGroup parameterGroup)
+        {
+            TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+            string value = parameterGroup.ToString().Replace("PG_", "");
+
+            if (value.Equals("INVALID")) return "Other";    //Special case
+
+            value = value.Replace("_", " ");
+            value = textInfo.ToTitleCase(value);
+
+            return value;
+        }
+
         /// <summary>
         /// Revit to UI units
         /// </summary>

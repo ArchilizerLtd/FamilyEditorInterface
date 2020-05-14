@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +58,8 @@ namespace FamilyEditorInterface.Associate
 		//UI Call
 		private void GetPushParamters()
 		{
+			ParameterSelectorViewModel vm = new ParameterSelectorViewModel(famParameters);
+			vm.Show();
 			//UI - Get Push Parameters
 			//if (famParam.Definition.Name.Equals(paramName)) paramToPush = famParam;
 		}

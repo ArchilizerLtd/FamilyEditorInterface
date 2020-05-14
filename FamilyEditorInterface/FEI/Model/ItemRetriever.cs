@@ -24,7 +24,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             FamilyParameterModel newItem = new FamilyParameterModel(); //Create new FamilyParamterModel
             newItem.Precision = Properties.Settings.Default.Precision;  //The precision set by the User in the Settings
             newItem.Name = fp.Definition.Name;  //The name of the Parameter
-            newItem.StorageType = fp.StorageType;
+            newItem.StorageType = fp.StorageType; 
             newItem.ParamType = GetParameterType(fp);
             newItem.DisplayUnitType = GetDisplayUnitType(fp);   //Set the DisplayUnitType for this parameter
             newItem.Type = fp.Definition.ParameterType.ToString();  //The parameter type

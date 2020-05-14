@@ -77,6 +77,21 @@
         <Setter Property="Foreground" Value="{StaticResource ButtonColor}"/>
     </Style>
 
+    <Style x:Key="ListBoxTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MessageTextBlockStyle}">
+        <Setter Property="LineHeight" Value="Auto"/>
+        <Setter Property="Foreground" Value="#1A1A1A"></Setter>
+        <Style.Triggers>
+            <!--Triggers for the IsSelected Property to check selection status-->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                <Setter Property="Foreground" Value="White"></Setter>
+            </DataTrigger>
+            <!--Triggers for the IsMouseOver Property to check focus status-->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                <Setter Property="Foreground" Value="Black"></Setter>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <!--UI Buttons-->
     <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
     <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
@@ -167,7 +182,141 @@
         </Style.Triggers>
     </Style>
 
+    <!--Control Colors-->
+    <Color x:Key="ControlLightColor">Transparent</Color>
+    <Color x:Key="DisabledControlLightColor">#B937EE</Color>
+    <!--Not used-->
 
+    <Color x:Key="ControlAlternationColor">#EAEAEA</Color>
+    <!--Alternating Color-->
+    <Color x:Key="MouseOverNotSelectedColor">#FFE08B</Color>
+    <!--MouseOver-->
+    <Color x:Key="MouseOverSelectedColor">#C9C9C9</Color>
+    <!--Pressed-->
+    <Color x:Key="SelectedFocusedColor">#0D6CD3</Color>
+    <!--Selected Passive-->
+
+    <!--Border colors-->
+    <Color x:Key="BorderMediumColor">#B2B5B6</Color>
+
+    <!--ListBox-->
+    <Style x:Key="{x:Type ListBox}"
+       TargetType="ListBox">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
+        <Setter Property="MinWidth" Value="120" />
+        <Setter Property="MinHeight" Value="95" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBox">
+                    <Border Name="Border" BorderThickness="0" CornerRadius="0">
+                        <Border.Background>
+                            <SolidColorBrush Color="{StaticResource ControlLightColor}" />
+                        </Border.Background>
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="{StaticResource BorderMediumColor}" />
+                        </Border.BorderBrush>
+                        <ScrollViewer Margin="0" Focusable="false">
+                            <StackPanel Margin="0" IsItemsHost="True" />
+                        </ScrollViewer>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource DisabledControlLightColor}" />
+                                    <!--Not working?-->
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="Border" Property="BorderBrush">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{DynamicResource DisabledBorderLightColor}" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsGrouping" Value="true">
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="{x:Type ListBoxItem}" TargetType="ListBoxItem">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="Border" Padding="8" SnapsToDevicePixels="true" BorderThickness="0.5" Margin="-0.5 -0.5 0 -0.5">
+                        <Border.Background>
+                            <SolidColorBrush Color="Transparent" />
+                            <!--Default Contorl Color-->
+                        </Border.Background>
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="{StaticResource BorderMediumColor}" />
+                        </Border.BorderBrush>
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource ControlAlternationColor}" />
+                                    <!-- Alternating (Every other item) Color-->
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource DisabledControlLightColor}" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="true">
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource SelectedFocusedColor}" />
+                                    <!--Selected Color-->
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsSelected" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource MouseOverSelectedColor}"/>
+                                    <!--Mouse Over-->
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsSelected" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource MouseOverNotSelectedColor}"/>
+                                    <!--Mouse Over Not Selected-->
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    
     <!--Separators-->
     <Style x:Key="SimpleSeparatorStyle" TargetType="{x:Type Separator}">
         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>

@@ -20,7 +20,6 @@ namespace FamilyEditorInterface.Resources.WPF.ViewModel
         public RequestHandler handler;
         public ExternalEvent exEvent;
 
-
         #region Form
         //Show the UI
         public void Show(ViewActivatedEventArgs e)

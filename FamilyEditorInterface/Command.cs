@@ -66,6 +66,14 @@ namespace FamilyEditorInterface
     {
         public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            UIApplication uiapp = commandData.Application;
+            Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Document doc = uidoc.Document;
+
+            PushParameters push = new PushParameters(app, uidoc, doc);
+            //push.Push();
+
             return Result.Succeeded;
         }
     }
