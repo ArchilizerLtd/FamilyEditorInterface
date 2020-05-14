@@ -27,7 +27,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <DockPanel HorizontalAlignment="Stretch">
-                        <TextBlock Style="{StaticResource ListBoxTextBlockStyle}" Margin="10 0" Text="{Binding Category}" DockPanel.Dock="Right"/>
+                        <TextBlock Style="{StaticResource ListBoxTextBlockStyle}" Margin="10 0" Text="{Binding Group}" DockPanel.Dock="Right"/>
                         <TextBlock Style="{StaticResource ListBoxTextBlockStyle}" Margin="5 0" Text="{Binding Name}" DockPanel.Dock="Left" FontSize="14" FontWeight="Regular"/>
                     </DockPanel>
                 </DataTemplate>

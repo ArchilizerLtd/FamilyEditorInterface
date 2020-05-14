@@ -51,7 +51,7 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
             foreach(var par in revitParameters)
             {
                 if (par.Id.IntegerValue < 0) continue; //Skip built-in parameters
-                models.Add(new ParameterSelectorModel() { Name = par.Definition.Name, Group = par.Definition.ParameterGroup.ToString(), Parameter = par });
+                models.Add(new ParameterSelectorModel() { Name = par.Definition.Name, Group = Utils.GetReadableGroupName(par.Definition.ParameterGroup), Parameter = par });
             }
 
             return new ObservableCollection<ParameterSelectorModel>(models);

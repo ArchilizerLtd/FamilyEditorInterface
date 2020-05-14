@@ -93,7 +93,7 @@ namespace FamilyEditorInterface
             if (value.Equals("INVALID")) return "Other";    //Special case
 
             value = value.Replace("_", " ");
-            value = textInfo.ToTitleCase(value);
+            value = textInfo.ToTitleCase(value.ToLower());
 
             return value;
         }
