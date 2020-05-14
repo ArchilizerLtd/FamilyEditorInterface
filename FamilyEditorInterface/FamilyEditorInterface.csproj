@@ -185,6 +185,11 @@
     <EmbeddedResource Include="Resources\icon_Pull Parameters.png" />
     <EmbeddedResource Include="Resources\icon_Push Parameters.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Associate\WPFSelectParameters\Model\" />
+    <Folder Include="Associate\WPFSelectParameters\ViewModel\" />
+    <Folder Include="Associate\WPFSelectParameters\View\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterClean">
     <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2015\AutodeskRibbonTemplate.addin" />
