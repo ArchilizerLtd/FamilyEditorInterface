@@ -22,7 +22,7 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ListBox AlternationCount="2" x:Name="listBox" ItemsSource="{Binding Parameters}" 
+        <ListBox AlternationCount="2" x:Name="propertiesListBox" ItemsSource="{Binding Parameters}" 
                  SelectionMode="Extended" Grid.Row="0">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -33,6 +33,6 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ListBox>
-        <Button Margin="20" x:Name="btnDialogOk" Style="{DynamicResource SimpleButtonStyle}" Grid.Row="1" Content="Close" HorizontalAlignment="Stretch" Height="30"/>
+        <Button Margin="20" x:Name="btnDialogOk" Style="{DynamicResource SimpleButtonStyle}" Grid.Row="1" Content="Push" Command="{Binding CloseCommand}" HorizontalAlignment="Stretch" Height="30"/>
     </Grid>
 </Window>

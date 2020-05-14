@@ -26,5 +26,10 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.View
 
             InitializeComponent();
         }
+
+        private void BtnDialogOk_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }
