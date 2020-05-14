@@ -72,7 +72,7 @@ namespace FamilyEditorInterface
             Document doc = uidoc.Document;
 
             PushParameters push = new PushParameters(app, uidoc, doc);
-            //push.Push();
+            push.Push();
 
             return Result.Succeeded;
         }

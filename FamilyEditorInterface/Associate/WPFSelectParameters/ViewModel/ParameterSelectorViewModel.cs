@@ -20,6 +20,7 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
 
         public ICommand CloseCommand { get; set; }  //Close Command
         private List<FamilyParameter> revitParameters;  //Contains all the Revit parameters in the current Family
+        public List<FamilyParameter> selectedParameters { get; internal set; }  //Contains all selected family parameters
 
         private ObservableCollection<ParameterSelectorModel> _parameters;
         public ObservableCollection<ParameterSelectorModel> Parameters
@@ -34,6 +35,7 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
                 RaisePropertyChanged("Parameters");
             }
         }
+
         #endregion
 
         #region Constructors & Initializers
@@ -56,13 +58,6 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
         #endregion
 
         #region Methods
-        //Close the View and save the selected Family Paramters
-        private void Close(string v)
-        {
-            var selectedItems = view.propertiesListBox.SelectedItems;
-            view.Close();
-        }
-
         //Populates the list (ObservableCollection) of Models to display in the UI
         private ObservableCollection<ParameterSelectorModel> PopulateParameters()
         {
@@ -79,11 +74,15 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
         #endregion
 
         #region View
-        /// <summary>
-        /// Terminates the View
-        /// </summary>
-        internal void Close()
+        //Close the View and save the selected Family Paramters
+        private void Close(string v)
         {
+            var selectedItems = view.propertiesListBox.SelectedItems;
+            selectedParameters = new List<FamilyParameter>();
+            foreach(var item in selectedItems)
+            {
+                selectedParameters.Add((item as ParameterSelectorModel).Parameter);
+            }
             view.Close();
         }
         /// <summary>
@@ -93,11 +92,11 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
         public void Show()
         {
             view = new ParameterSelectorView(this);
-            System.Windows.Interop.WindowInteropHelper x = new System.Windows.Interop.WindowInteropHelper(view);
+            //System.Windows.Interop.WindowInteropHelper x = new System.Windows.Interop.WindowInteropHelper(view);
             //x.Owner = hWndRevit.Handle;
             try
             {
-                view.Show();
+                view.ShowDialog();
             }
             catch (Exception ex)
             {

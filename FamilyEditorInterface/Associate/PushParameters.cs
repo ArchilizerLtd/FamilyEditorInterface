@@ -60,6 +60,7 @@ namespace FamilyEditorInterface.Associate
 		{
 			ParameterSelectorViewModel vm = new ParameterSelectorViewModel(famParameters);
 			vm.Show();
+			pushParameters = vm.selectedParameters;
 			//UI - Get Push Parameters
 			//if (famParam.Definition.Name.Equals(paramName)) paramToPush = famParam;
 		}
@@ -81,7 +82,10 @@ namespace FamilyEditorInterface.Associate
 			{
 				foreach (FamilyParameter paramToPush in pushParameters)
 				{
-					sharedParam = GetSharedParameter(app, paramToPush.Definition.Name); //This only returns if a paramter is shared though ... messy messy
+					if(paramToPush.IsShared)
+					{
+						sharedParam = GetSharedParameter(app, paramToPush.Definition.Name); //This only returns if a paramter is shared though ... messy messy
+					}
 					ExecuteSharedPushParamters(sel, sharedParam, paramToPush);
 				}
 			}
@@ -98,10 +102,19 @@ namespace FamilyEditorInterface.Associate
 			var pushFamDoc = doc.EditFamily(pushFamily);    //Open the family
 
 			RemoveExistingParameter(pushFamDoc, paramToPush);   //Remove the existing project parameter 
-			AddSharedParameter(pushFamDoc, paramToPush);    //To replace it with a Shared Parameter
+			if(sharedParam != null)
+			{
+				AddSharedParameter(pushFamDoc, paramToPush);    //To replace it with a Shared Parameter
+			}
+			else
+			{
+				AddParameter(pushFamDoc, paramToPush);
+			}
 			LoadBackFamily(pushFamDoc, pushFamily);
 			AssociateParameters(pushFamInstance, paramToPush);
 		}
+
+
 		//Associate the parameters
 		private void AssociateParameters(FamilyInstance pushFamInstance, FamilyParameter paramToPush)
 		{
@@ -127,6 +140,21 @@ namespace FamilyEditorInterface.Associate
 				pushFamily = pushFamDoc.LoadFamily(doc, new FamilyOption());
 				t.Commit();
 			}
+		}
+		//Creates a regular parameter
+		private void AddParameter(Document pushFamDoc, FamilyParameter paramToPush)
+		{
+			// Add the parameter to the family
+			try
+			{
+				using (Transaction ft = new Transaction(pushFamDoc, "Push parameter"))
+				{
+					ft.Start();
+					pushFamDoc.FamilyManager.AddParameter(paramToPush.Definition.Name, paramToPush.Definition.ParameterGroup, paramToPush.Definition.ParameterType, paramToPush.IsInstance);
+					ft.Commit();
+				}
+			}
+			catch (Exception) { }
 		}
 		//Adds a parameter as a SharedParemter
 		private void AddSharedParameter(Document pushFamDoc, FamilyParameter paramToPush)
@@ -178,7 +206,7 @@ namespace FamilyEditorInterface.Associate
 					 where d.Name == name
 					 select d);
 
-			if (v == null || v.Count() < 1) throw new Exception("Invalid Name Input!");
+			if (v == null || v.Count() < 1) return null;	//There is no Shared parameter with this name
 
 			ExternalDefinition def = v.First();
 			return def;
