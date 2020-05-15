@@ -75,7 +75,7 @@ namespace FamilyEditorInterface.Associate
 			if (!doc.IsFamilyDocument) return;  //Only execute in FamilyDocument
 			if (pushParameters == null) return; //No parameter to be pushed, return
 
-			var selection = uidoc.Selection.PickObjects(ObjectType.Element, "Pick family to push to");  //Select a family, Revit user interface
+			var selection = Utils.PickObjects(uidoc, "Pick families to push parameters to.");  //Select a family, Revit user interface
 			if (selection == null) return;  //If the user did not select (escaped), return
 
 			foreach (Reference sel in selection)
@@ -108,11 +108,11 @@ namespace FamilyEditorInterface.Associate
 		{
 			//If the parameter already exists, remove the parameter before adding it again
 			//Issue a warning maybe? Or skip this?
-			try
+			using (Transaction ft = new Transaction(nestedFamilyDocument, "Remove parameter"))
 			{
-				using (Transaction ft = new Transaction(nestedFamilyDocument, "Push parameter"))
+				ft.Start();
+				try
 				{
-					ft.Start();
 					foreach (FamilyParameter famparam in nestedFamilyDocument.FamilyManager.Parameters)   //Go through each parameter in the push document
 					{
 						if (famparam.Definition.Name.Equals(paramToPush.Definition.Name))
@@ -121,11 +121,10 @@ namespace FamilyEditorInterface.Associate
 							break;
 						}
 					}
-
-					ft.Commit();
 				}
+				catch (Exception) { }
+				ft.Commit();
 			}
-			catch (Exception) { }
 		}
 		//Adds a Project or Shared Parameter depending on the original parameter to be pushed
 		private void AddParameter(Document nestedFamilyDocument, FamilyParameter parameterToPush)

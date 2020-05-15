@@ -104,6 +104,9 @@ namespace FamilyEditorInterface
 
             if (!Utils.CheckFamilyDocument(doc)) return Result.Cancelled;    //The method should only be used inside a FamilyDocument
 
+            PullParameters pull = new PullParameters(app, uidoc, doc);
+            pull.Pull();
+
             return Result.Succeeded;
         }
     }

@@ -56,9 +56,9 @@ namespace FamilyEditorInterface.Associate
         /// </summary>
         public void Wire()
         {
-			if (!doc.IsFamilyDocument || !famParam.Any()) return;	//Only work in Family Document that has parameters to associate with
+			if (!doc.IsFamilyDocument || !famParam.Any()) return;   //Only work in Family Document that has parameters to associate with
 
-			var wireFamily = uidoc.Selection.PickObject(ObjectType.Element, "Pick Object"); //Get the family to associate to 
+			var wireFamily = Utils.PickObject(uidoc, "Pick a Nested Family."); //Get the family to associate to 
 			if (wireFamily == null) return;
 			var fam = doc.GetElement(wireFamily) as FamilyInstance;
 

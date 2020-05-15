@@ -1,4 +1,6 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 using Dialog.Alerts;
 using Dialog.Service;
 using System;
@@ -103,6 +105,34 @@ namespace FamilyEditorInterface
                 Alert("Warning", "Not a Family Document.");
                 return false;
             }
+        }
+        /// <summary>
+        /// Executes Revit Selection.PickObject and catches user cancel exception
+        /// </summary>
+        /// <param name="uidoc">Current UI Document</param>
+        /// <param name="message">The message for PickObject</param>
+        /// <returns></returns>
+        internal static Reference PickObject(UIDocument uidoc, string message)
+        {
+            try
+            {
+               return uidoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element, message);
+            }
+            catch(Exception) { return null; }
+        }
+        /// <summary>
+        /// Executes Revit Selection.PickObjects and catches user cancel exception
+        /// </summary>
+        /// <param name="uidoc"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        internal static IList<Reference> PickObjects(UIDocument uidoc, string message)
+        {
+            try
+            {
+               return uidoc.Selection.PickObjects(ObjectType.Element, message);
+            }
+            catch (Exception) { return null; }
         }
         /// <summary>
         /// UI to Revit internal unit values
