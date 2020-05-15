@@ -1,10 +1,15 @@
 ﻿using Autodesk.Revit.DB;
+using Dialog.Alerts;
+using Dialog.Service;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace FamilyEditorInterface
 {
+
+    #region Random
     public class SingleRandom : Random
     {
         static SingleRandom _Instance;
@@ -19,6 +24,8 @@ namespace FamilyEditorInterface
 
         private SingleRandom() { }
     }
+    #endregion
+
     public static class Utils
     {
         private static DisplayUnitType DUT;
@@ -33,6 +40,23 @@ namespace FamilyEditorInterface
                 DUT = DisplayUnitType.DUT_DECIMAL_FEET;
             }
         }
+        #region Dialogs
+        public static void Alert(string title, List<Message> note)
+        {
+            var dialog = new AlertDialogViewModel(title, note);
+            var result = new DialogService().OpenDialog(dialog);
+        }
+        public static void Alert(string title, string message)
+        {
+            var dialog = new AlertDialogViewModel(title, message);
+            var result = new DialogService().OpenDialog(dialog);
+        }
+        public static void Notify(string title, string message)
+        {
+            var dialog = new NotifyDialogViewModel(title, message);
+            var result = new DialogService().OpenDialog(dialog);
+        }
+        #endregion
         /// <summary>
         /// UI to Revit internal unit values
         /// </summary>
@@ -50,6 +74,19 @@ namespace FamilyEditorInterface
         public static double convertValueFROM(double p)
         {
             return GetDutValueFrom(DUT, p);
+        }
+        /// <summary>
+        /// Checks if the document is a Family Document and issues a Warning if it isn't
+        /// </summary>
+        /// <param name="doc"></param>
+        internal static bool CheckFamilyDocument(Document doc)
+        {
+            if (doc.IsFamilyDocument) return true;
+            else
+            {
+                Alert("Warning", "Not a Family Document.");
+                return false;
+            }
         }
         /// <summary>
         /// UI to Revit internal unit values

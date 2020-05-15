@@ -50,6 +50,8 @@ namespace FamilyEditorInterface
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uidoc.Document;
 
+            if(!Utils.CheckFamilyDocument(doc)) return Result.Cancelled;
+
             WireParameters wire = new WireParameters(uidoc, doc);
             wire.Wire();
 

@@ -17,15 +17,19 @@ namespace FamilyEditorInterface.Associate
     public class WireParameters
     {
         #region Properties & Fields
-        private enum ParamType { Type, Instance }
-		private UIDocument uidoc;	
-		private Document doc;
-		private FamilyManager familyManager;
-		private SortedList<string, FamilyParameter> famParam;
+        private enum ParamType { Type, Instance }	//Parameter type enum; type or instance
+		private UIDocument uidoc;	//Current Revit UIDocument
+		private Document doc;   //Active Revit (Family) Document 
+		private FamilyManager familyManager;	//FamilyManager of the Family Document. Contains all Parameter related information and manipulation methods
+		private SortedList<string, FamilyParameter> famParam;	//Contains all Parameters in the current Family in an orderred fashion
         #endregion
 
         #region Constructors & Initializers
-        //Constructor
+        /// <summary>
+		/// Public Constructor. Will Initialize the Class
+		/// </summary>
+		/// <param name="uidoc">Current Revit UI Document</param>
+		/// <param name="doc">Active Revit Family Document</param>
         public WireParameters(UIDocument uidoc, Document doc)
         {
 			this.uidoc = uidoc;
