@@ -24,17 +24,19 @@
                 VerticalAlignment="Top" HorizontalAlignment="Right" />
         <StackPanel Orientation="Horizontal" Grid.Row="1" VerticalAlignment="Top" Margin="20 0">
             <Label x:Name="warningIcon" Content="{StaticResource WarningIcon}" VerticalAlignment="Top"/>
-            <TextBlock Text="{Binding Message}" Style="{StaticResource MessageTextBlockStyle}" LineHeight="Auto" VerticalAlignment="Center" FontSize="10"/>
-            <ItemsControl ItemsSource="{Binding Note}" VerticalAlignment="Top" Margin="15 5 5 15" MinWidth="300">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="0 0 0 10">
-                            <TextBlock Text="{Binding Bold}" Style="{StaticResource MessageTextBlockStyle}" FontWeight="Bold" FontSize="14"/>
-                            <TextBlock Text="{Binding Body}" Style="{StaticResource MessageTextBlockStyle}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <StackPanel Orientation="Vertical" Margin="15 5 5 15">
+                <TextBlock Text="{Binding Message}" Style="{StaticResource MessageTextBlockStyle}" LineHeight="Auto" VerticalAlignment="Center" Margin="0 0 0 10"/>
+                <ItemsControl ItemsSource="{Binding Note}" VerticalAlignment="Top" MinWidth="300">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" Margin="0 0 0 10">
+                                <TextBlock Text="{Binding Bold}" Style="{StaticResource MessageTextBlockStyle}" FontWeight="Bold" FontSize="14"/>
+                                <TextBlock Text="{Binding Body}" Style="{StaticResource MessageTextBlockStyle}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

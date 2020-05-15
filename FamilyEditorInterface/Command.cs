@@ -19,13 +19,18 @@ namespace FamilyEditorInterface
         public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             if (Application.Started) return Result.Succeeded;
-
             try
             {
                 Application.App = commandData.Application;
-                Application.Control.ShowForm();
-                Application.Started = true;
-                return Result.Succeeded;
+                if (Application.Control.ShowForm()) //If the Document is not a FamilyDocument, the app shouldn't start
+                {
+                    Application.Started = true;
+                    return Result.Succeeded;
+                }
+                else
+                {
+                    return Result.Failed;
+                }
             }
             catch (Exception ex)
             {
@@ -50,7 +55,7 @@ namespace FamilyEditorInterface
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uidoc.Document;
 
-            if(!Utils.CheckFamilyDocument(doc)) return Result.Cancelled;
+            if(!Utils.CheckFamilyDocument(doc)) return Result.Cancelled;    //The method should only be used inside a FamilyDocument
 
             WireParameters wire = new WireParameters(uidoc, doc);
             wire.Wire();
@@ -72,6 +77,8 @@ namespace FamilyEditorInterface
             Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uidoc.Document;
+            
+            if (!Utils.CheckFamilyDocument(doc)) return Result.Cancelled;    //The method should only be used inside a FamilyDocument
 
             PushParameters push = new PushParameters(app, uidoc, doc);
             push.Push();
@@ -89,6 +96,14 @@ namespace FamilyEditorInterface
     {
         public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+
+            UIApplication uiapp = commandData.Application;
+            Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Document doc = uidoc.Document;
+
+            if (!Utils.CheckFamilyDocument(doc)) return Result.Cancelled;    //The method should only be used inside a FamilyDocument
+
             return Result.Succeeded;
         }
     }

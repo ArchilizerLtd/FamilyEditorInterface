@@ -141,17 +141,6 @@ namespace FamilyEditorInterface.WPF
             _dialogService = new DialogService();
 
         }
-        
-        public static void Alert(string title, List<Message> note)
-        {
-            var dialog = new AlertDialogViewModel(title, note);
-            var result = _dialogService.OpenDialog(dialog);
-        }
-        public static void Notify(string title, string message)
-        {
-            var dialog = new NotifyDialogViewModel(title, message);
-            var result = _dialogService.OpenDialog(dialog);
-        }
         #endregion
 
         #region Main Methods
@@ -344,8 +333,7 @@ namespace FamilyEditorInterface.WPF
 
             if (values.Count > 0)
             {
-                Alert("Alert", new List<Message>() { new Message("Warning!", $"{values.Count.ToString()} Parameters will be removed.")});
-                //System.Windows.Forms.MessageBox.Show(string.Format());
+                Utils.Alert("Alert", new List<Message>() { new Message("Warning!", $"{values.Count.ToString()} Parameters will be removed.")});
                 MakeRequest(RequestId.DeleteId, values);
             }
         }

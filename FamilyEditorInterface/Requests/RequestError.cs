@@ -28,14 +28,14 @@ namespace FamilyEditorInterface.Requests
         /// </summary>
         public static void Notify()
         {
-            FamilyParameterViewModel.Notify("Notify", NotifyLog);
+            Utils.Notify("Notify", NotifyLog);
         }
         /// <summary>
         /// Will alert the user through the alert dialog box
         /// </summary>
         public static void ReprotError()
         {
-            FamilyParameterViewModel.Alert("Alert", ErrorLog);
+            Utils.Alert("Alert", ErrorLog);
         }
         /// <summary>
         /// Resets all message logs

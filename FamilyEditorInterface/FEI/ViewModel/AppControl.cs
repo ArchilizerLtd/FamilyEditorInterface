@@ -32,7 +32,7 @@ namespace FamilyEditorInterface.Resources.WPF.ViewModel
             CheckDoc(e);
         }
         //De-facto the command is here. Will either be started on start (duh) or activated when switched back to a Family Document
-        public void ShowForm()
+        public bool ShowForm()
         {
             GetRevitHandle();
 
@@ -43,8 +43,8 @@ namespace FamilyEditorInterface.Resources.WPF.ViewModel
                 {
                     if (!Application.App.ActiveUIDocument.Document.IsFamilyDocument)
                     {
-                        TaskDialog.Show("Error", "Usable only in Family Documents");
-                        return;
+                        Utils.Alert("Error", "Usable only in Family Documents");
+                        return false;
                     }
                     
                     handler = new RequestHandler(); //new handler                    
@@ -61,8 +61,10 @@ namespace FamilyEditorInterface.Resources.WPF.ViewModel
                     TaskDialog.Show("Error", ex.Message);
                     _presenter.Dispose();
                     _presenter = null;
+                    return false;
                 }
             }
+            return true;
         }
         //Stop FamilyEditorInterface execution
         private void Stop(object sender, EventArgs e)
