@@ -21,17 +21,21 @@ namespace FamilyEditorInterface.Associate
 	public class PushParameters
 	{
 		#region Properties & Fields
-		private Autodesk.Revit.ApplicationServices.Application app;
-		private UIDocument uidoc;
-		private Document doc;
-		private FamilyManager familyManager;
-		private List<FamilyParameter> famParameters;
-		private List<FamilyParameter> pushParameters = null;
-		private ExternalDefinition sharedParam = null;
+		private Autodesk.Revit.ApplicationServices.Application app;	//Revit Application
+		private UIDocument uidoc;	//Current Revit UIDocument
+		private Document doc;	//Active (Family) Document
+		private FamilyManager familyManager;	//The FamilyManager of this Document. Contains everything about Parameters
+		private List<FamilyParameter> familyParameters;	//Contains all FamilyParameters in the current Document
+		private List<FamilyParameter> pushParameters = null;	//User selected list of parameters to be pushed in the selected Nested family
 		#endregion
 
 		#region Constructors & Initializers
-		//Constructor
+		/// <summary>
+		/// The public constructor. Initializes starting parameters
+		/// </summary>
+		/// <param name="app">Revit Application</param>
+		/// <param name="uidoc">Current Revit UIDocument</param>
+		/// <param name="doc">Active (Family) Document</param>
 		public PushParameters(Autodesk.Revit.ApplicationServices.Application app, UIDocument uidoc, Document doc)
 		{
 			this.app = app;
@@ -40,81 +44,144 @@ namespace FamilyEditorInterface.Associate
 
 			Initialize();
 		}
-
+		//Initializes starting parameters
 		private void Initialize()
 		{
 			familyManager = doc.FamilyManager;
-			famParameters = new List<FamilyParameter>();
+			familyParameters = new List<FamilyParameter>();
 
-			var parameters = familyManager.Parameters;
-
-			foreach (FamilyParameter famParam in parameters)
+			foreach (FamilyParameter famParam in familyManager.Parameters)
 			{
-				famParameters.Add(famParam);
+				familyParameters.Add(famParam);	//Fills in all FamilyParameters in the current document
 			}
 
 			GetPushParamters(); //User Select all parameters to be transfered
 		}
-		//UI Call
+		//Envokes the UI to select FamilyParameters to be pushed
 		private void GetPushParamters()
 		{
-			ParameterSelectorViewModel vm = new ParameterSelectorViewModel(famParameters);
-			vm.Show();
-			pushParameters = vm.selectedParameters;
-			//UI - Get Push Parameters
-			//if (famParam.Definition.Name.Equals(paramName)) paramToPush = famParam;
+			var vm = new ParameterSelectorViewModel(familyParameters);	//Initializes a new view and passes in this ViewModel as a DataContext
+			vm.Show();	//Show the UI
+			pushParameters = vm.selectedParameters;	//Collect all user-selected parameters
 		}
 		#endregion
 
-		#region Methods
+		#region Public Methods
 		/// <summary>
-		/// The main method. Pushes selected parameters into a nested family
+		/// The Main method. Pushes selected parameters into a nested family
 		/// </summary>
 		public void Push()
 		{
 			if (!doc.IsFamilyDocument) return;  //Only execute in FamilyDocument
-			if (pushParameters == null) return; //Couldn't find it
+			if (pushParameters == null) return; //No parameter to be pushed, return
 
-			var selection = uidoc.Selection.PickObjects(ObjectType.Element, "Pick family to push to");  //Select a family
-			if (selection == null) return;
+			var selection = uidoc.Selection.PickObjects(ObjectType.Element, "Pick family to push to");  //Select a family, Revit user interface
+			if (selection == null) return;  //If the user did not select (escaped), return
 
 			foreach (Reference sel in selection)
 			{
+				var familyInstance = doc.GetElement(sel.ElementId) as FamilyInstance;	//Cast the current selection as a FamilyInstance
+				if (familyInstance == null) continue;	//If the selection is not a family instance, skip
+
 				foreach (FamilyParameter paramToPush in pushParameters)
 				{
-					if(paramToPush.IsShared)
-					{
-						sharedParam = GetSharedParameter(app, paramToPush.Definition.Name); //This only returns if a paramter is shared though ... messy messy
-					}
-					ExecuteSharedPushParamters(sel, sharedParam, paramToPush);
+					ExecutePushParamters(familyInstance, paramToPush);	//Execute Push Parameter for each Selection and each Selected Paramter
 				}
 			}
 		}
-		//TO DO: Clean the mess
-		//TO DO: Replace with SubTransactions if possible?
-		//We will be pushing paramters from the current family into the Nested family
-		//The parameter will be a shared parameter
-		//Therefore, if the parameter already exists, we will remove it  first
-		private void ExecuteSharedPushParamters(Reference selection, ExternalDefinition sharedParam, FamilyParameter paramToPush)
-		{
-			var pushFamInstance = doc.GetElement(selection.ElementId) as FamilyInstance;
-			var pushFamily = pushFamInstance.Symbol.Family; //Get the family from the selection
-			var pushFamDoc = doc.EditFamily(pushFamily);    //Open the family
+        #endregion
 
-			RemoveExistingParameter(pushFamDoc, paramToPush);   //Remove the existing project parameter 
-			if(sharedParam != null)
+        #region Internal Methods
+        //Push parameter into selected FamilyInstance
+        private void ExecutePushParamters(FamilyInstance familyInstance, FamilyParameter parameterToPush)
+		{
+			var nestedFamily = familyInstance.Symbol.Family; //Get the family from the selection
+			var nestedFamilyDocument = doc.EditFamily(nestedFamily);    //Open the family
+
+			RemoveExistingParameter(nestedFamilyDocument, parameterToPush);   //Remove the existing project parameter 
+			AddParameter(nestedFamilyDocument, parameterToPush);	//Add the Parameter to the Nested Family
+			LoadBackFamily(nestedFamilyDocument, nestedFamily);		//Load back the Nested Family
+			AssociateParameters(familyInstance, parameterToPush);	//Associate the newly created nested family parameters to the current family parameters
+		}
+		//Remove existing parameter
+		private void RemoveExistingParameter(Document nestedFamilyDocument, FamilyParameter paramToPush)
+		{
+			//If the parameter already exists, remove the parameter before adding it again
+			//Issue a warning maybe? Or skip this?
+			try
 			{
-				AddSharedParameter(pushFamDoc, paramToPush);    //To replace it with a Shared Parameter
+				using (Transaction ft = new Transaction(nestedFamilyDocument, "Push parameter"))
+				{
+					ft.Start();
+					foreach (FamilyParameter famparam in nestedFamilyDocument.FamilyManager.Parameters)   //Go through each parameter in the push document
+					{
+						if (famparam.Definition.Name.Equals(paramToPush.Definition.Name))
+						{
+							nestedFamilyDocument.FamilyManager.RemoveParameter(famparam); //If the parameter already exists, remove it. Or should we skip it?
+							break;
+						}
+					}
+
+					ft.Commit();
+				}
+			}
+			catch (Exception) { }
+		}
+		//Adds a Project or Shared Parameter depending on the original parameter to be pushed
+		private void AddParameter(Document nestedFamilyDocument, FamilyParameter parameterToPush)
+		{
+			if (parameterToPush.IsShared)
+			{
+				ExternalDefinition sharedParameter = GetSharedParameter(app, parameterToPush.Definition.Name); //Get the ExternalDefinition, in case it's a Shared Parameter
+				AddSharedParameter(nestedFamilyDocument, sharedParameter, parameterToPush);    //Adds a Shared Parameter
 			}
 			else
 			{
-				AddParameter(pushFamDoc, paramToPush);
+				AddProjectParameter(nestedFamilyDocument, parameterToPush);   //Adds a (normal) Project Parameter
 			}
-			LoadBackFamily(pushFamDoc, pushFamily);
-			AssociateParameters(pushFamInstance, paramToPush);
 		}
-
-
+		//Creates a regular parameter
+		private void AddProjectParameter(Document nestedFamilyDocument, FamilyParameter parameterToPush)
+		{
+			try
+			{
+				using (Transaction ft = new Transaction(nestedFamilyDocument, "Push parameter"))
+				{
+					ft.Start();
+					//Adds a Parameter to the Family
+					nestedFamilyDocument.FamilyManager.AddParameter(parameterToPush.Definition.Name, parameterToPush.Definition.ParameterGroup, parameterToPush.Definition.ParameterType, parameterToPush.IsInstance);
+					ft.Commit();
+				}
+			}
+			catch (Exception) { }
+		}
+		//Adds a parameter as a SharedParemter
+		private void AddSharedParameter(Document nestedFamilyDocument, ExternalDefinition sharedParameter, FamilyParameter paramToPush)
+		{
+			// Add the parameter to the family
+			try
+			{
+				using (Transaction ft = new Transaction(nestedFamilyDocument, "Push shared parameter"))
+				{
+					ft.Start();
+					//Adds a Shared Parameter to the Family
+					nestedFamilyDocument.FamilyManager.AddParameter(sharedParameter, paramToPush.Definition.ParameterGroup, paramToPush.IsInstance);
+					ft.Commit();
+				}
+			}
+			catch (Exception) { }
+		}
+		//Loads back a nested family into the main family
+		private void LoadBackFamily(Document nestedFamilyDocument, Family nestedFamily)
+		{ 
+			using (Transaction t = new Transaction(nestedFamilyDocument, "Push parameter"))
+			{
+				t.Start();
+				//Loads back the nested family into the main family document
+				nestedFamily = nestedFamilyDocument.LoadFamily(doc, new FamilyOption());
+				t.Commit();
+			}
+		}
 		//Associate the parameters
 		private void AssociateParameters(FamilyInstance pushFamInstance, FamilyParameter paramToPush)
 		{
@@ -126,74 +193,9 @@ namespace FamilyEditorInterface.Associate
 					var famParameter = pushFamInstance.LookupParameter(paramToPush.Definition.Name);    //Finds the newly created parameter in the nested family
 					doc.FamilyManager.AssociateElementParameterToFamilyParameter(famParameter, paramToPush);    //And associates it to the existing family parameter
 				}
-				catch (Exception ex) { }
+				catch (Exception) { }
 				tw.Commit();
 			}
-		}
-		//Loads back a nested family into the main family
-		private void LoadBackFamily(Document pushFamDoc, Family pushFamily)
-		{
-			// Load back the family	    
-			using (Transaction t = new Transaction(pushFamDoc, "Push parameter"))
-			{
-				t.Start();
-				pushFamily = pushFamDoc.LoadFamily(doc, new FamilyOption());
-				t.Commit();
-			}
-		}
-		//Creates a regular parameter
-		private void AddParameter(Document pushFamDoc, FamilyParameter paramToPush)
-		{
-			// Add the parameter to the family
-			try
-			{
-				using (Transaction ft = new Transaction(pushFamDoc, "Push parameter"))
-				{
-					ft.Start();
-					pushFamDoc.FamilyManager.AddParameter(paramToPush.Definition.Name, paramToPush.Definition.ParameterGroup, paramToPush.Definition.ParameterType, paramToPush.IsInstance);
-					ft.Commit();
-				}
-			}
-			catch (Exception) { }
-		}
-		//Adds a parameter as a SharedParemter
-		private void AddSharedParameter(Document pushFamDoc, FamilyParameter paramToPush)
-		{
-			// Add the parameter to the family
-			try
-			{
-				using (Transaction ft = new Transaction(pushFamDoc, "Push parameter"))
-				{
-					ft.Start();
-					pushFamDoc.FamilyManager.AddParameter(sharedParam, paramToPush.Definition.ParameterGroup, paramToPush.IsInstance);
-					ft.Commit();
-				}
-			}
-			catch (Exception) { }
-		}
-		//Remove existing parameter
-		private void RemoveExistingParameter(Document pushFamDoc, FamilyParameter paramToPush)
-		{
-			//If the parameter already exists, remove the parameter before adding it again
-			//Issue a warning maybe? Or skip this?
-			try
-			{
-				using (Transaction ft = new Transaction(pushFamDoc, "Push parameter"))
-				{
-					ft.Start();
-					foreach (FamilyParameter famparam in pushFamDoc.FamilyManager.Parameters)   //Go through each parameter in the push document
-					{
-						if (famparam.Definition.Name.Equals(paramToPush.Definition.Name))
-						{
-							pushFamDoc.FamilyManager.RemoveParameter(famparam); //If the parameter already exists, remove it. Or should we skip it?
-							break;
-						}
-					}
-
-					ft.Commit();
-				}
-			}
-			catch (Exception) { }
 		}
 		//Gets a SharedParameter
 		private ExternalDefinition GetSharedParameter(Autodesk.Revit.ApplicationServices.Application app, string name)
