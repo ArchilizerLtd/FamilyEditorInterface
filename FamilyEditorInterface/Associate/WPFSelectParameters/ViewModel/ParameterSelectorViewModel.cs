@@ -20,7 +20,10 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
 
         public ICommand CloseCommand { get; set; }  //Close Command
         private List<FamilyParameter> revitParameters;  //Contains all the Revit parameters in the current Family
+
+        public string buttonName { get; private set; }  //The name of the Button, either be "Push" or "Pull" or something else
         public List<FamilyParameter> selectedParameters { get; internal set; }  //Contains all selected family parameters
+        public List<ParameterSelectorModel> selectedFamilyParameters { get; internal set; }  //Contains all selected family parameters
 
         private ObservableCollection<ParameterSelectorModel> _parameters;
         public ObservableCollection<ParameterSelectorModel> Parameters
@@ -43,9 +46,10 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
         /// Public Constructor of ParameterSelectorViewModel
         /// </summary>
         /// <param name="parameters">All FamilyParamters to display</param>
-        public ParameterSelectorViewModel(List<FamilyParameter> parameters)
+        public ParameterSelectorViewModel(List<FamilyParameter> parameters, string button)
         {
             this.revitParameters = parameters;
+            this.buttonName = button; 
 
             Initialize();
         }
@@ -66,7 +70,16 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
             foreach(var par in revitParameters)
             {
                 if (par.Id.IntegerValue < 0) continue; //Skip built-in parameters
-                models.Add(new ParameterSelectorModel() { Name = par.Definition.Name, Group = Utils.GetReadableGroupName(par.Definition.ParameterGroup), Parameter = par });
+                models.Add(new ParameterSelectorModel()
+                {
+                    Name = par.Definition.Name,
+                    Group = Utils.GetReadableGroupName(par.Definition.ParameterGroup),
+                    Parameter = par,
+                    ParameterGroup = par.Definition.ParameterGroup,
+                    ParameterType = par.Definition.ParameterType,
+                    IsInstance = par.IsInstance,
+                    IsShared = par.IsShared
+                }) ;
             }
             models = models.OrderBy(x => x.Group).ToList();
             return new ObservableCollection<ParameterSelectorModel>(models);
@@ -79,9 +92,11 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
         {
             var selectedItems = view.propertiesListBox.SelectedItems;
             selectedParameters = new List<FamilyParameter>();
-            foreach(var item in selectedItems)
+            selectedFamilyParameters = new List<ParameterSelectorModel>();
+            foreach (var item in selectedItems)
             {
                 selectedParameters.Add((item as ParameterSelectorModel).Parameter);
+                selectedFamilyParameters.Add(item as ParameterSelectorModel);
             }
             view.Close();
         }

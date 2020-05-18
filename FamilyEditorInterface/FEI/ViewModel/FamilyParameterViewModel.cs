@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using Dialog.Alerts;
 using Dialog.Service;
+using FamilyEditorInterface.Dialog.Alerts;
 using FamilyEditorInterface.Requests;
 using FamilyEditorInterface.Resources.WPF.Model;
 using FamilyEditorInterface.Resources.WPF.ViewModel;
@@ -333,7 +334,7 @@ namespace FamilyEditorInterface.WPF
 
             if (values.Count > 0)
             {
-                Utils.Alert("Alert", new List<Message>() { new Message("Warning!", $"{values.Count.ToString()} Parameters will be removed.")});
+                DialogUtils.Alert("Alert", new List<Message>() { new Message("Warning!", $"{values.Count.ToString()} Parameters will be removed.")});
                 MakeRequest(RequestId.DeleteId, values);
             }
         }

@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using FamilyEditorInterface.Dialog.Alerts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,16 +22,18 @@ namespace FamilyEditorInterface.Associate
 		private UIDocument uidoc;	//Current Revit UIDocument
 		private Document doc;   //Active Revit (Family) Document 
 		private FamilyManager familyManager;	//FamilyManager of the Family Document. Contains all Parameter related information and manipulation methods
-		private SortedList<string, FamilyParameter> famParam;	//Contains all Parameters in the current Family in an orderred fashion
-        #endregion
+		private SortedList<string, FamilyParameter> famParam;   //Contains all Parameters in the current Family in an orderred fashion
+		private string AlertMessage;    //Contains all warnings to be displayed at the end of the run
+		private string SuccessMessage;    //Contains all the successfully pulled parameters to be displayed at the end of the run
+		#endregion
 
-        #region Constructors & Initializers
-        /// <summary>
+		#region Constructors & Initializers
+		/// <summary>
 		/// Public Constructor. Will Initialize the Class
 		/// </summary>
 		/// <param name="uidoc">Current Revit UI Document</param>
 		/// <param name="doc">Active Revit Family Document</param>
-        public WireParameters(UIDocument uidoc, Document doc)
+		public WireParameters(UIDocument uidoc, Document doc)
         {
 			this.uidoc = uidoc;
 			this.doc = doc;
@@ -45,7 +48,7 @@ namespace FamilyEditorInterface.Associate
 
 			foreach (FamilyParameter fp in familyManager.Parameters)
 			{
-				famParam.Add(fp.Definition.Name, fp);	//Collect all parameters in the current Family in a sorted list
+				famParam.Add(fp.Definition.Name, fp);   //Collect all parameters in the current Family in a sorted list
 			}
 		}
         #endregion
@@ -63,7 +66,10 @@ namespace FamilyEditorInterface.Associate
 			var fam = doc.GetElement(wireFamily) as FamilyInstance;
 
 			AssociateParameters(fam, ParamType.Instance);	//Associate all possible Instance parameters
-			AssociateParameters(fam, ParamType.Type);	//Associate all possible Type
+			AssociateParameters(fam, ParamType.Type);   //Associate all possible Type
+
+			if (!String.IsNullOrEmpty(AlertMessage)) DialogUtils.Alert("Warning", AlertMessage);    //Finally, alert the user if we had any issues
+			if (!String.IsNullOrEmpty(SuccessMessage)) DialogUtils.Notify("Warning", SuccessMessage);  //And, issue an OK message the user for all the successfully processed parameters
 		}
 		//Dispatch based on Parmater Type
 		private void AssociateParameters(FamilyInstance family, ParamType pType)
@@ -90,7 +96,15 @@ namespace FamilyEditorInterface.Associate
 					try
 					{
 						if (famParam.TryGetValue(param.Definition.Name, out var famParameter))
+						{
+							if (famParameter.AssociatedParameters.Contains(param))
+							{
+								AlertMessage += $"Parameter '{param.Definition.Name}' is already associated and will be skipped.{Environment.NewLine}";
+								continue;
+							}
 							doc.FamilyManager.AssociateElementParameterToFamilyParameter(param, famParameter);  //The MAIN method - associate the element parameters from both families
+							SuccessMessage += $"Successfully associated '{param.Definition.Name}' parameter{Environment.NewLine}";
+						}
 					}
 					catch (Exception) { }
 				}

@@ -1,6 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using FamilyEditorInterface.Associate.WPFSelectParameters.Model;
 using FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel;
+using FamilyEditorInterface.Dialog.Alerts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +29,9 @@ namespace FamilyEditorInterface.Associate
 		private FamilyInstance familyInstance;	//The User-selected Family Instance
 		private FamilyManager familyManager;    //The FamilyManager of this Document. Contains everything about Parameters
 		private List<FamilyParameter> familyParameters; //Contains all FamilyParameters in the current Document
-		private List<FamilyParameter> pullParameters = null;    //User selected list of parameters to be pushed in the selected Nested family
+		private List<ParameterSelectorModel> pullParameters = null;    //User selected list of parameters to be pushed in the selected Nested family
+		private string AlertMessage;	//Contains all warnings to be displayed at the end of the run
+		private string SuccessMessage;    //Contains all the successfully pulled parameters to be displayed at the end of the run
 		#endregion
 
 		#region Constructors & Initializers
@@ -51,22 +55,25 @@ namespace FamilyEditorInterface.Associate
 		//Initializes starting parameters
 		private void Initialize()
 		{
-			familyManager = nestedDoc.FamilyManager;
+			familyManager = doc.FamilyManager;
 			familyParameters = new List<FamilyParameter>();
 
-			foreach (FamilyParameter famParam in familyManager.Parameters)
+			foreach (FamilyParameter famParam in nestedDoc.FamilyManager.Parameters)
 			{
 				familyParameters.Add(famParam); //Fills in all FamilyParameters in the current document
 			}
 
 			GetPullParamters(); //User Select all parameters to be transfered
+			CloseNestedDocument();	//Finally, close the nested document as we don't need it anymore
 		}
+
+
 		//Envokes the UI to select FamilyParameters to be pushed
 		private void GetPullParamters()
 		{
-			var vm = new ParameterSelectorViewModel(familyParameters);  //Initializes a new view and passes in this ViewModel as a DataContext
+			var vm = new ParameterSelectorViewModel(familyParameters, "Pull");  //Initializes a new view and passes in this ViewModel as a DataContext
 			vm.Show();  //Show the UI
-			pullParameters = vm.selectedParameters; //Collect all user-selected parameters
+			pullParameters = vm.selectedFamilyParameters; //Collect all user-selected parameters
 		}
 		#endregion
 
@@ -79,15 +86,23 @@ namespace FamilyEditorInterface.Associate
 			if (!doc.IsFamilyDocument) return;  //Only execute in FamilyDocument
 			if (pullParameters == null) return; //No parameter to be pushed, return
 
-			foreach (FamilyParameter parameterToPull in pullParameters)
+			foreach (ParameterSelectorModel parameterToPull in pullParameters)
 			{
 				ExecutePullParamters(parameterToPull);  //Execute Push Parameter for each Selection and each Selected Paramter
 			}
+
+			if (!String.IsNullOrEmpty(AlertMessage)) DialogUtils.Alert("Warning", AlertMessage);	//Finally, alert the user if we had any issues
+			if (!String.IsNullOrEmpty(SuccessMessage)) DialogUtils.Notify("Warning", SuccessMessage);  //And, issue an OK message the user for all the successfully processed parameters
 		}
 		#endregion
 
 
 		#region Internal Methods
+		//Close the nested document
+		private void CloseNestedDocument()
+		{
+			nestedDoc.Close(false);	//Close the nested document without saving
+		}
 		//Retrieves a Nested Family Documnet from User Selection
 		private Document GetNestedDocument()
 		{
@@ -96,7 +111,7 @@ namespace FamilyEditorInterface.Associate
 			var familyInstance = doc.GetElement(selection.ElementId) as FamilyInstance;   //Cast the current selection as a FamilyInstance
 			if (familyInstance == null)
 			{
-				Utils.Alert("Warning", "No nested family selected"); //If the selection is not a family instance, issue a warning and fail
+				DialogUtils.Alert("Warning", "No nested family selected"); //If the selection is not a family instance, issue a warning and fail
 				return null;
 			}
 			var nestedFamily = familyInstance.Symbol.Family; //Get the family from the selection
@@ -107,69 +122,66 @@ namespace FamilyEditorInterface.Associate
 			return nestedFamilyDocument;
 		}
 		//Push parameter into selected FamilyInstance
-		private void ExecutePullParamters(FamilyParameter parameterToPull)
+		private void ExecutePullParamters(ParameterSelectorModel parameterToPull)
 		{
-			RemoveExistingParameter(parameterToPull);   //Remove the existing project parameter 
-			AddParameter(parameterToPull);    //Add the Parameter to the Nested Family
-			AssociateParameters(familyInstance, parameterToPull);   //Associate the newly created nested family parameters to the current family parameters
-		}
-		//Remove existing parameter
-		private void RemoveExistingParameter(FamilyParameter paramToPull)
-		{
-			//If the parameter already exists, remove the parameter before adding it again
-			//Issue a warning maybe? Or skip this?
-			using (Transaction ft = new Transaction(doc, "Remove parameter"))
+			var exist = RemoveExistingParameter(parameterToPull);   //Check if existing project parameter 
+			if(String.IsNullOrEmpty(exist))
 			{
-				ft.Start();
-				try
-				{
-					foreach (FamilyParameter familyParameter in familyManager.Parameters)   //Go through each parameter in the push document
-					{
-						if (familyParameter.Definition.Name.Equals(paramToPull.Definition.Name))
-						{
-							familyManager.RemoveParameter(familyParameter); //If the parameter already exists, remove it. Or should we skip it?
-							break;
-						}
-					}
-				}			
-				catch (Exception ex)
-				{
-					Utils.Alert("Failed", ex.Message);
-				}
-				ft.Commit();
-			}
-		}
-		//Adds a Project or Shared Parameter depending on the original parameter to be pushed
-		private void AddParameter(FamilyParameter parameterToPull)
-		{
-			if (parameterToPull.IsShared)
-			{
-				ExternalDefinition sharedParameter = GetSharedParameter(app, parameterToPull.Definition.Name); //Get the ExternalDefinition, in case it's a Shared Parameter
-				AddSharedParameter(sharedParameter, parameterToPull);    //Adds a Shared Parameter
+				var parameter = AddParameter(parameterToPull);    //Add the Parameter to the Nested Family
+				if (parameter != null) SuccessMessage += $"{parameter.Definition.Name} created sucessfully{Environment.NewLine}";   //Report the good news
 			}
 			else
 			{
-				AddProjectParameter(parameterToPull);   //Adds a (normal) Project Parameter
+				AlertMessage += exist;
+			}
+		}
+		//Remove existing parameter
+		private string RemoveExistingParameter(ParameterSelectorModel paramToPull)
+		{
+			//If the parameter already exists, return a alert message
+			foreach (FamilyParameter familyParameter in familyManager.Parameters)   //Go through each parameter in the push document
+			{
+				if (familyParameter.Definition.Name.Equals(paramToPull.Name))
+				{
+					return $"Parameter '{paramToPull.Name}' alerady exists in the current Family and will be skipped.{Environment.NewLine}";
+				}
+			}
+			return "";
+		}
+		//Adds a Project or Shared Parameter depending on the original parameter to be pushed
+		private FamilyParameter AddParameter(ParameterSelectorModel parameterToPull)
+		{
+			if (parameterToPull.IsShared)
+			{
+				ExternalDefinition sharedParameter = GetSharedParameter(app, parameterToPull.Name); //Get the ExternalDefinition, in case it's a Shared Parameter
+				return AddSharedParameter(sharedParameter, parameterToPull);    //Adds a Shared Parameter
+			}
+			else
+			{
+				return AddProjectParameter(parameterToPull);   //Adds a (normal) Project Parameter
 			}
 		}
 		//Creates a regular parameter
-		private void AddProjectParameter(FamilyParameter parameterToPull)
+		private FamilyParameter AddProjectParameter(ParameterSelectorModel parameterToPull)
 		{
+			FamilyParameter parameter = null;
 			try
 			{
 				using (Transaction ft = new Transaction(doc, "Pull parameter"))
 				{
 					ft.Start();
 					//Adds a Parameter to the Family
-					familyManager.AddParameter(parameterToPull.Definition.Name, parameterToPull.Definition.ParameterGroup, parameterToPull.Definition.ParameterType, parameterToPull.IsInstance);
+					parameter = familyManager.AddParameter(parameterToPull.Name, parameterToPull.ParameterGroup, parameterToPull.ParameterType, parameterToPull.IsInstance);
 					ft.Commit();
 				}
 			}
-			catch (Exception ex) { Utils.Alert("Failed", ex.Message); }
+			catch (Exception ex) { DialogUtils.Alert("Failed", ex.Message); }
+			return parameter;
 		}
 		//Adds a parameter as a SharedParemter
-		private void AddSharedParameter(ExternalDefinition sharedParameter, FamilyParameter paramToPull)
+		private FamilyParameter AddSharedParameter(ExternalDefinition sharedParameter, ParameterSelectorModel paramToPull)
 		{
+			FamilyParameter parameter = null;
 			// Add the parameter to the family
 			try
 			{
@@ -177,26 +189,61 @@ namespace FamilyEditorInterface.Associate
 				{
 					ft.Start();
 					//Adds a Shared Parameter to the Family
-					familyManager.AddParameter(sharedParameter, paramToPull.Definition.ParameterGroup, paramToPull.IsInstance);
+					parameter = familyManager.AddParameter(sharedParameter, paramToPull.ParameterGroup, paramToPull.IsInstance);
 					ft.Commit();
 				}
 			}
 			catch (Exception) { }
+			return parameter;
+		}
+		//Retrieve the parameter from the nested family
+		private Parameter GetNestedParameter(string name)
+		{
+			Parameter parameter = familyInstance.LookupParameter(name);	//Try to return an Instance parameter
+			if (parameter == null) parameter = familyInstance.Symbol.LookupParameter(name);	//Try to return a Type parameter
+			return parameter;
 		}
 		//Associate the parameters
-		private void AssociateParameters(FamilyInstance pushFamInstance, FamilyParameter paramToPull)
+		//NOT IN USE IN THIS VERSION
+		private string AssociateParameters(FamilyParameter newParameter)
 		{
 			using (Transaction tw = new Transaction(doc, "Wire parameters"))
 			{
 				tw.Start();
 				try
 				{
-					var famParameter = pushFamInstance.LookupParameter(paramToPull.Definition.Name);    //Finds the newly created parameter in the nested family
-					doc.FamilyManager.AssociateElementParameterToFamilyParameter(famParameter, paramToPull);    //And associates it to the existing family parameter
+					var nestedParameter = GetNestedParameter(newParameter.Definition.Name);    //Finds the parameter in the nested family
+					//var docParameter = doc.FamilyManager.get_Parameter(newParameter.Definition.Name);	//Finds the newly created paramter in the main family
+					SetDocumentParameter(newParameter, nestedParameter);	//Set the value first, we don't want to lose it
+
+					doc.FamilyManager.AssociateElementParameterToFamilyParameter(nestedParameter, newParameter);    //And associates it to the existing family parameter. The second parameter belongs to the Main family
+					return $"'{newParameter.Definition.Name}' was processed successfully.{Environment.NewLine}";	//Helps to populates the SuccessMessage
 				}
-				catch (Exception) { }
+				catch (Exception ex) { DialogUtils.Alert("Error", ex.Message); return null; }
 				tw.Commit();
 			}
+		}
+		//Sets the value of the family parameter based on a parameter value
+		private void SetDocumentParameter(FamilyParameter docParameter, Parameter famParameter)
+		{
+			switch (famParameter.StorageType)
+			{
+				case (StorageType.Double):
+					var value = famParameter.AsDouble();
+					familyManager.Set(docParameter, famParameter.AsDouble());
+					break;
+				case (StorageType.Integer):
+					familyManager.Set(docParameter, famParameter.AsInteger());
+					break;
+				case (StorageType.String):
+					familyManager.Set(docParameter, famParameter.AsString());
+					break;
+				case (StorageType.ElementId):
+					familyManager.Set(docParameter, famParameter.AsElementId());
+					break;
+				case (StorageType.None):
+					break;
+			}			
 		}
 		//Gets a SharedParameter
 		private ExternalDefinition GetSharedParameter(Autodesk.Revit.ApplicationServices.Application app, string name)

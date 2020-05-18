@@ -3,6 +3,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Dialog.Alerts;
 using Dialog.Service;
+using FamilyEditorInterface.Dialog.Alerts;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -42,39 +43,6 @@ namespace FamilyEditorInterface
                 DUT = DisplayUnitType.DUT_DECIMAL_FEET;
             }
         }
-        #region Dialogs
-        /// <summary>
-        /// A Custom Alert DialogBox. Displays a Title and a list of Messages
-        /// A single Message has a (text in) Bold and a (regular) Body
-        /// </summary>
-        /// <param name="title">Title</param>
-        /// <param name="note">List of Messages List<Message></param>
-        public static void Alert(string title, List<Message> note)
-        {
-            var dialog = new AlertDialogViewModel(title, note);
-            var result = new DialogService().OpenDialog(dialog);
-        }
-        /// <summary>
-        /// A Custom Alert DialogBox that displays a Title and a single Message string
-        /// </summary>
-        /// <param name="title">Title</param>
-        /// <param name="message">Message string</param>
-        public static void Alert(string title, string message)
-        {
-            var dialog = new AlertDialogViewModel(title, message);
-            var result = new DialogService().OpenDialog(dialog);
-        }
-        /// <summary>
-        /// A notification DialogBox. Displays a Title and a single Message string
-        /// </summary>
-        /// <param name="title">Title</param>
-        /// <param name="message">Message string</param>
-        public static void Notify(string title, string message)
-        {
-            var dialog = new NotifyDialogViewModel(title, message);
-            var result = new DialogService().OpenDialog(dialog);
-        }
-        #endregion
         /// <summary>
         /// UI to Revit internal unit values
         /// </summary>
@@ -102,7 +70,7 @@ namespace FamilyEditorInterface
             if (doc.IsFamilyDocument) return true;
             else
             {
-                Alert("Warning", "Not a Family Document.");
+                DialogUtils.Alert("Warning", "Not a Family Document.");
                 return false;
             }
         }

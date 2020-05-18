@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
+using FamilyEditorInterface.Dialog.Alerts;
 using FamilyEditorInterface.WPF;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace FamilyEditorInterface.Resources.WPF.ViewModel
                 {
                     if (!Application.App.ActiveUIDocument.Document.IsFamilyDocument)
                     {
-                        Utils.Alert("Error", "Usable only in Family Documents");
+                        DialogUtils.Alert("Error", "Usable only in Family Documents");
                         return false;
                     }
                     

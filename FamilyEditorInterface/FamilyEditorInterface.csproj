@@ -85,6 +85,7 @@
     <Compile Include="Associate\WPFSelectParameters\View\ParameterSelectorView.xaml.cs">
       <DependentUpon>ParameterSelectorView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\Alerts\DialogUtils.cs" />
     <Compile Include="Dialog\Alerts\NotifyDialogView.cs">
       <DependentUpon>NotifyDialogView.xaml</DependentUpon>
     </Compile>

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FamilyEditorInterface.WPF;
+using FamilyEditorInterface.Dialog.Alerts;
 
 namespace FamilyEditorInterface.Requests
 {
@@ -28,14 +29,14 @@ namespace FamilyEditorInterface.Requests
         /// </summary>
         public static void Notify()
         {
-            Utils.Notify("Notify", NotifyLog);
+            DialogUtils.Notify("Notify", NotifyLog);
         }
         /// <summary>
         /// Will alert the user through the alert dialog box
         /// </summary>
         public static void ReprotError()
         {
-            Utils.Alert("Alert", ErrorLog);
+            DialogUtils.Alert("Alert", ErrorLog);
         }
         /// <summary>
         /// Resets all message logs
