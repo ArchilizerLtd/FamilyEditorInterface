@@ -13,7 +13,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="#FAFAFA">
+    <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
@@ -22,10 +22,14 @@
         <Button x:Name="Close" IsCancel="True" Grid.Row="0"
                 Content="{StaticResource CloseIcon}" Style="{StaticResource ToolbarButton}"
                 VerticalAlignment="Top" HorizontalAlignment="Right" />
-        <StackPanel Orientation="Horizontal" Grid.Row="1" VerticalAlignment="Top" Margin="20 0 20 20">
-            <Label x:Name="warningIcon" Content="{StaticResource NotifyIcon}" VerticalAlignment="Top"/>
-            <TextBlock Text="{Binding Message}" Style="{StaticResource MessageTextBlockStyle}" MinWidth="300" Margin="20 10" TextWrapping="WrapWithOverflow"/>
-        </StackPanel>
+        <Grid Grid.Row="1" VerticalAlignment="Top" Margin="20 0 20 25" MinWidth="300">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" x:Name="warningIcon" Content="{StaticResource NotifyIcon}" VerticalAlignment="Top"/>
+            <TextBlock Grid.Column="1" Text="{Binding Message}" Style="{StaticResource MessageTextBlockStyle}" MaxWidth="500" LineHeight="18" Margin="20 10"/>
+        </Grid>
         <!--<Button Content="OK" Grid.Row="1" 
             Command="{Binding OKCommand}" 
             CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window}}"

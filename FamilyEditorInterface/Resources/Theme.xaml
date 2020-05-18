@@ -7,6 +7,7 @@
     <SolidColorBrush x:Key="ButtonColor" Color="#444444"/>
     <SolidColorBrush x:Key="WarningColorBrush" Color="#FFBB00"/>
     <SolidColorBrush x:Key="NotifyColorBrush" Color="#40BB00"/>
+    <SolidColorBrush x:Key="TextColor" Color="#1F1E21"/>
 
     <!--Icons-->
     <!--https://materialdesignicons.com/-->
@@ -69,12 +70,14 @@
     <Style x:Key="MessageTextBlockStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
         <Setter Property="FontFamily" Value="Lato"/>
-        <Setter Property="FontWeight" Value="Light"/>
         <Setter Property="LineHeight" Value="24"/>
+        <Setter Property="MaxWidth" Value="300"/>
         <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
-        <Setter Property="Foreground" Value="{StaticResource ButtonColor}"/>
+        <Setter Property="Foreground" Value="{StaticResource ButtonPressedColor}"/>
     </Style>
 
     <Style x:Key="ListBoxTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MessageTextBlockStyle}">
@@ -159,7 +162,7 @@
         <Setter Property="Width" Value="30"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="DockPanel.Dock" Value="Left"/>
-        <Setter Property="Background" Value="#FAFAFA"/>
+        <Setter Property="Background" Value="White"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">

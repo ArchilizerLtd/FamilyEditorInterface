@@ -106,7 +106,8 @@ namespace FamilyEditorInterface.Associate
 		//Retrieves a Nested Family Documnet from User Selection
 		private Document GetNestedDocument()
 		{
-			var selection = Utils.PickObject(uidoc, "Pick nested family to pull parameters from."); 
+			var selection = Utils.PickObject(uidoc, "Pick nested family to pull parameters from.");
+			if (selection == null) return null;
 
 			var familyInstance = doc.GetElement(selection.ElementId) as FamilyInstance;   //Cast the current selection as a FamilyInstance
 			if (familyInstance == null)

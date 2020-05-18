@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Dialog.Service"
         xmlns:alert="clr-namespace:Dialog.Alerts"
         mc:Ignorable="d"
-        SizeToContent="WidthAndHeight"
+        SizeToContent="WidthAndHeight" ResizeMode="CanResizeWithGrip"
         WindowStyle="None" MouseDown="Window_MouseDown"
         WindowStartupLocation="CenterScreen"
         Background="#FAFAFA"

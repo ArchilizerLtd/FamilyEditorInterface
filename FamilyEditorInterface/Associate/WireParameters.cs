@@ -97,10 +97,15 @@ namespace FamilyEditorInterface.Associate
 					{
 						if (famParam.TryGetValue(param.Definition.Name, out var famParameter))
 						{
-							if (famParameter.AssociatedParameters.Contains(param))
+							if (doc.FamilyManager.GetAssociatedFamilyParameter(param) != null)
 							{
 								AlertMessage += $"Parameter '{param.Definition.Name}' is already associated and will be skipped.{Environment.NewLine}";
 								continue;
+							}
+							if (!doc.FamilyManager.CanElementParameterBeAssociated(param))
+							{
+								AlertMessage += $"'{param.Definition.Name}' cannot be associated.{Environment.NewLine}";
+								continue;   //For some reason the element cannot be associated
 							}
 							doc.FamilyManager.AssociateElementParameterToFamilyParameter(param, famParameter);  //The MAIN method - associate the element parameters from both families
 							SuccessMessage += $"Successfully associated '{param.Definition.Name}' parameter{Environment.NewLine}";
