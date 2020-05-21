@@ -16,5 +16,6 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.Model
         public string Group { get; internal set; }
         public bool IsShared { get; internal set; }
         public bool IsInstance { get; internal set; }
+        public bool Exists { get; set; }
     }
 }

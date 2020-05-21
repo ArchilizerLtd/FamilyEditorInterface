@@ -24,9 +24,10 @@ namespace FamilyEditorInterface.Associate
 		#region Properties & Fields
 		private Autodesk.Revit.ApplicationServices.Application app;	//Revit Application
 		private UIDocument uidoc;	//Current Revit UIDocument
-		private Document doc;	//Active (Family) Document
+		private Document doc;   //Active (Family) Document
+		private FamilyInstance familyInstance;
 		private FamilyManager familyManager;	//The FamilyManager of this Document. Contains everything about Parameters
-		private List<FamilyParameter> familyParameters;	//Contains all FamilyParameters in the current Document
+		private Dictionary<FamilyParameter, bool> familyParameters;	//Contains all FamilyParameters in the current Document
 		private List<FamilyParameter> pushParameters = null;    //User selected list of parameters to be pushed in the selected Nested family
 		private string AlertMessage;    //Contains all warnings to be displayed at the end of the run
 		private string SuccessMessage;    //Contains all the successfully pulled parameters to be displayed at the end of the run
@@ -50,15 +51,30 @@ namespace FamilyEditorInterface.Associate
 		//Initializes starting parameters
 		private void Initialize()
 		{
+			familyInstance = GetFamilyInstance();
 			familyManager = doc.FamilyManager;
-			familyParameters = new List<FamilyParameter>();
+			familyParameters = new Dictionary<FamilyParameter, bool>();
 
 			foreach (FamilyParameter famParam in familyManager.Parameters)
 			{
-				familyParameters.Add(famParam);	//Fills in all FamilyParameters in the current document
+				familyParameters[famParam] = Utils.ParameterExist(famParam, familyInstance);	//Fills in all FamilyParameters in the current document
 			}
 
 			GetPushParamters(); //User Select all parameters to be transfered
+		}
+		//Retrieves a nested Family Instance from User selection
+		private FamilyInstance GetFamilyInstance()
+		{
+			if (!doc.IsFamilyDocument) return null;  //Only execute in FamilyDocument
+
+			var selection = Utils.PickObject(uidoc, "Pick family to push parameters to.");  //Select a family, Revit user interface
+			if (selection == null) return null;  //If the user did not select (escaped), return
+
+
+			var familyInstance = doc.GetElement(selection.ElementId) as FamilyInstance; //Cast the current selection as a FamilyInstance
+			if (familyInstance == null) return null; //If the selection is not a family instance, skip
+
+			return familyInstance;
 		}
 		//Envokes the UI to select FamilyParameters to be pushed
 		private void GetPushParamters()
@@ -75,22 +91,12 @@ namespace FamilyEditorInterface.Associate
 		/// </summary>
 		public void Push()
 		{
-			if (!doc.IsFamilyDocument) return;  //Only execute in FamilyDocument
 			if (pushParameters == null) return; //No parameter to be pushed, return
-
-			var selection = Utils.PickObjects(uidoc, "Pick families to push parameters to.");  //Select a family, Revit user interface
-			if (selection == null) return;  //If the user did not select (escaped), return
-
-			foreach (Reference sel in selection)
+			if (familyInstance == null) return;	//If we failed to collect a family instance from user in the previous step, return
+			foreach (FamilyParameter paramToPush in pushParameters)
 			{
-				var familyInstance = doc.GetElement(sel.ElementId) as FamilyInstance;	//Cast the current selection as a FamilyInstance
-				if (familyInstance == null) continue;	//If the selection is not a family instance, skip
-
-				foreach (FamilyParameter paramToPush in pushParameters)
-				{
-					SuccessMessage += ExecutePushParamters(familyInstance, paramToPush);	//Execute Push Parameter for each Selection and each Selected Paramter
-				}
-			}
+				SuccessMessage += ExecutePushParamters(familyInstance, paramToPush);	//Execute Push Parameter for each Selection and each Selected Paramter
+			}			
 
 			if (!String.IsNullOrEmpty(AlertMessage)) DialogUtils.Alert("Warning", AlertMessage);    //Finally, alert the user if we had any issues
 			if (!String.IsNullOrEmpty(SuccessMessage)) DialogUtils.Notify("Warning", SuccessMessage);  //And, issue an OK message the user for all the successfully processed parameters

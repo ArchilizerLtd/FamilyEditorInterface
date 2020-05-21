@@ -75,6 +75,38 @@ namespace FamilyEditorInterface
             }
         }
         /// <summary>
+        /// Checks if a parameter with the same name eixsts in a family
+        /// </summary>
+        /// <param name="famParam">FamilyParameter to check</param>
+        /// <param name="familyInstance">A family instance to check against</param>
+        /// <returns></returns>
+        internal static bool ParameterExist(FamilyParameter famParam, FamilyInstance familyInstance)
+        {
+            foreach(Parameter param in familyInstance.Parameters)
+            {
+                if (famParam.Definition.Name.Equals(param.Definition.Name)) return true;
+            }
+            foreach (Parameter param in familyInstance.Symbol.Parameters)
+            {
+                if (famParam.Definition.Name.Equals(param.Definition.Name)) return true;
+            }
+            return false;
+        }       
+        /// <summary>
+        /// Checks if a parameter with the same name eixsts in a family
+        /// </summary>
+        /// <param name="famParam">FamilyParameter to check</param>
+        /// <param name="familyInstance">The parameterset containing all family parameters</param>
+        /// <returns></returns>
+        internal static bool ParameterExist(FamilyParameter famParam, FamilyParameterSet parameters)
+        {
+            foreach(FamilyParameter param in parameters)
+            {
+                if (famParam.Definition.Name.Equals(param.Definition.Name)) return true;
+            }
+            return false;
+        }
+        /// <summary>
         /// Executes Revit Selection.PickObject and catches user cancel exception
         /// </summary>
         /// <param name="uidoc">Current UI Document</param>

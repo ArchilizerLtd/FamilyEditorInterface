@@ -28,7 +28,7 @@ namespace FamilyEditorInterface.Associate
 		private Document nestedDoc;	//The Family Document of the User-selected Nested Family
 		private FamilyInstance familyInstance;	//The User-selected Family Instance
 		private FamilyManager familyManager;    //The FamilyManager of this Document. Contains everything about Parameters
-		private List<FamilyParameter> familyParameters; //Contains all FamilyParameters in the current Document
+		private Dictionary<FamilyParameter, bool> familyParameters; //Contains all FamilyParameters in the current Document
 		private List<ParameterSelectorModel> pullParameters = null;    //User selected list of parameters to be pushed in the selected Nested family
 		private string AlertMessage;	//Contains all warnings to be displayed at the end of the run
 		private string SuccessMessage;    //Contains all the successfully pulled parameters to be displayed at the end of the run
@@ -56,11 +56,11 @@ namespace FamilyEditorInterface.Associate
 		private void Initialize()
 		{
 			familyManager = doc.FamilyManager;
-			familyParameters = new List<FamilyParameter>();
+			familyParameters = new Dictionary<FamilyParameter, bool>();
 
 			foreach (FamilyParameter famParam in nestedDoc.FamilyManager.Parameters)
 			{
-				familyParameters.Add(famParam); //Fills in all FamilyParameters in the current document
+				familyParameters[famParam] = Utils.ParameterExist(famParam, familyManager.Parameters); //Fills in all FamilyParameters in the current document
 			}
 
 			GetPullParamters(); //User Select all parameters to be transfered
@@ -214,9 +214,8 @@ namespace FamilyEditorInterface.Associate
 				try
 				{
 					var nestedParameter = GetNestedParameter(newParameter.Definition.Name);    //Finds the parameter in the nested family
-					//var docParameter = doc.FamilyManager.get_Parameter(newParameter.Definition.Name);	//Finds the newly created paramter in the main family
 					SetDocumentParameter(newParameter, nestedParameter);	//Set the value first, we don't want to lose it
-
+					
 					doc.FamilyManager.AssociateElementParameterToFamilyParameter(nestedParameter, newParameter);    //And associates it to the existing family parameter. The second parameter belongs to the Main family
 					return $"'{newParameter.Definition.Name}' was processed successfully.{Environment.NewLine}";	//Helps to populates the SuccessMessage
 				}

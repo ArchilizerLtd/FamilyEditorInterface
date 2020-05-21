@@ -100,19 +100,19 @@ namespace FamilyEditorInterface
                     Text = "Associate Parameters",
                     Command = "FamilyEditorInterface.CommandAssociateParameters"},
 
-                new Button(){Name = "Pull Parameters",
-                    Image = "FamilyEditorInterface.Resources.icon_Pull Parameters.png",
-                    ToolTip = "Pulls Parameters from a nested family into the current family",
-                    ContextualHelp = ch,
-                    Text = "Pull Parameters",
-                    Command = "FamilyEditorInterface.CommandPullParameters"},
-
                 new Button(){Name = "Push Parameters",
                     Image = "FamilyEditorInterface.Resources.icon_Push Parameters.png",
                     ToolTip = "Push parameters from the current family into a nested family",
                     ContextualHelp = ch,
                     Text = "Push Parameters",
-                    Command = "FamilyEditorInterface.CommandPushParameters"}
+                    Command = "FamilyEditorInterface.CommandPushParameters"},
+
+                new Button(){Name = "Pull Parameters",
+                    Image = "FamilyEditorInterface.Resources.icon_Pull Parameters.png",
+                    ToolTip = "Pulls Parameters from a nested family into the current family",
+                    ContextualHelp = ch,
+                    Text = "Pull Parameters",
+                    Command = "FamilyEditorInterface.CommandPullParameters"}
             };
 
             return buttons;

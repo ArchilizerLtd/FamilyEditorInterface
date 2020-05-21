@@ -51,6 +51,14 @@
                     <Setter Property="SnapsToDevicePixels" Value="True"/>
                 </Style.Setters>
             </Style>
+            <!--Tags' ContentControl DataTebmpalte-->
+            <DataTemplate x:Key="TagElement">
+                <Border Style="{StaticResource Tag}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" 
+                        Width="{Binding Converter={StaticResource B2WC}}" Margin="{Binding Converter={StaticResource B2MC}}"
+                        Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl, AncestorLevel=1}}">
+                    <TextBlock Text="{Binding Path=Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl, AncestorLevel=1}}" Style="{StaticResource TagText}"/>
+                </Border>
+            </DataTemplate>
             <!--Text Value Boxes-->
             <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}" x:Key="EnterText">
                 <Style.Setters>
@@ -96,14 +104,6 @@
             <Style x:Key="ItemControlGridStyle" TargetType="{x:Type Grid}">
                 <Setter Property="Margin" Value="0 6 0 6"/>
             </Style>
-            <!--Tags' ContentControl DataTebmpalte-->
-            <DataTemplate x:Key="TagElement">
-                <Border Style="{StaticResource Tag}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" 
-                        Width="{Binding Converter={StaticResource B2WC}}" Margin="{Binding Converter={StaticResource B2MC}}"
-                        Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl, AncestorLevel=1}}">
-                    <TextBlock Text="{Binding Path=Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl, AncestorLevel=1}}" Style="{StaticResource TagText}"/>
-                </Border>
-            </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
     <DockPanel Margin="25,25,20,25">

@@ -317,13 +317,16 @@
         </Setter>
     </Style>
 
+    <!--ListView Border Color-->
+    <SolidColorBrush x:Key="ListViewBorderColor" Color="#C9C9C9"/>
+    
     <!--List View-->
     <Style x:Key="RoundedListview" TargetType="{x:Type ListView}">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListView}">
-                    <Border Name="Bd" CornerRadius="8" Background="{TemplateBinding Background}" BorderBrush="{StaticResource ButtonPressedColor}" BorderThickness="0" SnapsToDevicePixels="true">
+                    <Border Name="Bd" CornerRadius="8" Background="{TemplateBinding Background}" BorderBrush="{DynamicResource ListViewBorderColor}" BorderThickness="0.5" SnapsToDevicePixels="true">
                         <ScrollViewer Padding="{TemplateBinding Padding}">
                             <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                         </ScrollViewer>

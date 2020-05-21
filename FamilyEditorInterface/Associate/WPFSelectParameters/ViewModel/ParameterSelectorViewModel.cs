@@ -19,7 +19,7 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
         public ParameterSelectorView view;    //The UI View for the Plugin
 
         public ICommand CloseCommand { get; set; }  //Close Command
-        private List<FamilyParameter> revitParameters;  //Contains all the Revit parameters in the current Family
+        private Dictionary<FamilyParameter, bool> revitParameters;  //Contains all the Revit parameters in the current Family
 
         public string buttonName { get; private set; }  //The name of the Button, either be "Push" or "Pull" or something else
         public List<FamilyParameter> selectedParameters { get; internal set; }  //Contains all selected family parameters
@@ -46,7 +46,7 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
         /// Public Constructor of ParameterSelectorViewModel
         /// </summary>
         /// <param name="parameters">All FamilyParamters to display</param>
-        public ParameterSelectorViewModel(List<FamilyParameter> parameters, string button)
+        public ParameterSelectorViewModel(Dictionary<FamilyParameter, bool> parameters, string button)
         {
             this.revitParameters = parameters;
             this.buttonName = button; 
@@ -67,8 +67,10 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
         {
             var models = new List<ParameterSelectorModel>();
 
-            foreach(var par in revitParameters)
+            foreach(KeyValuePair<FamilyParameter, bool> pair in revitParameters)
             {
+                var par = pair.Key;
+
                 if (par.Id.IntegerValue < 0) continue; //Skip built-in parameters
                 models.Add(new ParameterSelectorModel()
                 {
@@ -78,8 +80,9 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
                     ParameterGroup = par.Definition.ParameterGroup,
                     ParameterType = par.Definition.ParameterType,
                     IsInstance = par.IsInstance,
-                    IsShared = par.IsShared
-                }) ;
+                    IsShared = par.IsShared,
+                    Exists = pair.Value
+                }); ;
             }
             models = models.OrderBy(x => x.Group).ToList();
             return new ObservableCollection<ParameterSelectorModel>(models);

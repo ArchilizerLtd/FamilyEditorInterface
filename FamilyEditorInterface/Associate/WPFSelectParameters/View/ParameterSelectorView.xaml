@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FamilyEditorInterface.Associate.WPFSelectParameters.View"
+        xmlns:convertors="clr-namespace:FamilyEditorInterface.WPF;assembly="    
         mc:Ignorable="d"
         TextElement.FontWeight="Light"
         TextElement.FontSize="12"
@@ -16,6 +17,32 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/FamilyEditorInterface;component/Resources/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <convertors:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></convertors:BoolToVisibilityConverter>
+            <!--Tag Styles-->
+            <Style TargetType="{x:Type Border}" x:Key="Tag">
+                <Style.Setters>
+                    <Setter Property="Tag" Value="Tag"/>
+                    <Setter Property="CornerRadius" Value="5"/>
+                    <Setter Property="Padding" Value="3"/>
+                    <Setter Property="MaxHeight" Value="12"/>
+                    <Setter Property="Margin" Value="6 0" />
+                </Style.Setters>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}" x:Key="TagText">
+                <Style.Setters>
+                    <Setter Property="FontSize" Value="8"/>
+                    <Setter Property="FontWeight" Value="Regular"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="SnapsToDevicePixels" Value="True"/>
+                </Style.Setters>
+            </Style>
+            <!--Tags' ContentControl DataTebmpalte-->
+            <DataTemplate x:Key="TagElement">
+                <Border Style="{StaticResource Tag}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" 
+                        Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl, AncestorLevel=1}}">
+                    <TextBlock Text="{Binding Path=Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl, AncestorLevel=1}}" Style="{StaticResource TagText}"/>
+                </Border>
+            </DataTemplate>
             <DataTemplate x:Key="ExpanderHeader">
                 <TextBlock Text="{Binding}" FontSize="14" FontWeight="Light" Margin="0 0 24 0" HorizontalAlignment="Right"/>
             </DataTemplate>
@@ -34,14 +61,19 @@
             </CollectionViewSource>
         </ResourceDictionary>
     </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="Close" Executed="OnCloseExecuted" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Command="Close" Key="Esc" />
+    </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
         <ListView Style="{DynamicResource RoundedListview}" x:Name="propertiesListBox"  ItemsSource="{Binding Source={StaticResource ParametersViewSource}}" IsSynchronizedWithCurrentItem="True" 
-                  Grid.Row="0" Margin="20" AlternationCount="2" VerticalAlignment="Top"
+                  Grid.Row="0" Margin="20" AlternationCount="2" SelectedIndex="-1" VerticalAlignment="Top"
                   Padding="10" Background="White" MinHeight="80">
             <ListView.GroupStyle>
                 <GroupStyle>
@@ -53,7 +85,7 @@
                                         <Expander IsExpanded="True" Style="{StaticResource CleanExpander}">
                                             <Expander.Header>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Name}" FontSize="14"/>
+                                                    <TextBlock Text="{Binding Name}" FontWeight="Medium" FontSize="14"/>
                                                 </StackPanel>
                                             </Expander.Header>
                                             <ItemsPresenter />
@@ -67,7 +99,10 @@
             </ListView.GroupStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name, Mode=OneWay}" FontFamily="Roboto" FontSize="11"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name, Mode=OneWay}" FontFamily="Roboto" FontSize="11"/>
+                        <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Exists, Converter={StaticResource BoolToVisibilityConverter}}" Background="#B7AB9D" Tag="exist" Content="{Binding Exists}" />
+                    </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ListView>

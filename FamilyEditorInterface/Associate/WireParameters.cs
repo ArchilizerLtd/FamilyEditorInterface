@@ -64,6 +64,7 @@ namespace FamilyEditorInterface.Associate
 			var wireFamily = Utils.PickObject(uidoc, "Pick a Nested Family."); //Get the family to associate to 
 			if (wireFamily == null) return;
 			var fam = doc.GetElement(wireFamily) as FamilyInstance;
+			if (fam == null) return;	//We could get a random selection, we haven't implemented a Filter (which we could TO DO)
 
 			AssociateParameters(fam, ParamType.Instance);	//Associate all possible Instance parameters
 			AssociateParameters(fam, ParamType.Type);   //Associate all possible Type
