@@ -163,6 +163,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="10"/>
                                         </Grid.ColumnDefinitions>
                                         <!--The Name-->
                                         <Border Background="White" CornerRadius="15">
@@ -224,6 +225,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="10"/>
                                         </Grid.ColumnDefinitions>
                                         <!--The Name-->
                                         <Border Background="White" CornerRadius="15">
@@ -271,6 +273,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="10"/>
                                         </Grid.ColumnDefinitions>
                                         <!--The Name-->
                                         <Border Background="White" CornerRadius="15">

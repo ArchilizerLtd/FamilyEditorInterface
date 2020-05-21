@@ -162,7 +162,7 @@
         <Setter Property="Width" Value="30"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="DockPanel.Dock" Value="Left"/>
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -189,22 +189,20 @@
     <Color x:Key="ControlLightColor">Transparent</Color>
     <Color x:Key="DisabledControlLightColor">#B937EE</Color>
     <!--Not used-->
-
-    <Color x:Key="ControlAlternationColor">#EAEAEA</Color>
+    <Color x:Key="ControlAlternationColor">#F5F5F5</Color>
     <!--Alternating Color-->
-    <Color x:Key="MouseOverNotSelectedColor">#FFE08B</Color>
+    <Color x:Key="MouseOverNotSelectedColor">#ECECEC</Color>
     <!--MouseOver-->
-    <Color x:Key="MouseOverSelectedColor">#0D6CD3</Color>
+    <Color x:Key="MouseOverSelectedColor">#9FC5EE</Color>
     <!--Pressed-->
-    <Color x:Key="SelectedFocusedColor">#90B2D6</Color>
+    <Color x:Key="SelectedFocusedColor">#DCE7F3</Color>
     <!--Selected Passive-->
 
     <!--Border colors-->
     <Color x:Key="BorderMediumColor">#B2B5B6</Color>
 
     <!--ListBox-->
-    <Style x:Key="{x:Type ListBox}"
-       TargetType="ListBox">
+    <Style x:Key="{x:Type ListBox}" TargetType="ListBox">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
@@ -318,8 +316,103 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
-    
+
+    <!--List View-->
+    <Style x:Key="RoundedListview" TargetType="{x:Type ListView}">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListView}">
+                    <Border Name="Bd" CornerRadius="8" Background="{TemplateBinding Background}" BorderBrush="{StaticResource ButtonPressedColor}" BorderThickness="0" SnapsToDevicePixels="true">
+                        <ScrollViewer Padding="{TemplateBinding Padding}">
+                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </ScrollViewer>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsGrouping" Value="true">
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="{x:Type ListViewItem}" TargetType="ListViewItem">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Light"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Border x:Name="Border" Padding="3" SnapsToDevicePixels="true" BorderThickness="0" Margin="-0.5 -0.5 0 -0.5">
+                        <Border.Background>
+                            <SolidColorBrush Color="Transparent" />
+                            <!--Default Contorl Color-->
+                        </Border.Background>
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="{StaticResource BorderMediumColor}" />
+                        </Border.BorderBrush>
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource ControlAlternationColor}" />
+                                    <!-- Alternating (Every other item) Color-->
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource DisabledControlLightColor}" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="true">
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource SelectedFocusedColor}" />
+                                    <!--Selected Color-->
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsSelected" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource MouseOverSelectedColor}"/>
+                                    <!--Mouse Over-->
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsSelected" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{StaticResource MouseOverNotSelectedColor}"/>
+                                    <!--Mouse Over Not Selected-->
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--Separators-->
     <Style x:Key="SimpleSeparatorStyle" TargetType="{x:Type Separator}">
         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
@@ -336,6 +429,16 @@
         <Setter Property="Height" Value=".5"/>
     </Style>
 
+    <!--Scrollbar Colors-->
+    <SolidColorBrush x:Key="ScrollBarColor">#ADABAB</SolidColorBrush>
+    <!--Main-->
+    <SolidColorBrush x:Key="ScrollBarBackgroundColor">Transparent</SolidColorBrush>
+    <!--Background-->
+    <SolidColorBrush x:Key="ScrollMouseOverColor">#9C9A9A</SolidColorBrush>
+    <!--MouseOver-->
+    <SolidColorBrush x:Key="ScrollIsDraggingrColor">#8C8B8B</SolidColorBrush>
+    <!--Dragging-->
+    
     <!--ScrollBar-->
     <Style x:Key="ScrollBarTrackThumb" TargetType="{x:Type Thumb}">
         <Setter Property="OverridesDefaultStyle" Value="true"/>
@@ -344,9 +447,8 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
                     <Grid x:Name="Grid">
-                        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto" Fill="Transparent" />
-                        <Border x:Name="CornerScrollBarRectangle" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                            Width="Auto" Height="Auto" Margin="0,1,0,1" Background="{TemplateBinding Background}" />
+                        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto" Fill="Transparent"/>
+                        <Border x:Name="CornerScrollBarRectangle" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto" Margin="0,1,0,1" Background="{TemplateBinding Background}" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="Tag" Value="Horizontal">
@@ -362,35 +464,37 @@
     <Style TargetType="{x:Type ScrollBar}">
         <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
         <Setter Property="Stylus.IsFlicksEnabled" Value="false" />
-        <Setter Property="BorderThickness" Value="1,0"/>
-        <Setter Property="Foreground" Value="#ADABAB" />
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Width" Value="7" />
+        <Setter Property="Foreground" Value="{DynamicResource ScrollBarColor}" />
+        <!--Scrollbar Color-->
+        <Setter Property="Background" Value="{DynamicResource ScrollBarBackgroundColor}"/>
+        <!--Scrollbar Background Color-->
+        <Setter Property="Margin" Value="-15 0 0 0"/>
+        <!--Control the negative offset of the scrollbar rather than the scrollviewer-->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ScrollBar}">
                     <Grid x:Name="GridRoot" Width="7" Margin="0,15" Background="{TemplateBinding Background}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="0.00001*" />
-                        </Grid.RowDefinitions>
-                        <Track x:Name="PART_Track" Grid.Row="0" IsDirectionReversed="true" Focusable="false">
+                        <Track x:Name="PART_Track" IsDirectionReversed="true" Focusable="false">
                             <Track.Thumb>
                                 <Thumb x:Name="Thumb" Background="{TemplateBinding Foreground}" Style="{DynamicResource ScrollBarTrackThumb}" />
+                                <!--Points to the Thumb style-->
                             </Track.Thumb>
                             <Track.IncreaseRepeatButton>
                                 <RepeatButton x:Name="PageUp" Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="false" />
+                                <!--Little page up button is hidden-->
                             </Track.IncreaseRepeatButton>
                             <Track.DecreaseRepeatButton>
                                 <RepeatButton x:Name="PageDown" Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="false" />
+                                <!--Little page down button is hidden-->
                             </Track.DecreaseRepeatButton>
                         </Track>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger SourceName="Thumb" Property="IsMouseOver" Value="true">
-                            <Setter Value="{DynamicResource ButtonSelectBrush}" TargetName="Thumb" Property="Background" />
+                            <Setter Value="{DynamicResource ScrollMouseOverColor}" TargetName="Thumb" Property="Background" />
                         </Trigger>
                         <Trigger SourceName="Thumb" Property="IsDragging" Value="true">
-                            <Setter Value="{DynamicResource DarkBrush}" TargetName="Thumb" Property="Background" />
+                            <Setter Value="{DynamicResource ScrollIsDraggingrColor}" TargetName="Thumb" Property="Background" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter TargetName="Thumb" Property="Visibility" Value="Collapsed" />
@@ -406,11 +510,6 @@
                                     <RotateTransform Angle="-90" />
                                 </Setter.Value>
                             </Setter>
-                            <Setter Property="Width" Value="Auto" />
-                            <Setter Property="Height" Value="8" />
-                            <Setter TargetName="Thumb" Property="Tag" Value="Horizontal" />
-                            <Setter TargetName="PageDown" Property="Command" Value="ScrollBar.PageLeftCommand" />
-                            <Setter TargetName="PageUp" Property="Command" Value="ScrollBar.PageRightCommand" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -418,20 +517,82 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type ScrollViewer}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type ScrollViewer}">
-                    <Grid x:Name="Grid"  >
-                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}" />
-                        <ScrollBar x:Name="ScrollBarTrackThumb" HorizontalAlignment="Right" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow"  Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}"/>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <!--Custom Expander-->
+    <ControlTemplate x:Key="CleanExpanderControlTemplateOverride" TargetType="{x:Type Expander}">
+        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="3" SnapsToDevicePixels="True">
+            <DockPanel>
+                <ToggleButton x:Name="HeaderSite" Margin="2 10 1 1" ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" DockPanel.Dock="Top" Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" FontStyle="{TemplateBinding FontStyle}" FontStretch="{TemplateBinding FontStretch}" FontSize="{TemplateBinding FontSize}" FontFamily="{TemplateBinding FontFamily}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" MinWidth="0" MinHeight="0" Padding="{TemplateBinding Padding}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                    <ToggleButton.FocusVisualStyle>
+                        <Style>
+                            <Setter Property="Control.Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Border>
+                                            <Rectangle Margin="0" SnapsToDevicePixels="True" Stroke="Black" StrokeThickness="1" StrokeDashArray="1 2"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ToggleButton.FocusVisualStyle>
+                    <ToggleButton.Style>
+                        <Style TargetType="{x:Type ToggleButton}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                        <Border Padding="{TemplateBinding Padding}">
+                                            <Grid Margin="0 0 0 5" Background="Transparent" SnapsToDevicePixels="False">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="19"/>
+                                                </Grid.ColumnDefinitions>
+                                                <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Column="0" ContentStringFormat="{TemplateBinding ContentStringFormat}" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0" FlowDirection="LeftToRight"/>
+                                                <Ellipse x:Name="circle" Grid.Column="2" Fill="#00000000" HorizontalAlignment="Center" Height="19" Stroke="{x:Null}" VerticalAlignment="Center" Width="19"/>
+                                                <Path x:Name="arrow" Grid.Column="2" Data="M1,1.5L4.5,5 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="False" Stroke="#FF333333" StrokeThickness="2" VerticalAlignment="Center"/>
+                                                <!--The 'Arrow' Shape-->
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Data" TargetName="arrow" Value="M1,4.5L4.5,1 8,4.5"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <!--<Setter Property="Stroke" TargetName="circle" Value="#FF5593FF"/>-->
+                                                <Setter Property="Fill" TargetName="circle" Value="#FFF3F9FF"/>
+                                                <Setter Property="Stroke" TargetName="arrow" Value="Black"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <!--<Setter Property="Stroke" TargetName="circle" Value="#FF3C77DD"/>-->
+                                                <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                                <Setter Property="Fill" TargetName="circle" Value="#FFD9ECFF"/>
+                                                <Setter Property="Stroke" TargetName="arrow" Value="Black"/>
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <!--<Setter Property="Stroke" TargetName="circle" Value="#FFBCBCBC"/>-->
+                                                <Setter Property="Fill" TargetName="circle" Value="#FFE6E6E6"/>
+                                                <Setter Property="Stroke" TargetName="arrow" Value="#FF707070"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ToggleButton.Style>
+                </ToggleButton>
+                <ContentPresenter x:Name="ExpandSite" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" DockPanel.Dock="Bottom" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" Visibility="Collapsed" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </DockPanel>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsExpanded" Value="True">
+                <Setter Property="Visibility" TargetName="ExpandSite" Value="Visible"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
     <ControlTemplate x:Key="ExpanderControlTemplateOverride" TargetType="{x:Type Expander}">
         <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="3" SnapsToDevicePixels="True">
             <DockPanel>
@@ -669,6 +830,7 @@
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
+
 
     <!--Sliders-->
     <SolidColorBrush x:Key="SliderThumb.Static.Foreground" Color="#FFE5E5E5"/>

@@ -9,12 +9,29 @@
         TextElement.FontSize="12"
         TextOptions.TextFormattingMode="Ideal"
         Background="#FAFAFA"
-        Title="Family Parameters" Height="600" MaxWidth="360" Width="360" MinWidth="360">
+        ResizeMode="CanResizeWithGrip"
+        Title="Family Parameters" Height="400" MaxWidth="360" Width="360" MinWidth="360">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/FamilyEditorInterface;component/Resources/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <DataTemplate x:Key="ExpanderHeader">
+                <TextBlock Text="{Binding}" FontSize="14" FontWeight="Light" Margin="0 0 24 0" HorizontalAlignment="Right"/>
+            </DataTemplate>
+            <Style x:Key="CleanExpander" TargetType="{x:Type Expander}">
+                <Style.Setters>
+                    <Setter Property="ExpandDirection" Value="Down"/>
+                    <Setter Property="DockPanel.Dock" Value="Top"/>
+                    <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+                    <Setter Property="Template" Value="{DynamicResource CleanExpanderControlTemplateOverride}"/>
+                </Style.Setters>
+            </Style>
+            <CollectionViewSource x:Key="ParametersViewSource" Source="{Binding Parameters}">
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription PropertyName="Group"/>
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -22,17 +39,39 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ListBox AlternationCount="2" x:Name="propertiesListBox" ItemsSource="{Binding Parameters}" 
-                 SelectionMode="Extended" Grid.Row="0">
+
+        <ListView Style="{DynamicResource RoundedListview}" x:Name="propertiesListBox"  ItemsSource="{Binding Source={StaticResource ParametersViewSource}}" IsSynchronizedWithCurrentItem="True" 
+                  Grid.Row="0" Margin="20" AlternationCount="2" VerticalAlignment="Top"
+                  Padding="10" Background="White" MinHeight="80">
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Expander IsExpanded="True" Style="{StaticResource CleanExpander}">
+                                            <Expander.Header>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Name}" FontSize="14"/>
+                                                </StackPanel>
+                                            </Expander.Header>
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </ListView.GroupStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <DockPanel HorizontalAlignment="Stretch">
-                        <TextBlock Style="{StaticResource ListBoxTextBlockStyle}" Margin="10 0" Text="{Binding Group}" DockPanel.Dock="Right"/>
-                        <TextBlock Style="{StaticResource ListBoxTextBlockStyle}" Margin="5 0" Text="{Binding Name}" DockPanel.Dock="Left" FontSize="14" FontWeight="Regular"/>
-                    </DockPanel>
+                    <TextBlock Text="{Binding Name, Mode=OneWay}" FontFamily="Roboto" FontSize="11"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ListBox>
+        </ListView>
+        
         <Button Margin="20" x:Name="btnDialogOk" Style="{DynamicResource SimpleButtonStyle}" Grid.Row="1" Content="{Binding buttonName}" Command="{Binding CloseCommand}" HorizontalAlignment="Stretch" Height="30"/>
     </Grid>
 </Window>
