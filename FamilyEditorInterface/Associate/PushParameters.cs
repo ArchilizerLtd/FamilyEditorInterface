@@ -99,7 +99,7 @@ namespace FamilyEditorInterface.Associate
 			}			
 
 			if (!String.IsNullOrEmpty(AlertMessage)) DialogUtils.Alert("Warning", AlertMessage);    //Finally, alert the user if we had any issues
-			if (!String.IsNullOrEmpty(SuccessMessage)) DialogUtils.Notify("Warning", SuccessMessage);  //And, issue an OK message the user for all the successfully processed parameters
+			if (!String.IsNullOrEmpty(SuccessMessage)) DialogUtils.OK("Push successful", SuccessMessage);  //And, issue an OK message the user for all the successfully processed parameters
 		}
         #endregion
 

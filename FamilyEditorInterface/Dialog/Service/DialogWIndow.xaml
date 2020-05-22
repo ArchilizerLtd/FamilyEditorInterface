@@ -18,6 +18,12 @@
         <DataTemplate DataType="{x:Type alert:NotifyDialogViewModel}">
             <alert:NotifyDialogView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type alert:OKDialogViewModel}">
+            <alert:OKDialogView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type alert:FailureDialogViewModel}">
+            <alert:FailureDialogView/>
+        </DataTemplate>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="Close" Executed="OnCloseExecuted" />

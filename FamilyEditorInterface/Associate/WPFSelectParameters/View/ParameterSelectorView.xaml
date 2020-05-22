@@ -10,8 +10,9 @@
         TextElement.FontSize="12"
         TextOptions.TextFormattingMode="Ideal"
         Background="#FAFAFA"
+        WindowStartupLocation="CenterScreen"
         ResizeMode="CanResizeWithGrip"
-        Title="Family Parameters" Height="400" MaxWidth="360" Width="360" MinWidth="360">
+        Title="Family Parameters" Height="460" MaxWidth="360" Width="360" MinWidth="360">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

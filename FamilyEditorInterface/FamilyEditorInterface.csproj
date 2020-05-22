@@ -86,6 +86,10 @@
       <DependentUpon>ParameterSelectorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialog\Alerts\DialogUtils.cs" />
+    <Compile Include="Dialog\Alerts\FailureDialogView.xaml.cs">
+      <DependentUpon>FailureDialogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Alerts\FailureDialogViewModel.cs" />
     <Compile Include="Dialog\Alerts\NotifyDialogView.cs">
       <DependentUpon>NotifyDialogView.xaml</DependentUpon>
     </Compile>
@@ -96,6 +100,10 @@
     </Compile>
     <Compile Include="Dialog\Alerts\AlertDialogViewModel.cs" />
     <Compile Include="Dialog\Alerts\NotifyDialogViewModel.cs" />
+    <Compile Include="Dialog\Alerts\OKDialogView.xaml.cs">
+      <DependentUpon>OKDialogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Alerts\OKDialogViewModel.cs" />
     <Compile Include="Dialog\DialogResults.cs" />
     <Compile Include="Dialog\Service\DataTemplateCreation.cs" />
     <Compile Include="Dialog\Service\DialogSerivce.cs" />
@@ -159,11 +167,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialog\Alerts\FailureDialogView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Dialog\Alerts\NotifyDialogView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialog\Alerts\AlertDialogView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\Alerts\OKDialogView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

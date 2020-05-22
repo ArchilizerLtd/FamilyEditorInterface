@@ -70,7 +70,7 @@ namespace FamilyEditorInterface.Associate
 			AssociateParameters(fam, ParamType.Type);   //Associate all possible Type
 
 			if (!String.IsNullOrEmpty(AlertMessage)) DialogUtils.Alert("Warning", AlertMessage);    //Finally, alert the user if we had any issues
-			if (!String.IsNullOrEmpty(SuccessMessage)) DialogUtils.Notify("Warning", SuccessMessage);  //And, issue an OK message the user for all the successfully processed parameters
+			if (!String.IsNullOrEmpty(SuccessMessage)) DialogUtils.OK("Wire successful", SuccessMessage);  //And, issue an OK message the user for all the successfully processed parameters
 		}
 		//Dispatch based on Parmater Type
 		private void AssociateParameters(FamilyInstance family, ParamType pType)

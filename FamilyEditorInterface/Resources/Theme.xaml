@@ -4,10 +4,13 @@
 
     <!--Icon Color-->
     <SolidColorBrush x:Key="ButtonPressedColor" Color="#111111"/>
+    <SolidColorBrush x:Key="MessageTextColor" Color="#51515A"/>
     <SolidColorBrush x:Key="ButtonColor" Color="#444444"/>
     <SolidColorBrush x:Key="WarningColorBrush" Color="#FFBB00"/>
-    <SolidColorBrush x:Key="NotifyColorBrush" Color="#40BB00"/>
-    <SolidColorBrush x:Key="TextColor" Color="#1F1E21"/>
+    <SolidColorBrush x:Key="NotifyColorBrush2" Color="#94C8DB"/>
+    <SolidColorBrush x:Key="NotifyColorBrush" Color="#31D2FD"/>
+    <SolidColorBrush x:Key="OKColorBrush" Color="#40BB00"/>
+    <SolidColorBrush x:Key="FailureColorBrush" Color="#FA4C5E"/>
 
     <!--Icons-->
     <!--https://materialdesignicons.com/-->
@@ -49,18 +52,28 @@
     </Viewbox>
     <Viewbox x:Key="CloseIcon" Width="14" Height="14">
         <Canvas Width="24" Height="24">
-            <Path Data="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z" 
+            <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" 
                   Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"/>
         </Canvas>
     </Viewbox>
-    <Viewbox x:Key="WarningIcon" Width="24" Height="24">
+    <Viewbox x:Key="WarningIcon" Width="36" Height="36">
         <Canvas Width="24" Height="24">
-            <Path Data="M13,10H11V6H13M13,14H11V12H13M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" Fill="{StaticResource WarningColorBrush}"/>
+            <Path Data="M 11,4L 13,4L 13,15L 11,15L 11,4 Z M 13,18L 13,20L 11,20L 11,18L 13,18 Z" Fill="{StaticResource WarningColorBrush}"/>
         </Canvas>
     </Viewbox>
-    <Viewbox x:Key="NotifyIcon" Width="24" Height="24">
+    <Viewbox x:Key="InfoIcon" Width="36" Height="36">
         <Canvas Width="24" Height="24">
-            <Path Data= "M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" Fill="{StaticResource NotifyColorBrush}"/>
+            <Path Data= "M13.5,4A1.5,1.5 0 0,0 12,5.5A1.5,1.5 0 0,0 13.5,7A1.5,1.5 0 0,0 15,5.5A1.5,1.5 0 0,0 13.5,4M13.14,8.77C11.95,8.87 8.7,11.46 8.7,11.46C8.5,11.61 8.56,11.6 8.72,11.88C8.88,12.15 8.86,12.17 9.05,12.04C9.25,11.91 9.58,11.7 10.13,11.36C12.25,10 10.47,13.14 9.56,18.43C9.2,21.05 11.56,19.7 12.17,19.3C12.77,18.91 14.38,17.8 14.54,17.69C14.76,17.54 14.6,17.42 14.43,17.17C14.31,17 14.19,17.12 14.19,17.12C13.54,17.55 12.35,18.45 12.19,17.88C12,17.31 13.22,13.4 13.89,10.71C14,10.07 14.3,8.67 13.14,8.77Z" Fill="{StaticResource NotifyColorBrush}"/>
+        </Canvas>
+    </Viewbox>
+    <Viewbox x:Key="OKIcon" Width="36" Height="36">
+        <Canvas Width="24" Height="24">
+            <Path Data= "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="{StaticResource OKColorBrush}"/>
+        </Canvas>
+    </Viewbox>
+    <Viewbox x:Key="FailureIcon" Width="36" Height="36">
+        <Canvas Width="24" Height="24">
+            <Path Data= "M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,13.85 4.63,15.55 5.68,16.91L16.91,5.68C15.55,4.63 13.85,4 12,4M12,20A8,8 0 0,0 20,12C20,10.15 19.37,8.45 18.32,7.09L7.09,18.32C8.45,19.37 10.15,20 12,20Z" Fill="{StaticResource FailureColorBrush}"/>
         </Canvas>
     </Viewbox>
 
@@ -71,15 +84,12 @@
         <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
-        <Setter Property="FontFamily" Value="Lato"/>
-        <Setter Property="LineHeight" Value="24"/>
-        <Setter Property="MaxWidth" Value="300"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="MaxWidth" Value="500"/>
+        <Setter Property="LineHeight" Value="22"/>
         <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
-        <Setter Property="Foreground" Value="{StaticResource ButtonPressedColor}"/>
+        <Setter Property="Foreground" Value="{StaticResource MessageTextColor}"/>
     </Style>
-
     <Style x:Key="ListBoxTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MessageTextBlockStyle}">
         <Setter Property="LineHeight" Value="Auto"/>
         <Setter Property="Foreground" Value="#1A1A1A"></Setter>

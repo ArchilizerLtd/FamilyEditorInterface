@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="Dialog.Alerts.AlertDialogView"
+﻿<UserControl x:Class="Dialog.Alerts.OKDialogView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Dialog.Alerts"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="300">
+             d:DesignHeight="120" d:DesignWidth="450">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -18,7 +18,7 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Rectangle Width="5" Fill="{StaticResource WarningColorBrush}" HorizontalAlignment="Left" Grid.RowSpan="2"/>
+        <Rectangle Width="5" Fill="{StaticResource OKColorBrush}" HorizontalAlignment="Left" Grid.RowSpan="2"/>
         <Button x:Name="Close" IsCancel="True" Grid.Row="0" Margin="0 0 8 0"
                 Content="{StaticResource CloseIcon}" Style="{StaticResource ToolbarButton}"
                 VerticalAlignment="Top" HorizontalAlignment="Right" />
@@ -27,10 +27,10 @@
                 <ColumnDefinition Width="46"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" x:Name="warningIcon" Content="{StaticResource WarningIcon}" VerticalAlignment="Top" Margin="0 5"/>
+            <Label Grid.Column="0" x:Name="warningIcon" Content="{StaticResource OKIcon}" VerticalAlignment="Top" Margin="0 5"/>
             <StackPanel Orientation="Vertical" Grid.Column="1" Margin="20 0">
                 <TextBlock Text="{Binding Title}" Style="{StaticResource MessageTextBlockStyle}" 
-                           Foreground="{DynamicResource WarningColorBrush}"
+                           Foreground="{DynamicResource OKColorBrush}"
                            FontSize="18"/>
                 <TextBlock Text="{Binding Message}" Style="{StaticResource MessageTextBlockStyle}" Margin="0 10 0 0"/>
                 <ItemsControl ItemsSource="{Binding Note}" VerticalAlignment="Top" Margin="0 5 0 15">
@@ -45,6 +45,5 @@
                 </ItemsControl>
             </StackPanel>
         </Grid>
-
     </Grid>
 </UserControl>
