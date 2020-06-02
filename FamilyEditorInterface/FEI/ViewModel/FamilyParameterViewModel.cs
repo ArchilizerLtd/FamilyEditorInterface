@@ -382,6 +382,10 @@ namespace FamilyEditorInterface.WPF
                 //DialogUtils.Alert("Alert", new List<Message>() { new Message("Warning!", $"{values.Count.ToString()} Parameters will be removed.")});
                 MakeRequest(RequestId.DeleteId, values);
             }
+            else
+            {
+                DialogUtils.Notify("Good stuff.", $"No unused parameters found.");
+            }
         }
         //Toggles Editable on/off
         private void Editable(object sender)
