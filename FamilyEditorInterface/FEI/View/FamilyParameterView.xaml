@@ -115,13 +115,14 @@
         <DockPanel DockPanel.Dock="Bottom" Margin="0,20,0,0">
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnShuffle" Content="{StaticResource ShuffleIcon}" Command="{Binding ShuffleCommand}" ToolTip="Shuffle Parameter Values"/>
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnDeleteAllUnused" Content="{StaticResource DeleteIcon}" Command="{Binding DeleteUnusedCommand}" ToolTip="Delete all unused Parameters"/>
-            <!--<Button Style="{StaticResource ToolbarButton}" x:Name="btnSettings" Content="{StaticResource SettingsIcon}" Command="{Binding PrecisionCommand}" ToolTip="Settings"/>-->
+            <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettings" Content="{StaticResource ViewIcon}" Command="{Binding EditableCommand}" ToolTip="Editable Parameters"/>
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettingsTest" Content="{StaticResource ToggleIcon}" Command="{Binding ToggleCommand}" ToolTip="Toggle Tags"/>
             <Button Style="{DynamicResource SimpleButtonStyle}" x:Name="btnDialogOk" Click="BtnDialogOk_Click" Content="Close" Width="95"/>
         </DockPanel>
         <!--Parameters-->
         <ScrollViewer x:Name="MainCanvas" VerticalScrollBarVisibility="Auto" MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}, Mode=FindAncestor}}" Margin="0,5,0,0">
             <DockPanel DockPanel.Dock="Top" Margin="0 0 10 0">
+                <!--Debug-->
                 <Expander Visibility="Collapsed" Style="{StaticResource RightExpander}" x:Name="Debug" IsExpanded="True" Header="Test Expander">
                     <DockPanel FlowDirection="LeftToRight" LastChildFill="True">
                         <Grid Style="{StaticResource ItemControlGridStyle}">
@@ -157,7 +158,7 @@
                         <ItemsControl ItemsSource="{Binding ValueParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Style="{StaticResource ItemControlGridStyle}">
+                                    <Grid Style="{StaticResource ItemControlGridStyle}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
@@ -171,7 +172,7 @@
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox ToolTip="{Binding Name}" Style="{StaticResource EnterText}" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}">
+                                        <TextBox ToolTip="{Binding Name}" Style="{StaticResource EnterText}" Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}">
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
@@ -186,26 +187,28 @@
                                         </TextBox>
                                         <!--Tags-->
                                         <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="2 0">
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource shared}" Tag="shared" Content="{Binding Shared}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource built-in}" Tag="shared" Content="{Binding BuiltIn}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource in-use}" Tag="in use" Content="{Binding IsUsed}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource fromF}" Tag="dF" Content="{Binding Formula}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource inF}" Tag="uF" Content="{Binding UsedInFormula}"/>
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource report}" Tag="report" Content="{Binding Reporting}"/>
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource label}" Tag="label" Content="{Binding Label}" />
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource shared}" Tag="shared" Content="{Binding Shared}" ToolTip="This is a Shared parameter"/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource built-in}" Tag="shared" Content="{Binding BuiltIn}" ToolTip="This is a Built-in parameter. Cannot be deleted."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource in-use}" Tag="in use" Content="{Binding IsUsed}" ToolTip="The parameter is either associated, used as a label or used in a formula."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource fromF}" Tag="dF" Content="{Binding Formula}" ToolTip="The parameter is driven by a formula."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource inF}" Tag="uF" Content="{Binding UsedInFormula}" ToolTip="The parameter is used in a formula."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource report}" Tag="report" Content="{Binding Reporting}" ToolTip="Reporting parameter"/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource label}" Tag="label" Content="{Binding Label}" ToolTip="The parameter is used in a label."/>
                                         </StackPanel>
                                         <!--The Value Slider-->
                                         <!--Delay makes the UI responsive-->
                                         <Slider Style="{DynamicResource RoundSliderStyle}" Value="{Binding UIValue, Delay=500}" HorizontalContentAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1"
-                                    Maximum="{Binding UIValue, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"/>
+                                                Maximum="{Binding UIValue, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" 
+                                                Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}"/>
                                         <!--The Value-->
                                         <Border Background="White" CornerRadius="15" Grid.Column="3">
                                             <Border.Effect>
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox Text="{Binding UIValue, Converter={StaticResource DoubleToStringConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="3" Style="{StaticResource EnterText}" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"
-                                                       PreviewTextInput="txtAnswer_PreviewTextInput"/>
+                                        <TextBox Text="{Binding UIValue, Converter={StaticResource DoubleToStringConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="3" Style="{StaticResource EnterText}" 
+                                                 Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}"
+                                                 PreviewTextInput="txtAnswer_PreviewTextInput"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -219,7 +222,7 @@
                         <ItemsControl ItemsSource="{Binding BuiltInParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Style="{StaticResource ItemControlGridStyle}">
+                                    <Grid Style="{StaticResource ItemControlGridStyle}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
@@ -233,28 +236,30 @@
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox Text="{Binding Name, Mode=OneWay}"  ToolTip="{Binding Name}" Style="{StaticResource EnterText}" IsReadOnly="True" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"/>
+                                        <TextBox Text="{Binding Name, Mode=OneWay}"  ToolTip="{Binding Name}" Style="{StaticResource EnterText}" IsReadOnly="True" Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}"/>
                                         <!--Tags-->
                                         <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="2 0">
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource shared}" Tag="shared" Content="{Binding Shared}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource built-in}" Tag="shared" Content="{Binding BuiltIn}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource in-use}" Tag="in use" Content="{Binding IsUsed}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource fromF}" Tag="dF" Content="{Binding Formula}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource inF}" Tag="uF" Content="{Binding UsedInFormula}"/>
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource report}" Tag="report" Content="{Binding Reporting}"/>
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource label}" Tag="label" Content="{Binding Label}" />
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource shared}" Tag="shared" Content="{Binding Shared}" ToolTip="This is a Shared parameter"/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource built-in}" Tag="built-in" Content="{Binding BuiltIn}" ToolTip="This is a Built-in parameter. Cannot be deleted."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource in-use}" Tag="in use" Content="{Binding IsUsed}" ToolTip="The parameter is either associated, used as a label or used in a formula."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource fromF}" Tag="dF" Content="{Binding Formula}" ToolTip="The parameter is driven by a formula."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource inF}" Tag="uF" Content="{Binding UsedInFormula}" ToolTip="The parameter is used in a formula."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource report}" Tag="report" Content="{Binding Reporting}" ToolTip="Reporting parameter"/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource label}" Tag="label" Content="{Binding Label}" ToolTip="The parameter is used in a label."/>
                                         </StackPanel>
                                         <!--The Value Slider-->
                                         <Slider Style="{DynamicResource RoundSliderStyle}" Value="{Binding Value, Delay=500}" HorizontalContentAlignment="Center"
-                                        Maximum="{Binding Value, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"/>
+                                        Maximum="{Binding Value, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" 
+                                                Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}"/>
                                         <!--The Value-->
                                         <Border Background="White" CornerRadius="15" Grid.Column="3">
                                             <Border.Effect>
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox Text="{Binding Value, Converter={StaticResource ReverseUnitConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="3" Style="{StaticResource EnterText}" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}"
-                                                     PreviewTextInput="txtAnswer_PreviewTextInput"/>
+                                        <TextBox Text="{Binding Value, Converter={StaticResource ReverseUnitConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="3" Style="{StaticResource EnterText}" 
+                                                 Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}"
+                                                 PreviewTextInput="txtAnswer_PreviewTextInput" />
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -268,7 +273,7 @@
                         <ItemsControl ItemsSource="{Binding CheckParameters}" Grid.IsSharedSizeScope="True" DockPanel.Dock="Top">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Style="{StaticResource ItemControlGridStyle}">
+                                    <Grid Style="{StaticResource ItemControlGridStyle}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
@@ -281,7 +286,7 @@
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"  ToolTip="{Binding Name}" Style="{StaticResource EnterText}" Foreground="{Binding IsUsed, Converter={StaticResource BoolToColorConverter}}">
+                                        <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"  ToolTip="{Binding Name}" Style="{StaticResource EnterText}" Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}">
                                             <TextBox.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
@@ -291,16 +296,17 @@
                                         </TextBox>
                                         <!--Tags-->
                                         <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="2 0">
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource shared}" Tag="shared" Content="{Binding Shared}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource built-in}" Tag="shared" Content="{Binding BuiltIn}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource in-use}" Tag="in use" Content="{Binding IsUsed}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource fromF}" Tag="dF" Content="{Binding Formula}" />
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource inF}" Tag="uF" Content="{Binding UsedInFormula}"/>
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource report}" Tag="report" Content="{Binding Reporting}"/>
-                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource label}" Tag="label" Content="{Binding Label}" />
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource shared}" Tag="shared" Content="{Binding Shared}" ToolTip="This is a Shared parameter"/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource built-in}" Tag="shared" Content="{Binding BuiltIn}" ToolTip="This is a Built-in parameter. Cannot be deleted."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource in-use}" Tag="in use" Content="{Binding IsUsed}" ToolTip="The parameter is either associated, used as a label or used in a formula."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource fromF}" Tag="dF" Content="{Binding Formula}" ToolTip="The parameter is driven by a formula."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource inF}" Tag="uF" Content="{Binding UsedInFormula}" ToolTip="The parameter is used in a formula."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource report}" Tag="report" Content="{Binding Reporting}" ToolTip="Reporting parameter"/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource label}" Tag="label" Content="{Binding Label}" ToolTip="The parameter is used in a label."/>
                                         </StackPanel>
                                         <!--The CheckBox-->
-                                        <CheckBox IsChecked="{Binding UIValue, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="2" HorizontalAlignment="Right" Margin="0,10,0,0" BorderThickness="0">
+                                        <CheckBox IsChecked="{Binding UIValue, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="2" HorizontalAlignment="Right" Margin="0,10,0,0" BorderThickness="0" 
+                                                  Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}">
                                             <CheckBox.Effect>
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="2" Opacity="0.25"/>
                                             </CheckBox.Effect>

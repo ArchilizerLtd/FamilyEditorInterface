@@ -70,5 +70,17 @@ namespace FamilyEditorInterface.Properties {
                 this["ToggleVisibility"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ToggleTagsVisibility {
+            get {
+                return ((bool)(this["ToggleTagsVisibility"]));
+            }
+            set {
+                this["ToggleTagsVisibility"] = value;
+            }
+        }
     }
 }

@@ -34,7 +34,7 @@ namespace FamilyEditorInterface.WPF
         private bool _builtIn;  //private bool if the parameter is Built-In (and cannot be deleted)
         private bool _shared;   //private bool if hte parameter is Shared
         private int _precision; //user defined precision
-        private bool _visible;  //private bool if hte parameter is visible
+        private bool _visible;  //private bool if the parameter is visible
         private bool _suppres;  //suppres request in case of shuffle or mass request
         private bool _readOnly; //read-only parameter
         private bool _modifiable;   //indicates if the itneractive user can modify the value of the parameter
@@ -44,6 +44,8 @@ namespace FamilyEditorInterface.WPF
         private bool _label;  //If the parameter is used to drive dimensions
         private bool _isUsed;
         private bool conversion = false;    //We need to stop the  circular reference during Value and UIValue change
+        private bool _edit;
+        private bool _tagVisible;   //Visibility of the Parameter Tags
 
         /// <summary>
         /// Constructor
@@ -129,8 +131,25 @@ namespace FamilyEditorInterface.WPF
             get { return _visible; }
             set
             {
-                _visible = value;
+                if (Editable)
+                {
+                    _visible = true;   //Only apply to not editable
+                }
+                else
+                {
+                    _visible = value;
+                }
                 RaisePropertyChanged("Visible");
+            }
+        }
+        //If the Paramter Tag is Visible 
+        public bool TagVisible
+        {
+            get { return _tagVisible; }
+            set
+            {
+                _tagVisible = value;
+                RaisePropertyChanged("TagVisible");
             }
         }
         //Parameter Type
@@ -150,7 +169,7 @@ namespace FamilyEditorInterface.WPF
             set
             {
                 _associated = value;
-                if (_associated && !Properties.Settings.Default.AssociatedVisibility) Visible = false;
+                if (_associated && !Properties.Settings.Default.AssociatedVisibility) TagVisible = false;
                 RaisePropertyChanged("Associated");
             }
         }        
@@ -242,6 +261,16 @@ namespace FamilyEditorInterface.WPF
             {
                 _isUsed = value;
                 RaisePropertyChanged("IsUsed");
+            }
+        }
+        //Sets if the parameter is greyed out in the UI
+        public bool Editable
+        {
+            get { return _edit; }
+            set
+            {
+                _edit = value;
+                RaisePropertyChanged("Editable");
             }
         }
         //Revit Display Unit Type to help us display the correct unit in the UI

@@ -78,11 +78,12 @@ namespace FamilyEditorInterface
                         }
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
                 if (EncounteredError != null)
                 {
                     EncounteredError(this, null);
+                    RequestError.ErrorLog.Add(new Message("Operation failed.", ex.Message));
                 }
             }
             finally
@@ -115,8 +116,7 @@ namespace FamilyEditorInterface
 
             if (!doc.IsFamilyDocument)
             {
-                Command.global_message =
-                  "Please run this command in a family document.";
+                Command.global_message = "Please run this command in a family document.";
                 TaskDialog.Show("Message", Command.global_message);
             }
 
@@ -164,12 +164,8 @@ namespace FamilyEditorInterface
             }
         }
         /// <summary>
-        ///   The main door-modification subroutine - called from every request 
+        /// Shuffles all parameter values in order to 'test' them
         /// </summary>
-        /// <remarks>
-        ///   It searches the current selection for all doors
-        ///   and if it finds any it applies the requested operation to them
-        /// </remarks>
         /// <param name="uiapp">The Revit application object</param>
         /// <param name="text">Caption of the transaction for the operation.</param>
         /// <param name="operation">A delegate to perform the operation on an instance of a door.</param>
@@ -181,8 +177,7 @@ namespace FamilyEditorInterface
 
             if (!doc.IsFamilyDocument)
             {
-                Command.global_message =
-                  "Please run this command in a family document.";
+                Command.global_message = "Please run this command in a family document.";
                 TaskDialog.Show("Message", Command.global_message);
             }
 
@@ -208,8 +203,9 @@ namespace FamilyEditorInterface
                             // The name of the transaction was given as an argument
                             if (trans.Start(text) == TransactionStatus.Started)
                             {
+                                if(fp.IsDeterminedByFormula) continue;  //Cannot change parameters driven by formulas
+                                if(fp.IsReporting) continue;    //Cannot change reporting parameters
                                 mgr.Set(fp, value.Item2);
-                                //operation(mgr, fp);
                                 doc.Regenerate();
                                 trans.Commit();
                                 uidoc.RefreshActiveView();
@@ -241,8 +237,7 @@ namespace FamilyEditorInterface
 
             if (!doc.IsFamilyDocument)
             {
-                Command.global_message =
-                  "Please run this command in a family document.";
+                Command.global_message = "Please run this command in a family document.";
                 TaskDialog.Show("Message", Command.global_message);
             }
 

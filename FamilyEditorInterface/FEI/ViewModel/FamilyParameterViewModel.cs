@@ -44,6 +44,7 @@ namespace FamilyEditorInterface.WPF
         public ICommand PrecisionCommand { get; set; }
         public ICommand DeleteUnusedCommand { get; set; }
         public ICommand ToggleCommand { get; set; }
+        public ICommand EditableCommand { get; set; }
 
         private ObservableCollection<FamilyParameterModel> _valueParameters;
         private ObservableCollection<FamilyParameterModel> _builtInParameters;
@@ -132,6 +133,8 @@ namespace FamilyEditorInterface.WPF
             PrecisionCommand = new RelayCommand(o => Precision("PrecisionButton"));
             DeleteUnusedCommand = new RelayCommand(o => DeleteUnused("DeleteUnusedButton"));
             ToggleCommand = new RelayCommand(o => ToggleTags("ToggleVisibility"));
+            EditableCommand = new RelayCommand(o => Editable("ShowEditable"));
+
 
             this.PopulateModel();
             this._enabled = true;
@@ -334,25 +337,45 @@ namespace FamilyEditorInterface.WPF
 
             if (values.Count > 0)
             {
-                DialogUtils.Alert("Alert", new List<Message>() { new Message("Warning!", $"{values.Count.ToString()} Parameters will be removed.")});
+                //DialogUtils.Alert("Alert", new List<Message>() { new Message("Warning!", $"{values.Count.ToString()} Parameters will be removed.")});
                 MakeRequest(RequestId.DeleteId, values);
+            }
+        }
+        //Toggles Editable on/off
+        private void Editable(object sender)
+        {
+            Properties.Settings.Default.ToggleVisibility = !Properties.Settings.Default.ToggleVisibility;   //Toggles the User-defined visibility
+            foreach (var param in ValueParameters)
+            {
+                if (param.Editable) continue;
+                param.Visible = Properties.Settings.Default.ToggleVisibility;
+            }
+            foreach (var param in BuiltInParameters)
+            {
+                if (param.Editable) continue;
+                param.Visible = Properties.Settings.Default.ToggleVisibility;
+            }
+            foreach (var param in CheckParameters)
+            {
+                if (param.Editable) continue;
+                param.Visible = Properties.Settings.Default.ToggleVisibility;
             }
         }
         // Toggles Tags on/off
         private void ToggleTags(object sender)
         {
-            Properties.Settings.Default.ToggleVisibility = !Properties.Settings.Default.ToggleVisibility;   //Toggles the User-defined visibility
+            Properties.Settings.Default.ToggleTagsVisibility = !Properties.Settings.Default.ToggleTagsVisibility;   //Toggles the User-defined visibility
             foreach (var param in ValueParameters)
             {
-                param.Visible = Properties.Settings.Default.ToggleVisibility;
+                param.TagVisible = Properties.Settings.Default.ToggleTagsVisibility;
             }
             foreach (var param in BuiltInParameters)
             {
-                param.Visible = Properties.Settings.Default.ToggleVisibility;
+                param.TagVisible = Properties.Settings.Default.ToggleTagsVisibility;
             }
             foreach (var param in CheckParameters)
             {
-                param.Visible = Properties.Settings.Default.ToggleVisibility;
+                param.TagVisible = Properties.Settings.Default.ToggleTagsVisibility;
             }
         }
         // Makes requiest, renames Parameters
@@ -363,7 +386,7 @@ namespace FamilyEditorInterface.WPF
             Application.Control.handler.Request.Make(request);
             Application.Control.exEvent.Raise();
         }
-        // Makes request, changes values
+        // Makes request, Shuffle values
         private void MakeRequest(RequestId request, List<Tuple<string, double>> values)
         {
             //MessageBox.Show("You are in the Control.Request event.");

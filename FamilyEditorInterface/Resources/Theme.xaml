@@ -77,7 +77,10 @@
         </Canvas>
     </Viewbox>
 
-
+    <!--ToolTip Styling-->
+    <Style x:Key="{x:Type ToolTip}" TargetType="ToolTip">
+        <Setter Property="Padding" Value="8"/>
+    </Style>
 
     <!--Textblock Styles-->
     <Style x:Key="MessageTextBlockStyle" TargetType="{x:Type TextBlock}">

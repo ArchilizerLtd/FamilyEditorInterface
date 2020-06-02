@@ -39,7 +39,9 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.Shared = fp.IsShared;
             newItem.TypeOrInstance = fp.IsInstance ? "Instance" : "Type";
             newItem.IsUsed = (newItem.Associated || newItem.Label || newItem.UsedInFormula);    //Used if any of the three is true
-            newItem.Visible = Properties.Settings.Default.ToggleVisibility; //Set the visibility in the UI (user defined Tag property for all Tags, regardless of their specific conditions)
+            newItem.Editable = newItem.IsUsed && !newItem.Formula && !newItem.Reporting; //If the Parameter is used or if the parameter is not defined by Formula, allow the user to edit
+            newItem.Visible = Properties.Settings.Default.ToggleVisibility; //Set the visibility in the UI (user defined Tag property for ALL Tags, regardless of their specific conditions)
+            newItem.TagVisible = Properties.Settings.Default.ToggleTagsVisibility; //Set the Tags visibility 
             newItem.Value = GetParameterValue(ft, fp) ;  //The Value of the parameter (can be yes/no, double, integer, string, ...
 
             return newItem;

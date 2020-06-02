@@ -5,12 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Dialog.Alerts"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="300">
+             d:DesignHeight="120" d:DesignWidth="450">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/FamilyEditorInterface;component/Resources/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <local:NullToVisibilityConverter x:Key="NullConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Background="White">
@@ -32,7 +33,8 @@
                 <TextBlock Text="{Binding Title}" Style="{StaticResource MessageTextBlockStyle}" 
                            Foreground="{DynamicResource WarningColorBrush}"
                            FontSize="18"/>
-                <TextBlock Text="{Binding Message}" Style="{StaticResource MessageTextBlockStyle}" Margin="0 10 0 0"/>
+                <TextBlock Text="{Binding Message}" Style="{StaticResource MessageTextBlockStyle}" Margin="0 10 0 0"
+                           Visibility="{Binding Message, Converter={StaticResource NullConverter}}"/>
                 <ItemsControl ItemsSource="{Binding Note}" VerticalAlignment="Top" Margin="0 5 0 15">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
