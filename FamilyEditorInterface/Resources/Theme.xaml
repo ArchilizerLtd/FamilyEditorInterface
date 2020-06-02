@@ -87,9 +87,9 @@
         <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontSize" Value="12"/>
         <Setter Property="MaxWidth" Value="500"/>
-        <Setter Property="LineHeight" Value="22"/>
+        <Setter Property="LineHeight" Value="20"/>
         <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
         <Setter Property="Foreground" Value="{StaticResource MessageTextColor}"/>
     </Style>

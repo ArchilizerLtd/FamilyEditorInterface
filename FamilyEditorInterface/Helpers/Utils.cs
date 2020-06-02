@@ -4,6 +4,7 @@ using Autodesk.Revit.UI.Selection;
 using Dialog.Alerts;
 using Dialog.Service;
 using FamilyEditorInterface.Dialog.Alerts;
+using FamilyEditorInterface.WPF;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -271,6 +272,32 @@ namespace FamilyEditorInterface
             {
                 return source;
             }
+        }
+        /// <summary>
+        /// Returns the opposite value for a boolean
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        internal static double GetRandomBooleanValue(FamilyParameterModel item)
+        {
+            return item.Value == 1 ? 0 : 1;
+        }
+        /// <summary>
+        /// Returns a random value +/- 25% around a target value
+        /// </summary>
+        /// <param name="item">The FamilyParameterValue to target</param>
+        /// <returns></returns>
+        internal static double GetRandomItemValue(FamilyParameterModel item)
+        {
+            SingleRandom random = SingleRandom.Instance;
+            
+            double value = item.UIValue + 1;
+            double plus = (value + 0.25 * value);    // plus minus values - around the current value +-25%
+            double minus = (value - 0.25 * value);
+            double randomValue = random.NextDouble() * (plus - minus) + minus;
+            //if (randomValue == 0) randomValue = random.NextDouble() * 10;
+            if (randomValue > 10) randomValue = Math.Round(randomValue);    //Round the value if it is not a single digit (inches and feet can be singe digit)
+            return randomValue;            
         }
         /// <summary>
         /// Check if a string contains unallowed characters

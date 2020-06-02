@@ -260,33 +260,75 @@ namespace FamilyEditorInterface.WPF
 
             foreach (var item in _valueParameters)
             {
-                if (item.Value != 0)
-                {
-                    double v = item.Value;
-                    double plus = (v + 0.25 * v);    // plus minus values - around the current value +-25%
-                    double minus = (v - 0.25 * v);
-                    double randValue = Math.Round(random.NextDouble() * (plus - minus) + minus);
-                    item.SuppressUpdate();
-                    item.Value = randValue;
-                    requestValues.Add(new Tuple<string, double>(item.Name, randValue));
-                }
-            }
+                if (!item.Editable) continue;
+                double randomValue = Utils.GetRandomItemValue(item);
+                item.Activated = true;
+                item.SuppressUpdate();
+                item.UIValue = randomValue;
 
+                requestValues.Add(new Tuple<string, double>(item.Name, item.Value));
+
+                //RequestHandling.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(item.Name, randomValue));
+                item.Activated = false;
+            }
             foreach (var item in _builtInParameters)
             {
-                if (item.Value != 0)
-                {
-                    double v = item.Value;
-                    double plus = (v + 0.25 * v);    // plus minus values - around the current value +-25%
-                    double minus = (v - 0.25 * v);
-                    double randValue = Math.Round(random.NextDouble() * (plus - minus) + minus);
-                    item.SuppressUpdate();
-                    item.Value = randValue;
-                    requestValues.Add(new Tuple<string, double>(item.Name, randValue));
-                }
+                if (!item.Editable) continue;
+                double randomValue = Utils.GetRandomItemValue(item);
+                item.Activated = true;
+                item.SuppressUpdate();
+                item.UIValue = randomValue;
+
+                requestValues.Add(new Tuple<string, double>(item.Name, item.Value));
+
+                //RequestHandling.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(item.Name, randomValue));
+                item.Activated = false;
+            }
+            foreach (var item in _checkParameters)
+            {
+                if (!item.Editable) continue;
+                double randomValue = Utils.GetRandomBooleanValue(item);
+                item.Activated = true;
+                item.SuppressUpdate();
+                item.UIValue = randomValue;
+
+                requestValues.Add(new Tuple<string, double>(item.Name, item.Value));
+
+                //RequestHandling.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(item.Name, randomValue));
+                item.Activated = false;
             }
 
             if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
+
+            /*
+            //item.Flash
+            if (item.Value != 0)
+            {
+                double v = item.Value;
+                double plus = (v + 0.25 * v);    // plus minus values - around the current value +-25%
+                double minus = (v - 0.25 * v);
+                double randValue = Math.Round(random.NextDouble() * (plus - minus) + minus);
+                item.SuppressUpdate();
+                item.Value = randValue;
+                requestValues.Add(new Tuple<string, double>(item.Name, randValue));
+            }
+        }
+
+        foreach (var item in _builtInParameters)
+        {
+            if (item.Value != 0)
+            {
+                double v = item.Value;
+                double plus = (v + 0.25 * v);    // plus minus values - around the current value +-25%
+                double minus = (v - 0.25 * v);
+                double randValue = Math.Round(random.NextDouble() * (plus - minus) + minus);
+                item.SuppressUpdate();
+                item.Value = randValue;
+                requestValues.Add(new Tuple<string, double>(item.Name, randValue));
+            }
+        }
+
+        */
         }
         //The collection has changed, notify the UI
         private void ValueParameters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

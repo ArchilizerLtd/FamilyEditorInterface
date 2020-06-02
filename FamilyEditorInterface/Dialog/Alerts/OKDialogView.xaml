@@ -28,7 +28,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" x:Name="warningIcon" Content="{StaticResource OKIcon}" VerticalAlignment="Top" Margin="0 5"/>
-            <StackPanel Orientation="Vertical" Grid.Column="1" Margin="20 0">
+            <StackPanel Orientation="Vertical" Grid.Column="1" Margin="20 0 20 30">
                 <TextBlock Text="{Binding Title}" Style="{StaticResource MessageTextBlockStyle}" 
                            Foreground="{DynamicResource OKColorBrush}"
                            FontSize="18"/>

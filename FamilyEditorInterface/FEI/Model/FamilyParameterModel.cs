@@ -46,6 +46,7 @@ namespace FamilyEditorInterface.WPF
         private bool conversion = false;    //We need to stop the  circular reference during Value and UIValue change
         private bool _edit;
         private bool _tagVisible;   //Visibility of the Parameter Tags
+        private bool _activated;  //Used to highlight the control when shuffling 
 
         /// <summary>
         /// Constructor
@@ -90,6 +91,16 @@ namespace FamilyEditorInterface.WPF
             {
                 _value = value;
                 RaisePropertyChanged("Value");
+            }
+        }
+        //Used to highlight the control when editing
+        public bool Activated
+        {
+            get { return _activated; }
+            set
+            {
+                _activated = value;
+                RaisePropertyChanged("Activated");
             }
         }
         //UI Friendly Value
@@ -289,8 +300,22 @@ namespace FamilyEditorInterface.WPF
                 conversion = true;
                 double revitValue = 0.0;
 
-                revitValue = (StorageType == StorageType.Integer) ? UIValue : Utils.GetDutValueFrom(DisplayUnitType, UIValue); //If integer, don't convert
-                revitValue = (ParamType != ParamType.YesNo) ? UIValue : Utils.GetYesNoValue(UIValue);   //If it's a check box, give 0 or 1 instead of -1 or 1
+                if(StorageType == StorageType.Integer) //If integer, don't convert
+                {
+                    if(ParamType == ParamType.YesNo)
+                    {
+                        revitValue = Utils.GetYesNoValue(UIValue); //If it's a check box, give 0 or 1 instead of -1 or 1
+                    }
+                    else
+                    {
+                        revitValue = UIValue;   //continue with the value
+                    }
+                }                
+                else
+                {
+                    revitValue = Utils.GetDutValueFrom(DisplayUnitType, UIValue);   //Else, it's a double that needs to be converted
+                }
+                
 
                 Value = revitValue;
 

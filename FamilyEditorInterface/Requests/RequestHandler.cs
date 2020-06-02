@@ -217,10 +217,19 @@ namespace FamilyEditorInterface
                                         EncounteredError(this, null);
                                     }
                                 }
+                                else
+                                {
+                                    RequestError.NotifyLog += $"{fp.Definition.Name} was shuffled.{Environment.NewLine}";
+                                }
                             }
                         }
                     }
                     tg.Assimilate();
+                    if(!String.IsNullOrEmpty(RequestError.NotifyLog))
+                    {
+                        var lines = RequestError.NotifyLog.Split('\n').Length - 1;
+                        RequestError.NotifyLog += $"{Environment.NewLine}{lines.ToString()} parameters have been processed sucessfully.";
+                    }
                 }
             }
         }

@@ -141,7 +141,8 @@ namespace FamilyEditorInterface.Associate
 			if (parameterToPush.IsShared)
 			{
 				ExternalDefinition sharedParameter = GetSharedParameter(app, parameterToPush.Definition.Name); //Get the ExternalDefinition, in case it's a Shared Parameter
-				return AddSharedParameter(nestedFamilyDocument, sharedParameter, parameterToPush);    //Adds a Shared Parameter
+				if (sharedParameter != null) return AddSharedParameter(nestedFamilyDocument, sharedParameter, parameterToPush);    //Adds a Shared Parameter
+				else return null;
 			}
 			else
 			{
@@ -219,7 +220,12 @@ namespace FamilyEditorInterface.Associate
 		private ExternalDefinition GetSharedParameter(Autodesk.Revit.ApplicationServices.Application app, string name)
 		{
 			DefinitionFile defFile = app.OpenSharedParameterFile();
-			if (defFile == null) throw new Exception("No SharedParameter File!");
+			if (defFile == null)
+			{
+				DialogUtils.Failure("Error", $"Shared parameters file does not exist. You are trying to push a Shared Parameter into another Family - make sure you have setup a Shared Parameters file.");
+				return null;
+				//throw new Exception("No SharedParameter File!");
+			}
 
 			var v = (from DefinitionGroup dg in defFile.Groups
 					 from ExternalDefinition d in dg.Definitions

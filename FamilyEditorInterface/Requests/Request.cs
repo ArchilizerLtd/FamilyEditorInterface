@@ -52,6 +52,9 @@ namespace FamilyEditorInterface
         /// "Change Parameter Name" request
         /// </summary>
         ChangeParamName = 4,
+        /// <summary>
+        /// Converts Type to Instance
+        /// </summary>
         TypeToInstance = 5,
     }
 
