@@ -43,11 +43,10 @@ namespace FamilyEditorInterface.WPF
         private bool _usedInFormula;    //If the parameter is used in any formulas
         private bool _label;  //If the parameter is used to drive dimensions
         private bool _isUsed;
-        private bool conversion = false;    //We need to stop the  circular reference during Value and UIValue change
         private bool _edit;
         private bool _tagVisible;   //Visibility of the Parameter Tags
         private bool _activated;  //Used to highlight the control when shuffling 
-
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -86,21 +85,27 @@ namespace FamilyEditorInterface.WPF
         //Parameter Value (Revit generic value, can be any Unit type)
         public double Value
         {
-            get { return _value; }
-            set
+            get
             {
-                _value = value;
-                RaisePropertyChanged("Value");
-            }
-        }
-        //Used to highlight the control when editing
-        public bool Activated
-        {
-            get { return _activated; }
-            set
-            {
-                _activated = value;
-                RaisePropertyChanged("Activated");
+                double revitValue = 0.0;
+
+                if (StorageType == StorageType.Integer) //If integer, don't convert
+                {
+                    if (ParamType == ParamType.YesNo)
+                    {
+                        revitValue = Utils.GetYesNoValue(UIValue); //If it's a check box, give 0 or 1 instead of -1 or 1
+                    }
+                    else
+                    {
+                        revitValue = UIValue;   //continue with the value
+                    }
+                }
+                else
+                {
+                    revitValue = Utils.GetDutValueFrom(DisplayUnitType, UIValue);   //Else, it's a double that needs to be converted
+                }
+
+                return revitValue;
             }
         }
         //UI Friendly Value
@@ -116,6 +121,17 @@ namespace FamilyEditorInterface.WPF
                 }
             }
         }       
+        
+        //Used to highlight the control when editing
+        public bool Activated
+        {
+            get { return _activated; }
+            set
+            {
+                _activated = value;
+                RaisePropertyChanged("Activated");
+            }
+        }
         //???
         public int Precision
         {
@@ -293,57 +309,10 @@ namespace FamilyEditorInterface.WPF
         #region RequestChanges
         //Executes after RaisePropertyChange of UIValue
         private void ChangeUIValue()
-        {
-            if (!conversion)
-            {
-                //From UI to Revit
-                conversion = true;
-                double revitValue = 0.0;
-
-                if(StorageType == StorageType.Integer) //If integer, don't convert
-                {
-                    if(ParamType == ParamType.YesNo)
-                    {
-                        revitValue = Utils.GetYesNoValue(UIValue); //If it's a check box, give 0 or 1 instead of -1 or 1
-                    }
-                    else
-                    {
-                        revitValue = UIValue;   //continue with the value
-                    }
-                }                
-                else
-                {
-                    revitValue = Utils.GetDutValueFrom(DisplayUnitType, UIValue);   //Else, it's a double that needs to be converted
-                }
-                
-
-                Value = revitValue;
-
-                // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
-                if (!_suppres) RequestHandling.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(Name, revitValue));
-                else _suppres = false;
-            }
-            else
-            {
-                //From Revit to UI
-                conversion = false;
-            }
-        }
-        //Executes after RaisePropertyChange of Value
-        private void ChangeValue()
-        {
-            if (!conversion)
-            {
-                //From Revit to UI
-                conversion = true;
-                UIValue = (StorageType == StorageType.Integer) ? Math.Round(Value, Precision) : Math.Round(Utils.GetDutValueTo(DisplayUnitType, Value), Precision);   //If integer, don't convert
-            }
-            else
-            {
-                //From UI to Revit
-                conversion = false;
-            }
-
+        { 
+            // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
+            if (!_suppres) RequestHandling.MakeRequest(RequestId.ChangeParam, new Tuple<string, double>(Name, Value));
+            else _suppres = false;
         }
         //Changes the Name of the Parameter
         private void ChangeName()
@@ -375,10 +344,6 @@ namespace FamilyEditorInterface.WPF
             if (handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
-            }
-            if (propertyName.Equals("Value"))
-            {
-                ChangeValue();
             }
             if (propertyName.Equals("UIValue"))
             {

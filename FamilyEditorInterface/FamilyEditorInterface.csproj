@@ -125,6 +125,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Requests\RequestExecute.cs" />
     <Compile Include="Requests\Request.cs" />
     <Compile Include="Requests\RequestError.cs" />
     <Compile Include="Requests\RequestHandler.cs" />

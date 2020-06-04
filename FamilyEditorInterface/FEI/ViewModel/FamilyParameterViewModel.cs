@@ -293,7 +293,7 @@ namespace FamilyEditorInterface.WPF
                 item.Activated = false;
             }
 
-            if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
+            if (requestValues.Count > 0) MakeRequest(RequestId.ShuffleParam, requestValues);
         }
         //The collection has changed, notify the UI
         private void ValueParameters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -392,16 +392,21 @@ namespace FamilyEditorInterface.WPF
         // Makes requiest, renames Parameters
         private void MakeRequest(RequestId request, List<string> values)
         {
-            //MessageBox.Show("You are in the Control.Request event.");
             Application.Control.handler.Request.DeleteValue(values);
             Application.Control.handler.Request.Make(request);
             Application.Control.exEvent.Raise();
         }
-        // Makes request, Shuffle values
+        // Makes request, change values
+        private void MakeRequest(RequestId request, Tuple<string, double> values)
+        {
+            Application.Control.handler.Request.Value(values);
+            Application.Control.handler.Request.Make(request);
+            Application.Control.exEvent.Raise();
+        }        
+        // Makes request, change values
         private void MakeRequest(RequestId request, List<Tuple<string, double>> values)
         {
-            //MessageBox.Show("You are in the Control.Request event.");
-            Application.Control.handler.Request.Value(values);
+            Application.Control.handler.Request.ShuffleValue(values);
             Application.Control.handler.Request.Make(request);
             Application.Control.exEvent.Raise();
         }

@@ -26,10 +26,10 @@ using System.Threading;
 
 namespace FamilyEditorInterface
 {
-   /// <summary>
-   ///   A list of requests the dialog has available
-   /// </summary>
-   /// 
+    /// <summary>
+    ///   A list of requests the dialog has available
+    /// </summary>
+    /// 
     public enum RequestId : int
     {
         /// <summary>
@@ -39,7 +39,7 @@ namespace FamilyEditorInterface
         /// <summary>
         /// "Change parameter value" request
         /// </summary>
-        SlideParam = 1,
+        ChangeParam = 1,
         /// <summary>
         /// "Delete an element" request
         /// </summary>
@@ -56,22 +56,26 @@ namespace FamilyEditorInterface
         /// Converts Type to Instance
         /// </summary>
         TypeToInstance = 5,
+        /// <summary>
+        /// "Shuffle parameters" request
+        /// </summary>
+        ShuffleParam = 6,
     }
-
-   /// <summary>
-   ///   A class around a variable holding the current request.
-   /// </summary>
-   /// <remarks>
-   ///   Access to it is made thread-safe, even though we don't necessarily
-   ///   need it if we always disable the dialog between individual requests.
-   /// </remarks>
-   /// 
-   public class Request
-   {
+    /// <summary>
+    ///   A class around a variable holding the current request.
+    /// </summary>
+    /// <remarks>
+    ///   Access to it is made thread-safe, even though we don't necessarily
+    ///   need it if we always disable the dialog between individual requests.
+    /// </remarks>
+    /// 
+    public class Request
+    {
         // Storing the value as a plain Int makes using the interlocking mechanism simpler
         private int m_request = (int)RequestId.None;
-        // try tp tramsport information
-        private List<Tuple<string, double>> value;
+        // try tp transport information
+        private Tuple<string, double> value;
+        private List<Tuple<string, double>> shuffleValue;
         private List<Tuple<string, string>> renameValue;
         private List<string> deleteValue;
         private List<string> typeToInstance;
@@ -88,7 +92,6 @@ namespace FamilyEditorInterface
         {
             return (RequestId)Interlocked.Exchange(ref m_request, (int)RequestId.None);
         }
-
         /// <summary>
         ///   Make - The Dialog calls this when the user presses a command button there. 
         /// </summary>
@@ -100,15 +103,24 @@ namespace FamilyEditorInterface
         {
             Interlocked.Exchange(ref m_request, (int)request);
         }
-        // try to trasport the message
-        internal void Value(List<Tuple<string, double>> value)
+
+        #region Values
+        //Contains a single value to change
+        internal void Value(Tuple<string, double> value)
         {
             this.value = value;
         }
+        //Contains the shuffle values, a list of tupples
+        internal void ShuffleValue(List<Tuple<string, double>> svalue)
+        {
+            this.shuffleValue = svalue;
+        }
+        //Contains all the values that needs to be renamed - when would that ever be the case? Why would we need a list?
         internal void RenameValue(List<Tuple<string, string>> renameValue)
         {
             this.renameValue = renameValue;
         }
+        //Contains a list of all the parameters that will be deleted
         internal void DeleteValue(List<string> deleteValue)
         {
             this.deleteValue = deleteValue;
@@ -117,19 +129,28 @@ namespace FamilyEditorInterface
         {
             this.allValues = allValues;
         }
+        //Contains the parameters that will be toggled form instance to type and vica verse
         internal void TypeToInstance(List<string> typeToInstance)
         {
             this.typeToInstance = typeToInstance;
         }
+        #endregion
+
+        #region GetValue
         // try to transport the message
         internal List<string> GetDeleteValue()
         {
             return this.deleteValue;
         }
         // try to transport the message
-        internal List<Tuple<string, double>> GetValue()
+        internal Tuple<string, double> GetValue()
         {
             return this.value;
+        }        
+        // try to transport the message
+        internal List<Tuple<string, double>> GetShuffleValue()
+        {
+            return this.shuffleValue;
         }
         // try to transport the message
         internal List<Tuple<string, string>> GetRenameValue()
@@ -146,5 +167,6 @@ namespace FamilyEditorInterface
         {
             return this.allValues;
         }
+        #endregion
     }
 }

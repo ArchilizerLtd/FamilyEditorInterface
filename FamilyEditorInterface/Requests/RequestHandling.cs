@@ -32,7 +32,7 @@ namespace FamilyEditorInterface.Requests
         /// </summary>
         public static void MakeRequest(RequestId request, List<Tuple<string, double>> values)
         {
-            Application.Control.handler.Request.Value(values);
+            Application.Control.handler.Request.ShuffleValue(values);
             Application.Control.handler.Request.Make(request);
             Application.Control.exEvent.Raise();
         }
@@ -50,7 +50,7 @@ namespace FamilyEditorInterface.Requests
         /// </summary>
         public static void MakeRequest(RequestId request, Tuple<string, double> value)
         {
-            Application.Control.handler.Request.Value(new List<Tuple<string, double>>() { value });
+            Application.Control.handler.Request.Value(value);
             Application.Control.handler.Request.Make(request);
             Application.Control.exEvent.Raise();
         }
