@@ -92,7 +92,9 @@ namespace FamilyEditorInterface
                 if (famParam.Definition.Name.Equals(param.Definition.Name)) return true;
             }
             return false;
-        }       
+        }
+
+
         /// <summary>
         /// Checks if a parameter with the same name eixsts in a family
         /// </summary>
@@ -163,6 +165,28 @@ namespace FamilyEditorInterface
                     return ToDegrees(p);
             }
             return p;
+        }
+        /// <summary>
+        /// Takes into account the storage type before returning the value
+        /// </summary>
+        /// <param name="storageType">The storage type of the parameter</param>
+        /// <remarks>
+        /// Storage type can be integer, double, string, elementId or none
+        /// </remarks>
+        /// <param name="displayUnitType">Display Unit Type of the parameter</param>
+        /// <param name="value">The parameter value. We only expect double.</param>
+        /// <returns></returns>
+        internal static double GetDutValueTo(StorageType storageType, DisplayUnitType displayUnitType, double value)
+        {
+            switch (storageType)
+            {
+                case StorageType.Double:
+                    return GetDutValueTo(displayUnitType, value);
+                case StorageType.Integer:
+                    return value;
+                default:
+                    return 0.0;
+            }
         }
         /// <summary>
         /// Retuns human-readable ParameterGroup name

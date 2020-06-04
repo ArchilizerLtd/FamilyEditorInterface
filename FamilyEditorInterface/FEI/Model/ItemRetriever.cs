@@ -42,7 +42,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.Editable = newItem.IsUsed && !newItem.Formula && !newItem.Reporting; //If the Parameter is used or if the parameter is not defined by Formula, allow the user to edit
             newItem.Visible = Properties.Settings.Default.ToggleVisibility; //Set the visibility in the UI (user defined Tag property for ALL Tags, regardless of their specific conditions)
             newItem.TagVisible = Properties.Settings.Default.ToggleTagsVisibility; //Set the Tags visibility 
-            newItem.UIValue = Math.Round(Utils.GetDutValueTo(newItem.DisplayUnitType, GetParameterValue(ft, fp)));  //The Value of the parameter (can be yes/no, double, integer, string, ...)
+            newItem.UIValue = Math.Round(Utils.GetDutValueTo(newItem.StorageType, newItem.DisplayUnitType, GetParameterValue(ft, fp)));  //The Value of the parameter (can be yes/no, double, integer, string, ...)
 
             return newItem;
         }
