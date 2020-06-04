@@ -12,6 +12,69 @@ namespace FamilyEditorInterface
 {
     public class RequestExecute
     {
+        #region Bar
+        // ProgressBar delegate
+        public delegate void ProgressBarDelegate();
+        public delegate void TextBlockDelegate();
+        public delegate void CaptionsBlockDelegate();
+        public string StatusText;
+        public string CaptionsText;
+        // The ProgressBar
+        private static System.Windows.Controls.ProgressBar bar;
+        private static System.Windows.Controls.TextBlock status;
+        private static System.Windows.Controls.TextBlock captions;
+        public List<string> versionFiles;
+
+        public System.Windows.Controls.ProgressBar Bar
+        {
+            get
+            {
+                return bar;
+            }
+            set
+            {
+                if (bar != value)
+                    bar = value;
+            }
+        }
+        public System.Windows.Controls.TextBlock Status
+        {
+            get
+            {
+                return status;
+            }
+            set
+            {
+                if (status != value)
+                    status = value;
+            }
+        }
+        public System.Windows.Controls.TextBlock Captions
+        {
+            get
+            {
+                return captions;
+            }
+            set
+            {
+                if (captions != value)
+                    captions = value;
+            }
+        }
+        // Update the progressbar
+        public void UpdateProgress()
+        {
+            Bar.Value += 1;
+        }
+        public void UpdateTextBlock()
+        {
+            Status.Text = StatusText;
+        }
+        public void UpdateCaptionsBlock()
+        {
+            Captions.Text = CaptionsText;
+        }
+        #endregion
 
         #region Execute
         /// <summary>
@@ -140,41 +203,59 @@ namespace FamilyEditorInterface
                 TaskDialog.Show("Message", Command.global_message);
             }
 
+            int counter = 0;
+            int max = values.Count();
+            string current = "";
+
             if ((uidoc != null))
             {
                 using (TransactionGroup tg = new TransactionGroup(doc, "Parameter Change"))
                 {
                     tg.Start();
-                    foreach (var value in values)
-                    {
-                        using (Transaction trans = new Transaction(uidoc.Document))
-                        {
-                            FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
-                            FailureHandler failureHandler = new FailureHandler();
-                            failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
-                            failureHandlingOptions.SetClearAfterRollback(true);
-                            trans.SetFailureHandlingOptions(failureHandlingOptions);
 
-                            FamilyManager mgr = doc.FamilyManager;
-                            FamilyParameter fp = mgr.get_Parameter(value.Item1);
-                            // Since we'll modify the document, we need a transaction
-                            // It's best if a transaction is scoped by a 'using' block
-                            // The name of the transaction was given as an argument
-                            if (trans.Start(text) == TransactionStatus.Started)
+                    string s = "{0} of " + max.ToString() + String.Format(" elements processed. ", counter.ToString()) + "{1}";
+                    string caption = "Processing ..";
+
+                    using (ProgressBarView pbv = new ProgressBarView(caption, s, max))
+                    {
+                        foreach (var value in values)
+                        {
+                            current = value.Item1;
+
+                            if (pbv.getAbortFlag())
                             {
-                                if (fp.IsDeterminedByFormula) continue;  //Cannot change parameters driven by formulas
-                                if (fp.IsReporting) continue;    //Cannot change reporting parameters
-                                mgr.Set(fp, value.Item2);
-                                doc.Regenerate();
-                                trans.Commit();
-                                uidoc.RefreshActiveView();
-                                if (failureHandler.ErrorMessage != "")
+                                break;
+                            }
+                            pbv.Increment(current);    //Increment the ProgressBar  
+                            using (Transaction trans = new Transaction(uidoc.Document))
+                            {
+                                FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
+                                FailureHandler failureHandler = new FailureHandler();
+                                failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
+                                failureHandlingOptions.SetClearAfterRollback(true);
+                                trans.SetFailureHandlingOptions(failureHandlingOptions);
+
+                                FamilyManager mgr = doc.FamilyManager;
+                                FamilyParameter fp = mgr.get_Parameter(value.Item1);
+                                // Since we'll modify the document, we need a transaction
+                                // It's best if a transaction is scoped by a 'using' block
+                                // The name of the transaction was given as an argument
+                                if (trans.Start(text) == TransactionStatus.Started)
                                 {
-                                    RequestError.ErrorLog.Add(new Message(fp.Definition.Name, failureHandler.ErrorMessage));                                 
-                                }
-                                else
-                                {
-                                    RequestError.NotifyLog += $"{fp.Definition.Name} was shuffled.{Environment.NewLine}";
+                                    if (fp.IsDeterminedByFormula) continue;  //Cannot change parameters driven by formulas
+                                    if (fp.IsReporting) continue;    //Cannot change reporting parameters
+                                    mgr.Set(fp, value.Item2);
+                                    doc.Regenerate();
+                                    trans.Commit();
+                                    uidoc.RefreshActiveView();
+                                    if (failureHandler.ErrorMessage != "")
+                                    {
+                                        RequestError.ErrorLog.Add(new Message(fp.Definition.Name, failureHandler.ErrorMessage));
+                                    }
+                                    else
+                                    {
+                                        RequestError.NotifyLog += $"{fp.Definition.Name} was shuffled.{Environment.NewLine}";
+                                    }
                                 }
                             }
                         }

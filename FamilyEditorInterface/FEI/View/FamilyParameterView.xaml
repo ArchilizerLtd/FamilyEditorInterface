@@ -132,9 +132,9 @@
         </DockPanel>
         <!--Control Bar-->
         <DockPanel DockPanel.Dock="Bottom" Margin="0,20,0,0">
-            <Button Style="{StaticResource ToolbarButton}" x:Name="btnShuffle" Content="{StaticResource ShuffleIcon}" Command="{Binding ShuffleCommand}" ToolTip="Shuffle Parameter Values"/>
+            <Button Style="{StaticResource ToolbarButton}" x:Name="btnShuffle" Content="{StaticResource ShuffleIcon}" Command="{Binding ShuffleCommand}" ToolTip="Shuffle Parameter Values. /n This command will attempt to make slight change to all editable parameters. Use with caution."/>
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnDeleteAllUnused" Content="{StaticResource DeleteIcon}" Command="{Binding DeleteUnusedCommand}" ToolTip="Delete all unused Parameters"/>
-            <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettings" Content="{StaticResource ViewIcon}" Command="{Binding EditableCommand}" ToolTip="Editable Parameters"/>
+            <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettings" Content="{StaticResource ViewIcon}" Command="{Binding EditableCommand}" ToolTip="Editable Parameters. /n Reporting parameters and parameters driven by formulas cannot be edited."/>
             <Button Style="{StaticResource ToolbarButton}" x:Name="btnSettingsTest" Content="{StaticResource ToggleIcon}" Command="{Binding ToggleCommand}" ToolTip="Toggle Tags"/>
             <Button Style="{DynamicResource SimpleButtonStyle}" x:Name="btnDialogOk" Click="BtnDialogOk_Click" Content="Close" Width="95"/>
         </DockPanel>

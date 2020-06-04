@@ -26,7 +26,6 @@ namespace FamilyEditorInterface.WPF
 
         private string _name;   //private Name  
         private string _oldName;    //private Old Name
-        private double _value;  //private Value - the internal Revit value (in feet)
         private double _uivalue;  //private UIValue - will be used in the WPF UI Window
         private string _type;   //private Type
         private string _typeOrInstance; //private bool if it is a Type or an Instance parameter
