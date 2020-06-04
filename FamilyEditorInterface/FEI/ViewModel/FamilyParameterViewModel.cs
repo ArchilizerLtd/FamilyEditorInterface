@@ -163,8 +163,6 @@ namespace FamilyEditorInterface.WPF
             PopulateFamilyParameters();
             PopulateUICollections();    //HERE
         }
-
-
         //Initialize all the collection variables
         private void Initialize()
         {
@@ -268,7 +266,6 @@ namespace FamilyEditorInterface.WPF
 
                 requestValues.Add(new Tuple<string, double>(item.Name, item.Value));
 
-                //RequestHandling.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(item.Name, randomValue));
                 item.Activated = false;
             }
             foreach (var item in _builtInParameters)
@@ -281,7 +278,6 @@ namespace FamilyEditorInterface.WPF
 
                 requestValues.Add(new Tuple<string, double>(item.Name, item.Value));
 
-                //RequestHandling.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(item.Name, randomValue));
                 item.Activated = false;
             }
             foreach (var item in _checkParameters)
@@ -294,41 +290,10 @@ namespace FamilyEditorInterface.WPF
 
                 requestValues.Add(new Tuple<string, double>(item.Name, item.Value));
 
-                //RequestHandling.MakeRequest(RequestId.SlideParam, new Tuple<string, double>(item.Name, randomValue));
                 item.Activated = false;
             }
 
             if (requestValues.Count > 0) MakeRequest(RequestId.SlideParam, requestValues);
-
-            /*
-            //item.Flash
-            if (item.Value != 0)
-            {
-                double v = item.Value;
-                double plus = (v + 0.25 * v);    // plus minus values - around the current value +-25%
-                double minus = (v - 0.25 * v);
-                double randValue = Math.Round(random.NextDouble() * (plus - minus) + minus);
-                item.SuppressUpdate();
-                item.Value = randValue;
-                requestValues.Add(new Tuple<string, double>(item.Name, randValue));
-            }
-        }
-
-        foreach (var item in _builtInParameters)
-        {
-            if (item.Value != 0)
-            {
-                double v = item.Value;
-                double plus = (v + 0.25 * v);    // plus minus values - around the current value +-25%
-                double minus = (v - 0.25 * v);
-                double randValue = Math.Round(random.NextDouble() * (plus - minus) + minus);
-                item.SuppressUpdate();
-                item.Value = randValue;
-                requestValues.Add(new Tuple<string, double>(item.Name, randValue));
-            }
-        }
-
-        */
         }
         //The collection has changed, notify the UI
         private void ValueParameters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
