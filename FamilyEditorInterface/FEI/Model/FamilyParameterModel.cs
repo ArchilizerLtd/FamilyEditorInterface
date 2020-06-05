@@ -119,18 +119,7 @@ namespace FamilyEditorInterface.WPF
                     RaisePropertyChanged("UIValue");
                 }
             }
-        }       
-        
-        //Used to highlight the control when editing
-        public bool Activated
-        {
-            get { return _activated; }
-            set
-            {
-                _activated = value;
-                RaisePropertyChanged("Activated");
-            }
-        }
+        }               
         //???
         public int Precision
         {
@@ -139,6 +128,16 @@ namespace FamilyEditorInterface.WPF
             {
                 _precision = value;
                 RaisePropertyChanged("Precision");
+            }
+        }
+        //Used to highlight the control when editing
+        public bool Activated
+        {
+            get { return _activated; }
+            set
+            {
+                _activated = value;
+                RaisePropertyChanged("Activated");
             }
         }
         //If it is a Type or an Instance parameter

@@ -22,11 +22,12 @@ namespace FamilyEditorInterface.Resources.WPF.Model
         {
             //Collect data depending on the type of paramter
             FamilyParameterModel newItem = new FamilyParameterModel(); //Create new FamilyParamterModel
-            newItem.Precision = Properties.Settings.Default.Precision;  //The precision set by the User in the Settings
+            newItem.SuppressUpdate();   //When setting the first time, suppress the back-update coming from the UI because of difference in precision
             newItem.Name = fp.Definition.Name;  //The name of the Parameter
             newItem.StorageType = fp.StorageType; 
             newItem.ParamType = GetParameterType(fp);
             newItem.DisplayUnitType = GetDisplayUnitType(fp);   //Set the DisplayUnitType for this parameter
+            newItem.Precision = Utils.GetPrecision(newItem.DisplayUnitType);   //Properties.Settings.Default.Precision;  //The precision set by the User in the Settings
             newItem.Type = fp.Definition.ParameterType.ToString();  //The parameter type
             newItem.Associated = !fp.AssociatedParameters.IsEmpty;    //If the parameter is being associated
             newItem.BuiltIn = fp.Id.IntegerValue < 0;
@@ -42,7 +43,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.Editable = newItem.IsUsed && !newItem.Formula && !newItem.Reporting; //If the Parameter is used or if the parameter is not defined by Formula, allow the user to edit
             newItem.Visible = Properties.Settings.Default.ToggleVisibility; //Set the visibility in the UI (user defined Tag property for ALL Tags, regardless of their specific conditions)
             newItem.TagVisible = Properties.Settings.Default.ToggleTagsVisibility; //Set the Tags visibility 
-            newItem.UIValue = Math.Round(Utils.GetDutValueTo(newItem.StorageType, newItem.DisplayUnitType, GetParameterValue(ft, fp)));  //The Value of the parameter (can be yes/no, double, integer, string, ...)
+            newItem.UIValue = Math.Round(Utils.GetDutValueTo(newItem.StorageType, newItem.DisplayUnitType, GetParameterValue(ft, fp)),newItem.Precision);  //The Value of the parameter (can be yes/no, double, integer, string, ...)
 
             return newItem;
         }

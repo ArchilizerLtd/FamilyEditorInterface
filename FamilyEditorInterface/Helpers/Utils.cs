@@ -52,7 +52,7 @@ namespace FamilyEditorInterface
         public static double convertValueTO(double p)
         {
             return GetDutValueTo(DUT, p);
-        }
+        }      
         /// <summary>
         /// Revit to UI units
         /// </summary>
@@ -138,6 +138,39 @@ namespace FamilyEditorInterface
             catch (Exception) { return null; }
         }
         /// <summary>
+        /// Returns the decimal point precision based on the DisplayUnitType
+        /// </summary>
+        /// <param name="displayUnitType"></param>
+        /// <returns></returns>
+        internal static int GetPrecision(DisplayUnitType displayUnitType)
+        {
+            switch (displayUnitType)
+            {
+                case DisplayUnitType.DUT_MILLIMETERS:
+                    return 0;
+                case DisplayUnitType.DUT_CENTIMETERS:
+                    return 2;
+                case DisplayUnitType.DUT_DECIMETERS:
+                    return 3;
+                case DisplayUnitType.DUT_METERS:
+                    return 4;
+                case DisplayUnitType.DUT_METERS_CENTIMETERS:
+                    return 4;
+                case DisplayUnitType.DUT_DECIMAL_FEET:
+                    return 3;
+                case DisplayUnitType.DUT_DECIMAL_INCHES:
+                    return 2;
+                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
+                    return 0;
+                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
+                    return 0;
+                case DisplayUnitType.DUT_DECIMAL_DEGREES:
+                    return 1;
+                default:
+                    return 0;
+            }
+        }
+        /// <summary>
         /// UI to Revit internal unit values
         /// </summary>
         /// <param name="dut"></param>
@@ -147,25 +180,29 @@ namespace FamilyEditorInterface
         {
             switch (dut)
             {
-                case DisplayUnitType.DUT_METERS:
-                    return p * METERS_IN_FEET;
+                case DisplayUnitType.DUT_MILLIMETERS:
+                    return p * METERS_IN_FEET * 1000;
                 case DisplayUnitType.DUT_CENTIMETERS:
                     return p * METERS_IN_FEET * 100;
+                case DisplayUnitType.DUT_DECIMETERS:
+                    return p * METERS_IN_FEET * 10;
+                case DisplayUnitType.DUT_METERS:
+                    return p * METERS_IN_FEET;
+                case DisplayUnitType.DUT_METERS_CENTIMETERS:
+                    return p * METERS_IN_FEET;
                 case DisplayUnitType.DUT_DECIMAL_FEET:
                     return p;
                 case DisplayUnitType.DUT_DECIMAL_INCHES:
                     return p * 12;
-                case DisplayUnitType.DUT_METERS_CENTIMETERS:
-                    return p * METERS_IN_FEET;
-                case DisplayUnitType.DUT_MILLIMETERS:
-                    return p * METERS_IN_FEET * 1000;
-                case DisplayUnitType.DUT_DECIMETERS:
-                    return p * METERS_IN_FEET * 10;
+                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
+                    return p;
+                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
+                    return p * 12;
                 case DisplayUnitType.DUT_DECIMAL_DEGREES:
                     return ToDegrees(p);
             }
             return p;
-        }
+        }      
         /// <summary>
         /// Takes into account the storage type before returning the value
         /// </summary>
