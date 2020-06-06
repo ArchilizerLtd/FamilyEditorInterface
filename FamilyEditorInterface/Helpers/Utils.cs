@@ -165,9 +165,9 @@ namespace FamilyEditorInterface
                 case DisplayUnitType.DUT_FRACTIONAL_INCHES:
                     return 0;
                 case DisplayUnitType.DUT_DECIMAL_DEGREES:
-                    return 1;
+                    return 2;
                 default:
-                    return 0;
+                    return 4;
             }
         }
         /// <summary>
@@ -254,19 +254,20 @@ namespace FamilyEditorInterface
             switch (dut)
             {
                 case DisplayUnitType.DUT_METERS:
-                    return p / METERS_IN_FEET;
-                case DisplayUnitType.DUT_CENTIMETERS:
-                    return p / METERS_IN_FEET / 100;
-                case DisplayUnitType.DUT_DECIMAL_FEET:
-                    return p;
-                case DisplayUnitType.DUT_DECIMAL_INCHES:
-                    return p / 12;
                 case DisplayUnitType.DUT_METERS_CENTIMETERS:
                     return p / METERS_IN_FEET;
-                case DisplayUnitType.DUT_MILLIMETERS:
-                    return p / METERS_IN_FEET / 1000;
                 case DisplayUnitType.DUT_DECIMETERS:
                     return p / METERS_IN_FEET / 10;
+                case DisplayUnitType.DUT_CENTIMETERS:
+                    return p / METERS_IN_FEET / 100;
+                case DisplayUnitType.DUT_MILLIMETERS:
+                    return p / METERS_IN_FEET / 1000;
+                case DisplayUnitType.DUT_DECIMAL_FEET:
+                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
+                    return p;
+                case DisplayUnitType.DUT_DECIMAL_INCHES:
+                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
+                    return p / 12;
                 case DisplayUnitType.DUT_DECIMAL_DEGREES:
                     return ToRadians(p);
             }
@@ -341,7 +342,7 @@ namespace FamilyEditorInterface
         /// <returns></returns>
         internal static double GetRandomBooleanValue(FamilyParameterModel item)
         {
-            return item.Value == 1 ? 0 : 1;
+            return item.RevitValue == 1 ? 0 : 1;
         }
         /// <summary>
         /// Returns a random value +/- 25% around a target value
@@ -352,7 +353,7 @@ namespace FamilyEditorInterface
         {
             SingleRandom random = SingleRandom.Instance;
             
-            double value = item.UIValue + 1;
+            double value = item.RevitValue + 0.01;  //TO DO - Needs CHanging
             double plus = (value + 0.25 * value);    // plus minus values - around the current value +-25%
             double minus = (value - 0.25 * value);
             double randomValue = random.NextDouble() * (plus - minus) + minus;

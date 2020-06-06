@@ -114,6 +114,7 @@
     <Compile Include="Dialog\Service\IDialogService.cs" />
     <Compile Include="Dialog\Service\IDialogWindow.cs" />
     <Compile Include="Helpers\BitmapIcons.cs" />
+    <Compile Include="Helpers\ValueConvertUtils.cs" />
     <Compile Include="ProgressBar\ProgressBar.xaml.cs">
       <DependentUpon>ProgressBar.xaml</DependentUpon>
     </Compile>

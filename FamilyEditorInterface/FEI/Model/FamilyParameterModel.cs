@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using FamilyEditorInterface.Helpers;
 using FamilyEditorInterface.Requests;
 using System;
 using System.ComponentModel;
@@ -26,7 +27,6 @@ namespace FamilyEditorInterface.WPF
 
         private string _name;   //private Name  
         private string _oldName;    //private Old Name
-        private double _uivalue;  //private UIValue - will be used in the WPF UI Window
         private string _type;   //private Type
         private string _typeOrInstance; //private bool if it is a Type or an Instance parameter
         private bool _associated;   //private bool if the paramter is associated 
@@ -45,7 +45,14 @@ namespace FamilyEditorInterface.WPF
         private bool _edit;
         private bool _tagVisible;   //Visibility of the Parameter Tags
         private bool _activated;  //Used to highlight the control when shuffling 
-        
+
+        private double _rvalue; //internal revit value
+        private double _value; //project revit value
+        private string _uivalue; //private UIValue - will be used in the WPF UI Window
+        private string _olduivalue;
+
+        private const double error = 0.001; //The margin of error during conversion
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -82,45 +89,91 @@ namespace FamilyEditorInterface.WPF
             }
         }
         //Parameter Value (Revit generic value, can be any Unit type)
-        public double Value
+        public double RevitValue 
         {
-            get
+            get { return _rvalue; }
+            set
             {
-                double revitValue = 0.0;
-
-                if (StorageType == StorageType.Integer) //If integer, don't convert
+                if (_rvalue != value)
                 {
-                    if (ParamType == ParamType.YesNo)
-                    {
-                        revitValue = Utils.GetYesNoValue(UIValue); //If it's a check box, give 0 or 1 instead of -1 or 1
-                    }
-                    else
-                    {
-                        revitValue = UIValue;   //continue with the value
-                    }
+                    _rvalue = value;
+                    RaisePropertyChanged("RevitValue");
                 }
-                else
-                {
-                    revitValue = Utils.GetDutValueFrom(DisplayUnitType, UIValue);   //Else, it's a double that needs to be converted
-                }
-
-                return revitValue;
             }
         }
         //UI Friendly Value
-        public double UIValue
+        public double Value
+        {
+            get { return _value; }
+            set
+            {
+                if (_value != value)
+                {
+                    _value = value;
+                }
+            }
+        }
+        //UI Friendly Value
+        public string OldUIValue
+        {
+            get { return _olduivalue; }
+            set
+            {
+                if (_olduivalue != value)
+                {
+                    _olduivalue = value;
+                }
+            }
+        }
+        //UI Friendly Value
+        public string UIValue
         {
             get { return _uivalue; }
             set
             {
                 if (_uivalue != value)
                 {
+                    OldUIValue = _uivalue;
                     _uivalue = value;
                     RaisePropertyChanged("UIValue");
                 }
             }
-        }               
-        //???
+        }
+        //Executes after RaisePropertyChange of UIValue
+        private void SetUIValue()
+        {            
+            double newValue = ValueConvertUtils.DoubleFromStringConvert(StorageType, DisplayUnitType, UIValue); //Get the double representation of the value based on the display unit type
+            //What could go wrong?
+            //1. The conversion precision fucks it up, leading to circular reference 
+            //2. The string input from the UI was bad, and returned 0.0
+            if(newValue == 0.0 || Math.Abs(Value - newValue) < error) //There was an error, set back the old value
+            {
+                UIValue = ValueConvertUtils.StringFromDoubleConvert(DisplayUnitType, Precision, Value);
+            }
+            else
+            {
+                Value = (double)newValue;
+                if(StorageType == StorageType.Integer)
+                {
+                    RevitValue = Value;
+                }
+                else
+                {
+                    RevitValue = Utils.GetDutValueFrom(DisplayUnitType, Value); //Make the change in the Value. This should propagate a series of changes as well
+                }
+            }
+        }
+        private void SetRevitValue()
+        {
+            //What could go wrong?
+            //1. The Value is already set and we go into circular reference - that should be resolved in the Revit value (skip if we are == value)
+            //2. The UIValue is already set and we go into circular reference ...
+            Value = Utils.GetDutValueTo(StorageType, DisplayUnitType, RevitValue);  
+            UIValue = ValueConvertUtils.StringFromDoubleConvert(DisplayUnitType, Precision, Value);
+            if (!_suppres) RequestHandling.MakeRequest(RequestId.ChangeParam, new Tuple<string, double>(Name, RevitValue)); // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
+            else _suppres = false;  
+        }
+        //Precision based on the DisplayUnitType
         public int Precision
         {
             get { return _precision; }
@@ -302,16 +355,10 @@ namespace FamilyEditorInterface.WPF
         public DisplayUnitType DisplayUnitType { get; internal set; }
         public ParamType ParamType { get; internal set; }
         public StorageType StorageType { get; internal set; }
-        #endregion
+#endregion
 
-        #region RequestChanges
-        //Executes after RaisePropertyChange of UIValue
-        private void ChangeUIValue()
-        { 
-            // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
-            if (!_suppres) RequestHandling.MakeRequest(RequestId.ChangeParam, new Tuple<string, double>(Name, Value));
-            else _suppres = false;
-        }
+#region RequestChanges
+
         //Changes the Name of the Parameter
         private void ChangeName()
         {
@@ -333,9 +380,9 @@ namespace FamilyEditorInterface.WPF
         {
             this._suppres = true;
         }
-        #endregion
+#endregion
 
-        #region Interface Implementation
+#region Interface Implementation
         protected void RaisePropertyChanged(string propertyName)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
@@ -345,7 +392,11 @@ namespace FamilyEditorInterface.WPF
             }
             if (propertyName.Equals("UIValue"))
             {
-                ChangeUIValue();
+                SetUIValue();
+            }
+            if (propertyName.Equals("RevitValue"))
+            {
+                SetRevitValue();
             }
             if (propertyName.Equals("Name"))
             {
@@ -354,6 +405,6 @@ namespace FamilyEditorInterface.WPF
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        #endregion
+#endregion
     }
 }

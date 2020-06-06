@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using FamilyEditorInterface.Helpers;
 using FamilyEditorInterface.WPF;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,14 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.Editable = newItem.IsUsed && !newItem.Formula && !newItem.Reporting; //If the Parameter is used or if the parameter is not defined by Formula, allow the user to edit
             newItem.Visible = Properties.Settings.Default.ToggleVisibility; //Set the visibility in the UI (user defined Tag property for ALL Tags, regardless of their specific conditions)
             newItem.TagVisible = Properties.Settings.Default.ToggleTagsVisibility; //Set the Tags visibility 
-            newItem.UIValue = Math.Round(Utils.GetDutValueTo(newItem.StorageType, newItem.DisplayUnitType, GetParameterValue(ft, fp)),newItem.Precision);  //The Value of the parameter (can be yes/no, double, integer, string, ...)
+
+            newItem.RevitValue = GetParameterValue(ft, fp);  //Set the Revit internal value for the Parameter
+
+            if(newItem.RevitValue == 0.0)
+            {
+                newItem.Value = Utils.GetDutValueTo(newItem.StorageType, newItem.DisplayUnitType, newItem.RevitValue);  //The unit specific value in double
+                newItem.UIValue = ValueConvertUtils.StringFromDoubleConvert(newItem.DisplayUnitType, newItem.Precision, newItem.Value); //The string representation of the value
+            }
 
             return newItem;
         }

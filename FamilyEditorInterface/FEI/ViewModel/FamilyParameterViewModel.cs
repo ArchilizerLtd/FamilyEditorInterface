@@ -262,9 +262,9 @@ namespace FamilyEditorInterface.WPF
                 double randomValue = Utils.GetRandomItemValue(item);
                 item.Activated = true;
                 item.SuppressUpdate();
-                item.UIValue = randomValue;
+                item.RevitValue = randomValue;
 
-                requestValues.Add(new Tuple<string, double>(item.Name, item.Value));
+                requestValues.Add(new Tuple<string, double>(item.Name, item.RevitValue));
 
                 item.Activated = false;
             }
@@ -274,9 +274,9 @@ namespace FamilyEditorInterface.WPF
                 double randomValue = Utils.GetRandomItemValue(item);
                 item.Activated = true;
                 item.SuppressUpdate();
-                item.UIValue = randomValue;
+                item.RevitValue = randomValue;
 
-                requestValues.Add(new Tuple<string, double>(item.Name, item.Value));
+                requestValues.Add(new Tuple<string, double>(item.Name, item.RevitValue));
 
                 item.Activated = false;
             }
@@ -286,9 +286,9 @@ namespace FamilyEditorInterface.WPF
                 double randomValue = Utils.GetRandomBooleanValue(item);
                 item.Activated = true;
                 item.SuppressUpdate();
-                item.UIValue = randomValue;
+                item.RevitValue = randomValue;
 
-                requestValues.Add(new Tuple<string, double>(item.Name, item.Value));
+                requestValues.Add(new Tuple<string, double>(item.Name, item.RevitValue));
 
                 item.Activated = false;
             }

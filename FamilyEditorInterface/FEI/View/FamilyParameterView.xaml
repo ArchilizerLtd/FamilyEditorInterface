@@ -25,6 +25,7 @@
             <local:BoolToCheckedConverter x:Key="BoolToCheckedConverter"></local:BoolToCheckedConverter>
             <local:BoolToWidthConverter x:Key="B2WC"></local:BoolToWidthConverter>
             <local:BoolToMarginConverter x:Key="B2MC"></local:BoolToMarginConverter>
+            <local:PrecisionConverter x:Key="PrecisionConverter"></local:PrecisionConverter>
             <!--Colors-->
             <SolidColorBrush x:Key="in-use" Color="#FFBB00"/>
             <SolidColorBrush x:Key="built-in" Color="#FF773D"/>
@@ -216,8 +217,8 @@
                                         </StackPanel>
                                         <!--The Value Slider-->
                                         <!--Delay makes the UI responsive-->
-                                        <Slider Style="{DynamicResource RoundSliderStyle}" Value="{Binding UIValue, Delay=500}" HorizontalContentAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1"
-                                                Maximum="{Binding UIValue, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" 
+                                        <Slider Style="{DynamicResource RoundSliderStyle}" Value="{Binding RevitValue, Delay=500}" HorizontalContentAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="0.01"
+                                                Maximum="{Binding RevitValue, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" 
                                                 Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}"/>
                                         <!--The Value-->
                                         <Border Background="White" CornerRadius="15" Grid.Column="3">
@@ -225,9 +226,10 @@
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox Text="{Binding UIValue, Converter={StaticResource DoubleToStringConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="3" Style="{StaticResource EnterText}" 
-                                                 Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}"
-                                                 PreviewTextInput="txtAnswer_PreviewTextInput"/>
+                                        <TextBox Grid.Column="3" Style="{StaticResource EnterText}" Text="{Binding UIValue, UpdateSourceTrigger=LostFocus}"
+                                                 Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}">
+                                            <!--PreviewTextInput="txtAnswer_PreviewTextInput">-->
+                                        </TextBox>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -267,8 +269,8 @@
                                             <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource label}" Tag="label" Content="{Binding Label}" ToolTip="The parameter is used in a label."/>
                                         </StackPanel>
                                         <!--The Value Slider-->
-                                        <Slider Style="{DynamicResource RoundSliderStyle}" Value="{Binding UIValue, Delay=500}" HorizontalContentAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="1"
-                                                Maximum="{Binding UIValue, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" 
+                                        <Slider Style="{DynamicResource RoundSliderStyle}" Value="{Binding RevitValue, Delay=500}" HorizontalContentAlignment="Center" IsSnapToTickEnabled="True" TickFrequency="0.01"
+                                                Maximum="{Binding RevitValue, Converter={StaticResource MultiplyConverter}, Mode=OneTime}" Grid.Column="2" Margin="10 2 10 0" 
                                                 Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}"/>
                                         <!--The Value-->
                                         <Border Background="White" CornerRadius="15" Grid.Column="3">
@@ -276,9 +278,10 @@
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="3" Opacity="0.25"/>
                                             </Border.Effect>
                                         </Border>
-                                        <TextBox Text="{Binding UIValue, Converter={StaticResource DoubleToStringConverter}, UpdateSourceTrigger=LostFocus}" Grid.Column="3" Style="{StaticResource EnterText}" 
-                                                 Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}"
-                                                 PreviewTextInput="txtAnswer_PreviewTextInput"/>
+                                        <TextBox Grid.Column="3" Style="{StaticResource EnterText}" Text="{Binding UIValue, UpdateSourceTrigger=LostFocus}"
+                                                 Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}">
+                                            <!--PreviewTextInput="txtAnswer_PreviewTextInput">-->
+                                        </TextBox>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -317,6 +320,7 @@
                                         <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="2 0">
                                             <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource shared}" Tag="shared" Content="{Binding Shared}" ToolTip="This is a Shared parameter"/>
                                             <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource built-in}" Tag="shared" Content="{Binding BuiltIn}" ToolTip="This is a Built-in parameter. Cannot be deleted."/>
+                                            <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource built-in}" Tag="shared" Content="{Binding BuiltIn}" ToolTip="This is a Built-in parameter. Cannot be deleted."/>
                                             <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource in-use}" Tag="in use" Content="{Binding IsUsed}" ToolTip="The parameter is either associated, used as a label or used in a formula."/>
                                             <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource fromF}" Tag="dF" Content="{Binding Formula}" ToolTip="The parameter is driven by a formula."/>
                                             <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource inF}" Tag="uF" Content="{Binding UsedInFormula}" ToolTip="The parameter is used in a formula."/>
@@ -324,7 +328,7 @@
                                             <ContentControl ContentTemplate="{StaticResource TagElement}" Visibility="{Binding TagVisible, Converter={StaticResource BoolToVisibilityConverter}}" Background="{StaticResource label}" Tag="label" Content="{Binding Label}" ToolTip="The parameter is used in a label."/>
                                         </StackPanel>
                                         <!--The CheckBox-->
-                                        <CheckBox IsChecked="{Binding UIValue, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="2" HorizontalAlignment="Right" Margin="0,10,0,0" BorderThickness="0" 
+                                        <CheckBox IsChecked="{Binding RevitValue, Converter={StaticResource BoolToCheckedConverter}}" Grid.Column="2" HorizontalAlignment="Right" Margin="0,10,0,0" BorderThickness="0" 
                                                   Foreground="{Binding Editable, Converter={StaticResource BoolToColorConverter}}" IsEnabled="{Binding Editable}">
                                             <CheckBox.Effect>
                                                 <DropShadowEffect Color="Gray" Direction="300" BlurRadius="8" ShadowDepth="2" Opacity="0.25"/>

@@ -122,6 +122,31 @@ namespace FamilyEditorInterface.WPF
             return Utils.convertValueFROM(Double.Parse((string)value.ToString()));
         }
     }
+    /// <summary>
+    /// MultiValueConverter for precision of numbers
+    /// </summary>
+    class PrecisionConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            int precision = int.Parse(values[1].ToString());
+            double Value = double.Parse(values[0].ToString());
+            NumberFormatInfo nfi = new NumberFormatInfo();
+            nfi.NumberDecimalDigits = precision;
+            return Value.ToString("N", nfi);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value == null) return null;
+            object[] values = new object[2];
+
+            values[0] = Utils.convertValueFROM(Double.Parse((string)value.ToString()));
+            values[1] = null;
+
+            return values;
+        }
+    }
     public class BindingProxy : Freezable
     {
         #region Overrides of Freezable
