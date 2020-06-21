@@ -48,8 +48,8 @@ namespace FamilyEditorInterface
         // Get absolute path to this assembly
         static string path = Assembly.GetExecutingAssembly().Location;
         static string contentPath = Path.GetDirectoryName(Path.GetDirectoryName(path)) + "/";
-        static string helpFile = "file:///C:/ProgramData/Autodesk/ApplicationPlugins/FamilyEditorInterface.bundle/Content/Family%20Editor%20Interface%20_%20Revit%20_%20Autodesk%20App%20Store.html";
-
+        static string helpFile = "file:///C:/ProgramData/Autodesk/ApplicationPlugins/FamilyEditorInterface.bundle/Content/Family%20Editor%20Interface%20_%20Revit%20_%20Autodesk%20App%20Store.html"; 
+        private static string assemblyVersion;
 
         // Marks if the Plugin has been started
         private static bool _started;
@@ -68,6 +68,8 @@ namespace FamilyEditorInterface
         private void AddRibbonPanel(UIControlledApplication application)
         {
             assembly = Assembly.GetExecutingAssembly();
+            assemblyVersion = $"v{assembly.GetName().Version.ToString()}";
+            assemblyVersion = assemblyVersion.Substring(0, assemblyVersion.Length - 2);
             string thisAssemblyPath = assembly.Location;   // Get dll assembly path
 
             // Create a custom ribbon panel or use the existing one
@@ -85,7 +87,7 @@ namespace FamilyEditorInterface
                         
             var buttons = GetStackButtons(ch); //Create the stack buttons
 
-            CreatePushButton(rvtRibbonPanel, String.Format("Family Editor" + Environment.NewLine + "Interface"), thisAssemblyPath, "FamilyEditorInterface.Command", Message, "FamilyEditorInterface.Resources.icon_Families.png", ch);
+            CreatePushButton(rvtRibbonPanel, String.Format("Family Editor" + Environment.NewLine + "Interface"), thisAssemblyPath, "FamilyEditorInterface.Command", Message, assemblyVersion, "FamilyEditorInterface.Resources.icon_Families.png", ch);
             CreateStackButtons(tabName, panelName, rvtRibbonPanel, buttons, thisAssemblyPath);
         }
         //Creates the local stack buttons for this application
@@ -138,7 +140,7 @@ namespace FamilyEditorInterface
             return panel;
         }
         //Create a pushbutton
-        private static void CreatePushButton(RibbonPanel ribbonPanel, string name, string path, string command, string tooltip, string icon, ContextualHelp ch)
+        private static void CreatePushButton(RibbonPanel ribbonPanel, string name, string path, string command, string tooltip, string assemblyVersion, string icon, ContextualHelp ch)
         {
             PushButtonData pbData = new PushButtonData(
                 name,
@@ -147,7 +149,7 @@ namespace FamilyEditorInterface
                 command);
 
             PushButton pb = ribbonPanel.AddItem(pbData) as PushButton;
-            pb.ToolTip = tooltip;
+            pb.ToolTip = $"{tooltip}{Environment.NewLine}{Environment.NewLine}{assemblyVersion}";
             pb.SetContextualHelp(ch);
 
             BitmapIcons bitmapIcons = new BitmapIcons(assembly, icon, MyApplication);
