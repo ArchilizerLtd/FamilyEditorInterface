@@ -52,6 +52,8 @@ namespace FamilyEditorInterface.Associate
 		private void Initialize()
 		{
 			familyInstance = GetFamilyInstance();
+			if (familyInstance == null) return;	//We failed to collect a FamilyInstance
+
 			familyManager = doc.FamilyManager;
 			familyParameters = new Dictionary<FamilyParameter, bool>();
 
