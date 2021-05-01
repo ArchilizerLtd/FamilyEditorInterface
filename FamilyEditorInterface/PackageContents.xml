@@ -24,10 +24,14 @@
   </Components>
   <Components Description="2020 parts">
     <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2020" SeriesMax="R2020" />
-    <ComponentEntry AppName="Family Editor Interface" Version="2.0.1" ModuleName="./Content/windows/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
+    <ComponentEntry AppName="Family Editor Interface" Version="2.0.1" ModuleName="./Content/windows/Revit2020/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
   </Components>
   <Components Description="2021 parts">
     <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2021" SeriesMax="R2021" />
-    <ComponentEntry AppName="Family Editor Interface" Version="2.0.1" ModuleName="./Content/windows/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
+    <ComponentEntry AppName="Family Editor Interface" Version="2.0.1" ModuleName="./Content/windows/Revit2021/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
+  </Components>
+  <Components Description="2022 parts">
+    <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2022" SeriesMax="R2022" />
+    <ComponentEntry AppName="Family Editor Interface" Version="2.0.1" ModuleName="./Content/windows/Revit2022/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
   </Components>
 </ApplicationPackage>

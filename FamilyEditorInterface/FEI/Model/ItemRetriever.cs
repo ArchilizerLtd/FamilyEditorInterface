@@ -27,9 +27,13 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.Name = fp.Definition.Name;  //The name of the Parameter
             newItem.StorageType = fp.StorageType; 
             newItem.ParamType = GetParameterType(fp);
-            newItem.DisplayUnitType = GetDisplayUnitType(fp);   //Set the DisplayUnitType for this parameter
-            newItem.Precision = Utils.GetPrecision(newItem.DisplayUnitType);   //Properties.Settings.Default.Precision;  //The precision set by the User in the Settings
+            newItem.UnitType = GetDisplayUnitType(fp);   //Set the DisplayUnitType for this parameter
+            newItem.Precision = Utils.GetPrecision(newItem.UnitType);   //Properties.Settings.Default.Precision;  //The precision set by the User in the Settings
+#if RELEASE2020 || RELEASE2021
             newItem.Type = fp.Definition.ParameterType.ToString();  //The parameter type
+#elif RELEASE2022
+            newItem.Type = fp.Definition.GetDataType().ToString();  //The parameter type
+#endif
             newItem.Associated = !fp.AssociatedParameters.IsEmpty;    //If the parameter is being associated
             newItem.BuiltIn = fp.Id.IntegerValue < 0;
             newItem.Modifiable = fp.UserModifiable;
@@ -49,13 +53,14 @@ namespace FamilyEditorInterface.Resources.WPF.Model
 
             if(newItem.RevitValue == 0.0)
             {
-                newItem.Value = Utils.GetDutValueTo(newItem.StorageType, newItem.DisplayUnitType, newItem.RevitValue);  //The unit specific value in double
-                newItem.UIValue = ValueConvertUtils.StringFromDoubleConvert(newItem.DisplayUnitType, newItem.Precision, newItem.Value); //The string representation of the value
+                newItem.Value = Utils.GetDutValueTo(newItem.StorageType, newItem.UnitType, newItem.RevitValue);  //The unit specific value in double
+                newItem.UIValue = ValueConvertUtils.StringFromDoubleConvert(newItem.UnitType, newItem.Precision, newItem.Value); //The string representation of the value
             }
 
             return newItem;
         }
         //Get the Display Unit Type
+#if RELEASE2020
         private static DisplayUnitType GetDisplayUnitType(FamilyParameter fp)
         {
             try
@@ -68,6 +73,20 @@ namespace FamilyEditorInterface.Resources.WPF.Model
                 return DisplayUnitType.DUT_MILLIMETERS;
             }
         }
+#elif RELEASE2021 || RELEASE2022
+        private static ForgeTypeId GetDisplayUnitType(FamilyParameter fp)
+        {
+            try
+            {
+                var dut = fp.GetUnitTypeId();
+                return dut;
+            }
+            catch (Exception)
+            {
+                return UnitTypeId.Millimeters;
+            }
+        }
+#endif
         //Get the parameter value as Double
         private static double GetParameterValue(FamilyType ft, FamilyParameter fp)
         {
@@ -97,6 +116,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
         private static ParamType GetParameterType(FamilyParameter fp)
         {
             ParamType type;
+#if RELEASE2020 || RELEASE2021
             switch (fp.Definition.ParameterType)
             {
                 case (Autodesk.Revit.DB.ParameterType.YesNo):
@@ -115,8 +135,14 @@ namespace FamilyEditorInterface.Resources.WPF.Model
                     type = ParamType.Supported;
                     break;
             }
-
             return type;
+#elif  RELEASE2022
+            //TO DO - missing Yes/No type
+            if (fp.Definition.GetDataType().Equals(SpecTypeId.Angle)) return ParamType.Angle;
+            if (fp.Definition.GetDataType().Equals(SpecTypeId.Area)) return ParamType.Area;
+            if (fp.Definition.GetDataType().Equals(SpecTypeId.Length)) return ParamType.Length;
+            else return ParamType.Supported;
+#endif
         }
         /// <summary>
         /// 1: Value

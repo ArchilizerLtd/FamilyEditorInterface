@@ -127,8 +127,10 @@ namespace FamilyEditorInterface.WPF
         {
             Application.Control.handler.EncounteredError += RollBackState;
 
+
             this.Document = document;
             
+
             ShuffleCommand = new RelayCommand(o => Shuffle("ShuffleButton"));
             PrecisionCommand = new RelayCommand(o => Precision("PrecisionButton"));
             DeleteUnusedCommand = new RelayCommand(o => DeleteUnused("DeleteUnusedButton"));
@@ -145,9 +147,9 @@ namespace FamilyEditorInterface.WPF
             _dialogService = new DialogService();
 
         }
-        #endregion
+#endregion
 
-        #region Main Methods
+#region Main Methods
         // Force update in case of error
         private void RollBackState(object sender, EventArgs e)
         {
@@ -217,9 +219,9 @@ namespace FamilyEditorInterface.WPF
             BuiltInParameters = new ObservableCollection<FamilyParameterModel>(getParameters.Item2);
             CheckParameters = new ObservableCollection<FamilyParameterModel>(getParameters.Item3);
         }
-        #endregion
+#endregion
 
-        #region View
+#region View
         /// <summary>
         /// Terminates the View
         /// </summary>
@@ -247,9 +249,9 @@ namespace FamilyEditorInterface.WPF
                 TaskDialog.Show("Error", ex.Message);
             }
         }
-        #endregion
+#endregion
 
-        #region Requests
+#region Requests
         // Shuffle parameter values
         private void Shuffle(object sender)
         {
@@ -463,9 +465,9 @@ namespace FamilyEditorInterface.WPF
             if (PresenterClosed != null)
                 PresenterClosed(this, new EventArgs());
         }
-        #endregion
+#endregion
 
-        #region Utility Methods
+#region Utility Methods
         /// <summary>
         /// Creates default family type.
         /// </summary>
@@ -529,19 +531,19 @@ namespace FamilyEditorInterface.WPF
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region Interface Implementation
+#region Interface Implementation
         protected void RaisePropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        #endregion
+#endregion
     }
 
-    #region Commands
+#region Commands
     /// <summary>
     /// The Command interface that will let us relay button events to view model methods
     /// </summary>
@@ -575,5 +577,5 @@ namespace FamilyEditorInterface.WPF
         }
 
     }
-    #endregion
+#endregion
 }

@@ -140,15 +140,16 @@ namespace FamilyEditorInterface.WPF
             }
         }
         //Executes after RaisePropertyChange of UIValue
+#if RELEASE2020
         private void SetUIValue()
         {            
-            double newValue = ValueConvertUtils.DoubleFromStringConvert(StorageType, DisplayUnitType, UIValue); //Get the double representation of the value based on the display unit type
+            double newValue = ValueConvertUtils.DoubleFromStringConvert(StorageType, UnitType, UIValue); //Get the double representation of the value based on the display unit type
             //What could go wrong?
             //1. The conversion precision fucks it up, leading to circular reference 
             //2. The string input from the UI was bad, and returned 0.0
             if(newValue == 0.0 || Math.Abs(Value - newValue) < error) //There was an error, set back the old value
             {
-                UIValue = ValueConvertUtils.StringFromDoubleConvert(DisplayUnitType, Precision, Value);
+                UIValue = ValueConvertUtils.StringFromDoubleConvert(UnitType, Precision, Value);
             }
             else
             {
@@ -159,17 +160,43 @@ namespace FamilyEditorInterface.WPF
                 }
                 else
                 {
-                    RevitValue = Utils.GetDutValueFrom(DisplayUnitType, Value); //Make the change in the Value. This should propagate a series of changes as well
+                    RevitValue = Utils.GetDutValueFrom(UnitType, Value); //Make the change in the Value. This should propagate a series of changes as well
                 }
             }
         }
+#elif RELEASE2021 || RELEASE2022        
+        private void SetUIValue()
+        {
+            double newValue = ValueConvertUtils.DoubleFromStringConvert(StorageType, UnitType, UIValue); //Get the double representation of the value based on the display unit type
+            //What could go wrong?
+            //1. The conversion precision fucks it up, leading to circular reference 
+            //2. The string input from the UI was bad, and returned 0.0
+            if (newValue == 0.0 || Math.Abs(Value - newValue) < error) //There was an error, set back the old value
+            {
+                UIValue = ValueConvertUtils.StringFromDoubleConvert(UnitType, Precision, Value);
+            }
+            else
+            {
+                Value = (double)newValue;
+                if (StorageType == StorageType.Integer)
+                {
+                    RevitValue = Value;
+                }
+                else
+                {
+                    RevitValue = Utils.GetDutValueFrom(UnitType, Value); //Make the change in the Value. This should propagate a series of changes as well
+                }
+            }
+        }
+
+#endif
         private void SetRevitValue()
         {
             //What could go wrong?
             //1. The Value is already set and we go into circular reference - that should be resolved in the Revit value (skip if we are == value)
             //2. The UIValue is already set and we go into circular reference ...
-            Value = Utils.GetDutValueTo(StorageType, DisplayUnitType, RevitValue);  
-            UIValue = ValueConvertUtils.StringFromDoubleConvert(DisplayUnitType, Precision, Value);
+            Value = Utils.GetDutValueTo(StorageType, UnitType, RevitValue);  
+            UIValue = ValueConvertUtils.StringFromDoubleConvert(UnitType, Precision, Value);
             if (!_suppres) RequestHandling.MakeRequest(RequestId.ChangeParam, new Tuple<string, double>(Name, RevitValue)); // Suppres request in case of Shuffle, or mass request (can only make 1 single bulk request at a time)
             else _suppres = false;  
         }
@@ -352,7 +379,13 @@ namespace FamilyEditorInterface.WPF
             }
         }
         //Revit Display Unit Type to help us display the correct unit in the UI
-        public DisplayUnitType DisplayUnitType { get; internal set; }
+
+#if RELEASE2020
+        public DisplayUnitType UnitType { get; internal set; }
+#elif RELEASE2021 || RELEASE2022
+        public ForgeTypeId UnitType { get; internal set; }      
+#endif
+
         public ParamType ParamType { get; internal set; }
         public StorageType StorageType { get; internal set; }
 #endregion

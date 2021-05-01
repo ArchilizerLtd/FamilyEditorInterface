@@ -16,10 +16,12 @@ namespace FamilyEditorInterface.Helpers
         /// <remarks>
         /// Depends on the DisplayUnitType and can be m, dm, cm, mm, ft, in, frac ft, frac in, angle
         /// </remarks>
-        public static string StringFromDoubleConvert(DisplayUnitType displayUnitType, int precision, double value)
+        /// 
+#if RELEASE2020
+        public static string StringFromDoubleConvert(DisplayUnitType unitType, int precision, double value)
         {
-            switch (displayUnitType)
-            {
+            switch (unitType)
+            {                
                 case DisplayUnitType.DUT_MILLIMETERS:
                 case DisplayUnitType.DUT_CENTIMETERS:
                 case DisplayUnitType.DUT_DECIMETERS:
@@ -38,6 +40,25 @@ namespace FamilyEditorInterface.Helpers
                     return "Not supported.";
             }
         }
+#elif RELEASE2021 || RELEASE2022
+        public static string StringFromDoubleConvert(ForgeTypeId unitType, int precision, double value)
+        {
+            if (unitType.Equals(UnitTypeId.Millimeters)) return ConvertPrecision(precision, value);
+            else if (unitType.Equals(UnitTypeId.Centimeters)) return ConvertPrecision(precision, value);
+            else if (unitType.Equals(UnitTypeId.Decimeters)) return ConvertPrecision(precision, value);
+            else if (unitType.Equals(UnitTypeId.Meters)) return ConvertPrecision(precision, value);
+            else if (unitType.Equals(UnitTypeId.MetersCentimeters)) return ConvertPrecision(precision, value);
+            else if (unitType.Equals(UnitTypeId.Feet)) return ConvertPrecision(precision, value);
+            else if (unitType.Equals(UnitTypeId.Inches)) return ConvertPrecision(precision, value);
+            else if (unitType.Equals(UnitTypeId.Degrees)) return ConvertAngle(precision, value);
+            else if (unitType.Equals(UnitTypeId.FeetFractionalInches)) return ConvertFeetInches(value);
+            else if (unitType.Equals(UnitTypeId.FractionalInches)) return ConvertInches(value);
+            return "Not supported.";
+        }
+#endif
+
+
+
         //Adds the degrees symbol to an angle value
         private static string ConvertAngle(int precision, double value)
         {
@@ -60,6 +81,7 @@ namespace FamilyEditorInterface.Helpers
         /// <param name="displayUnitType">the Display Unit Type</param>
         /// <param name="value">The value</param>
         /// <returns></returns>
+#if RELEASE2020
         public static double DoubleFromStringConvert(StorageType storageType, DisplayUnitType displayUnitType, string value)
         {
             switch (storageType)
@@ -72,12 +94,27 @@ namespace FamilyEditorInterface.Helpers
                     return 0.0;
             }
         }
+#elif RELEASE2021 || RELEASE2022
+        public static double DoubleFromStringConvert(StorageType storageType, ForgeTypeId displayUnitType, string value)
+        {
+            switch (storageType)
+            {
+                case (StorageType.Double):
+                    return DoubleFromStringConvert(displayUnitType, value);
+                case (StorageType.Integer):
+                    return Double.Parse(value);
+                default:
+                    return 0.0;
+            }
+        }
+#endif
         /// <summary>
         /// Converts a double from a string value
         /// </summary>
         /// <remarks>
         /// Depends on the DisplayUnitType and can be m, dm, cm, mm, ft, in, frac ft, frac in, angle
         /// </remarks>
+#if RELEASE2020
         public static double DoubleFromStringConvert(DisplayUnitType displayUnitType, string value)
         {
             double result = 0.0;
@@ -103,6 +140,24 @@ namespace FamilyEditorInterface.Helpers
                     return 0.0;
             }
         }
+#elif RELEASE2021 || RELEASE2022
+        public static double DoubleFromStringConvert(ForgeTypeId dut, string value)
+        {
+            double result = 0.0;
+
+            if (dut.Equals(UnitTypeId.Millimeters)) double.TryParse(value, out result);
+            else if (dut.Equals(UnitTypeId.Centimeters)) double.TryParse(value, out result);
+            else if (dut.Equals(UnitTypeId.Decimeters)) double.TryParse(value, out result);
+            else if (dut.Equals(UnitTypeId.Meters)) double.TryParse(value, out result);
+            else if (dut.Equals(UnitTypeId.MetersCentimeters)) double.TryParse(value, out result);
+            else if (dut.Equals(UnitTypeId.Feet)) double.TryParse(value, out result);
+            else if (dut.Equals(UnitTypeId.Inches)) double.TryParse(value, out result);
+            else if (dut.Equals(UnitTypeId.Degrees)) double.TryParse(value.Trim('°'), out result);
+            else if (dut.Equals(UnitTypeId.FeetFractionalInches)) return ConvertFeetInches(value);
+            else if (dut.Equals(UnitTypeId.FractionalInches)) return ConvertInches(value);
+            return result;
+        }
+#endif
         //Convert string to double fractional inches
         private static double ConvertInches(string value)
         {
@@ -116,7 +171,7 @@ namespace FamilyEditorInterface.Helpers
             return result;
         }
 
-        #region Double to String
+#region Double to String
         /// <summary>
         /// Creates a precision formatted string form a double
         /// </summary>
@@ -190,9 +245,9 @@ namespace FamilyEditorInterface.Helpers
             else
                 return integer.ToString(); // just an integer value, e.g. 0, -3, 12...  
         }
-        #endregion
+#endregion
 
-        #region String to Double
+#region String to Double
         //Returns decimal from fractional feet and inches
         private static double? FromFractionalInches(string value, out double success)
         {
@@ -304,6 +359,6 @@ namespace FamilyEditorInterface.Helpers
 
             return result;
         }
-        #endregion
+#endregion
     }
 }
