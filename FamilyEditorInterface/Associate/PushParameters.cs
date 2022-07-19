@@ -159,8 +159,13 @@ namespace FamilyEditorInterface.Associate
 				using (Transaction ft = new Transaction(nestedFamilyDocument, "Push parameter"))
 				{
 					ft.Start();
+#if RELEASE2019 || RELEASE2020 || RELEASE2021
 					//Adds a Parameter to the Family
 					nestedFamilyDocument.FamilyManager.AddParameter(parameterToPush.Definition.Name, parameterToPush.Definition.ParameterGroup, parameterToPush.Definition.ParameterType, parameterToPush.IsInstance);
+#elif RELEASE2022 || RELEASE2023
+					//Adds a Parameter to the Family
+					nestedFamilyDocument.FamilyManager.AddParameter(parameterToPush.Definition.Name, parameterToPush.Definition.GetGroupTypeId(), parameterToPush.Definition.GetDataType(), parameterToPush.IsInstance);
+#endif
 					ft.Commit();
 				}
 			}
@@ -239,7 +244,7 @@ namespace FamilyEditorInterface.Associate
 			ExternalDefinition def = v.First();
 			return def;
 		}
-		#endregion
+#endregion
 	}
 
 	/// <summary>

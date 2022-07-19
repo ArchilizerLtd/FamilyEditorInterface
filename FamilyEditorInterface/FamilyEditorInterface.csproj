@@ -92,6 +92,16 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2023|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Revit2023\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2023</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AdWindows, Version=2018.11.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -101,25 +111,25 @@
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Revit2020'">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Revit2021'">
       <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Revit2022'">
       <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2022\RevitAPI.dll</HintPath>
     </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Revit2020'">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="RevitAPI, Version=21.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Revit2021'">
       <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPIUI.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Revit2022'">
       <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2022\RevitAPIUI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPIUI, Version=21.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPIUI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -288,6 +298,7 @@ echo Configuration: $(Configuration)
 if $(Configuration) == Revit2020 goto 2020
 if $(Configuration) == Revit2021 goto 2021
 if $(Configuration) == Revit2022 goto 2022
+if $(Configuration) == Revit2023 goto 2023
 
 echo Copying results to 2020
 :2020
@@ -307,12 +318,19 @@ copy "$(ProjectDir)bin\Revit2022\FamilyEditorInterface.dll" "%25Programdata%25\A
 copy "$(ProjectDir)FamilyEditorInterface.addin" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022"
 goto exit
 
+echo Copying results to 2023
+:2023
+copy "$(ProjectDir)bin\Revit2023\FamilyEditorInterface.dll" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2023"
+copy "$(ProjectDir)FamilyEditorInterface.addin" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2023"
+goto exit
+
 :exit</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"
 if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2020" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2020"
 if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2021" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2021"
-if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022"</PreBuildEvent>
+if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022"
+if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2023" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2023"</PreBuildEvent>
   </PropertyGroup>
 </Project>

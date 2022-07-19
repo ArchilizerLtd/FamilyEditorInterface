@@ -164,7 +164,7 @@ namespace FamilyEditorInterface.WPF
                 }
             }
         }
-#elif RELEASE2021 || RELEASE2022        
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023       
         private void SetUIValue()
         {
             double newValue = ValueConvertUtils.DoubleFromStringConvert(StorageType, UnitType, UIValue); //Get the double representation of the value based on the display unit type
@@ -382,7 +382,7 @@ namespace FamilyEditorInterface.WPF
 
 #if RELEASE2020
         public DisplayUnitType UnitType { get; internal set; }
-#elif RELEASE2021 || RELEASE2022
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023
         public ForgeTypeId UnitType { get; internal set; }      
 #endif
 

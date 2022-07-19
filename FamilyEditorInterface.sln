@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29728.190
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FamilyEditorInterface", "FamilyEditorInterface\FamilyEditorInterface.csproj", "{EB9ACB02-3104-48F9-AA3E-09BB391D99AF}"
 EndProject
@@ -12,6 +12,7 @@ Global
 		Revit2020|Any CPU = Revit2020|Any CPU
 		Revit2021|Any CPU = Revit2021|Any CPU
 		Revit2022|Any CPU = Revit2022|Any CPU
+		Revit2023|Any CPU = Revit2023|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{EB9ACB02-3104-48F9-AA3E-09BB391D99AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -24,6 +25,8 @@ Global
 		{EB9ACB02-3104-48F9-AA3E-09BB391D99AF}.Revit2021|Any CPU.Build.0 = Revit2021|Any CPU
 		{EB9ACB02-3104-48F9-AA3E-09BB391D99AF}.Revit2022|Any CPU.ActiveCfg = Revit2022|Any CPU
 		{EB9ACB02-3104-48F9-AA3E-09BB391D99AF}.Revit2022|Any CPU.Build.0 = Revit2022|Any CPU
+		{EB9ACB02-3104-48F9-AA3E-09BB391D99AF}.Revit2023|Any CPU.ActiveCfg = Revit2023|Any CPU
+		{EB9ACB02-3104-48F9-AA3E-09BB391D99AF}.Revit2023|Any CPU.Build.0 = Revit2023|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

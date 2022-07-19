@@ -72,6 +72,8 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
                 var par = pair.Key;
 
                 if (par.Id.IntegerValue < 0) continue; //Skip built-in parameters
+
+#if RELEASE2020 || RELEASE2021 
                 models.Add(new ParameterSelectorModel()
                 {
                     Name = par.Definition.Name,
@@ -82,12 +84,29 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
                     IsInstance = par.IsInstance,
                     IsShared = par.IsShared,
                     Exists = pair.Value
-                }); ;
+                });
+#elif RELEASE2022 || RELEASE2023
+                models.Add(new ParameterSelectorModel()
+                {
+                    Name = par.Definition.Name,
+                    Group = Utils.GetReadableGroupName(par.Definition.ParameterGroup),
+                    Parameter = par,
+                    ParameterGroup = par.Definition.GetGroupTypeId(),
+                    ParameterType = par.Definition.GetDataType(),
+                    IsInstance = par.IsInstance,
+                    IsShared = par.IsShared,
+                    Exists = pair.Value
+                }); 
+#endif
             }
+
             models = models.OrderBy(x => x.Group).ToList();
             return new ObservableCollection<ParameterSelectorModel>(models);
         }
-        #endregion
+            
+
+
+#endregion
 
         #region View
         //Close the View and save the selected Family Paramters
@@ -121,15 +140,15 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
                 //Show error message
             }
         }
-        #endregion
+#endregion
 
-        #region Interface Implementation
+#region Interface Implementation
         protected void RaisePropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        #endregion
+#endregion
     }
 }
