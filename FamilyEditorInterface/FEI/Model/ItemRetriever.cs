@@ -31,7 +31,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.Precision = Utils.GetPrecision(newItem.UnitType);   //Properties.Settings.Default.Precision;  //The precision set by the User in the Settings
 #if RELEASE2020 || RELEASE2021
             newItem.Type = fp.Definition.ParameterType.ToString();  //The parameter type
-#elif RELEASE2022 || RELEASE2023   
+#elif RELEASE2022 || RELEASE2023 || RELEASE2024   
             newItem.Type = fp.Definition.GetDataType().ToString();  //The parameter type
 #endif
             newItem.Associated = !fp.AssociatedParameters.IsEmpty;    //If the parameter is being associated
@@ -73,7 +73,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
                 return DisplayUnitType.DUT_MILLIMETERS;
             }
         }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023   
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024   
         private static ForgeTypeId GetDisplayUnitType(FamilyParameter fp)
         {
             try
@@ -136,7 +136,7 @@ namespace FamilyEditorInterface.Resources.WPF.Model
                     break;
             }
             return type;
-#elif  RELEASE2022|| RELEASE2023   
+#elif  RELEASE2022|| RELEASE2023 || RELEASE2024  
             //TO DO - missing Yes/No type
             if (fp.Definition.GetDataType().Equals(SpecTypeId.Angle)) return ParamType.Angle;
             if (fp.Definition.GetDataType().Equals(SpecTypeId.Area)) return ParamType.Area;

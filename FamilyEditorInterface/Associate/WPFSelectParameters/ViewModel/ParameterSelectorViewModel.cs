@@ -85,7 +85,7 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
                     IsShared = par.IsShared,
                     Exists = pair.Value
                 });
-#elif RELEASE2022 || RELEASE2023
+#elif RELEASE2022 || RELEASE2023 || RELEASE2024
                 models.Add(new ParameterSelectorModel()
                 {
                     Name = par.Definition.Name,

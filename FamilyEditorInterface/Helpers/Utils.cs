@@ -34,7 +34,7 @@ namespace FamilyEditorInterface
     {
 #if RELEASE2020
         private static DisplayUnitType DUT;
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023   
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024   
         private static ForgeTypeId DUT;
 #endif
         public const double METERS_IN_FEET = 0.3048;
@@ -49,7 +49,7 @@ namespace FamilyEditorInterface
                 DUT = DisplayUnitType.DUT_DECIMAL_FEET;
             }
         }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023   
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024  
         public static void InitializeUnits(Document doc)
         {
             DUT = doc.GetUnits().GetFormatOptions(SpecTypeId.Length).GetUnitTypeId();
@@ -188,7 +188,7 @@ namespace FamilyEditorInterface
                     return 4;
             }
         }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         internal static int GetPrecision(ForgeTypeId dut)
         {
             if (dut.Equals(UnitTypeId.Millimeters)) return 0;
@@ -238,7 +238,7 @@ namespace FamilyEditorInterface
             }
             return p;
         }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static double GetDutValueTo(ForgeTypeId dut, double p)
         {
             if (dut.Equals(UnitTypeId.Millimeters)) return p * METERS_IN_FEET * 1000;
@@ -277,7 +277,7 @@ namespace FamilyEditorInterface
                     return 0.0;
             }
         }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         internal static double GetDutValueTo(StorageType storageType, ForgeTypeId unitType, double value)
         {
             switch (storageType)
@@ -339,7 +339,7 @@ namespace FamilyEditorInterface
             }
             return p;
         }       
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static double GetDutValueFrom(ForgeTypeId dut, double p)
         {
             if (dut.Equals(UnitTypeId.Millimeters)) return p / METERS_IN_FEET / 1000;
@@ -364,7 +364,7 @@ namespace FamilyEditorInterface
         {
             //System.Windows.MessageBox.Show("Unit Type not supported.", "Family Editor Interface");
         }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         private static void NotSupported(ForgeTypeId dut)
         {
             //System.Windows.MessageBox.Show("Unit Type not supported.", "Family Editor Interface");
@@ -381,7 +381,7 @@ namespace FamilyEditorInterface
             if (DUT.Equals(DisplayUnitType.DUT_FRACTIONAL_INCHES)) return false;
             return true;
         }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static Boolean _goUnits()
         {
             if (DUT.Equals(UnitTypeId.FeetFractionalInches)) return false;

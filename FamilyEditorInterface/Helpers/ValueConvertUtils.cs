@@ -40,7 +40,7 @@ namespace FamilyEditorInterface.Helpers
                     return "Not supported.";
             }
         }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static string StringFromDoubleConvert(ForgeTypeId unitType, int precision, double value)
         {
             if (unitType.Equals(UnitTypeId.Millimeters)) return ConvertPrecision(precision, value);
@@ -94,7 +94,7 @@ namespace FamilyEditorInterface.Helpers
                     return 0.0;
             }
         }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static double DoubleFromStringConvert(StorageType storageType, ForgeTypeId displayUnitType, string value)
         {
             switch (storageType)
@@ -140,7 +140,7 @@ namespace FamilyEditorInterface.Helpers
                     return 0.0;
             }
         }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023
+#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static double DoubleFromStringConvert(ForgeTypeId dut, string value)
         {
             double result = 0.0;

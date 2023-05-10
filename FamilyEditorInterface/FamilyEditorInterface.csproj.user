@@ -29,4 +29,11 @@
     <StartProgram>C:\Program Files\Autodesk\Revit 2023\Revit.exe</StartProgram>
     <StartAction>Program</StartAction>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2024|AnyCPU'">
+    <StartProgram>C:\Program Files\Autodesk\Revit 2023\Revit.exe</StartProgram>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2024|AnyCPU'">
+    <StartProgram>C:\Program Files\Autodesk\Revit 2024\Revit.exe</StartProgram>
+  </PropertyGroup>
 </Project>

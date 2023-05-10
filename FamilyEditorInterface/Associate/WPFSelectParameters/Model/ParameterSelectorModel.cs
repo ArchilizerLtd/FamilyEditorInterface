@@ -17,7 +17,7 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.Model
 
         public ParameterType ParameterType { get; internal set; }
 
-#elif RELEASE2022 || RELEASE2023
+#elif RELEASE2022 || RELEASE2023 || RELEASE2024
         public ForgeTypeId ParameterGroup { get; internal set; }
         public ForgeTypeId ParameterType { get; internal set; }
 #endif

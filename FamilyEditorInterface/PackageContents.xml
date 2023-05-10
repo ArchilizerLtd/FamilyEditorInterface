@@ -38,4 +38,8 @@
 	  <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2023" SeriesMax="R2023" />
 	  <ComponentEntry AppName="Family Editor Interface" Version="2.0.2" ModuleName="./Content/windows/Revit2022/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
   </Components>
+  <Components Description="2024 parts">
+    <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2024" SeriesMax="R2024" />
+    <ComponentEntry AppName="Family Editor Interface" Version="2.0.3" ModuleName="./Content/windows/Revit2022/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
+  </Components>
 </ApplicationPackage>
