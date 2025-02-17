@@ -344,8 +344,6 @@ goto exit
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"
-if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2020" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2020"
-if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2021" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2021"
 if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022"
 if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2023" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2023"
 if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2024" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2024"</PreBuildEvent>
