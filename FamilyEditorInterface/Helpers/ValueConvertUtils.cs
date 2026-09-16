@@ -17,30 +17,6 @@ namespace FamilyEditorInterface.Helpers
         /// Depends on the DisplayUnitType and can be m, dm, cm, mm, ft, in, frac ft, frac in, angle
         /// </remarks>
         /// 
-#if RELEASE2020
-        public static string StringFromDoubleConvert(DisplayUnitType unitType, int precision, double value)
-        {
-            switch (unitType)
-            {                
-                case DisplayUnitType.DUT_MILLIMETERS:
-                case DisplayUnitType.DUT_CENTIMETERS:
-                case DisplayUnitType.DUT_DECIMETERS:
-                case DisplayUnitType.DUT_METERS:
-                case DisplayUnitType.DUT_METERS_CENTIMETERS:
-                case DisplayUnitType.DUT_DECIMAL_FEET:
-                case DisplayUnitType.DUT_DECIMAL_INCHES:
-                    return ConvertPrecision(precision, value);
-                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
-                    return ConvertFeetInches(value);
-                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
-                    return ConvertInches(value);
-                case DisplayUnitType.DUT_DECIMAL_DEGREES:
-                    return ConvertAngle(precision, value);
-                default:
-                    return "Not supported.";
-            }
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static string StringFromDoubleConvert(ForgeTypeId unitType, int precision, double value)
         {
             if (unitType.Equals(UnitTypeId.Millimeters)) return ConvertPrecision(precision, value);
@@ -55,7 +31,6 @@ namespace FamilyEditorInterface.Helpers
             else if (unitType.Equals(UnitTypeId.FractionalInches)) return ConvertInches(value);
             return "Not supported.";
         }
-#endif
 
 
 
@@ -81,20 +56,6 @@ namespace FamilyEditorInterface.Helpers
         /// <param name="displayUnitType">the Display Unit Type</param>
         /// <param name="value">The value</param>
         /// <returns></returns>
-#if RELEASE2020
-        public static double DoubleFromStringConvert(StorageType storageType, DisplayUnitType displayUnitType, string value)
-        {
-            switch (storageType)
-            {
-                case (StorageType.Double):
-                    return DoubleFromStringConvert(displayUnitType, value);
-                case (StorageType.Integer):
-                    return Double.Parse(value);
-                default:
-                    return 0.0;
-            }
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static double DoubleFromStringConvert(StorageType storageType, ForgeTypeId displayUnitType, string value)
         {
             switch (storageType)
@@ -107,40 +68,12 @@ namespace FamilyEditorInterface.Helpers
                     return 0.0;
             }
         }
-#endif
         /// <summary>
         /// Converts a double from a string value
         /// </summary>
         /// <remarks>
         /// Depends on the DisplayUnitType and can be m, dm, cm, mm, ft, in, frac ft, frac in, angle
         /// </remarks>
-#if RELEASE2020
-        public static double DoubleFromStringConvert(DisplayUnitType displayUnitType, string value)
-        {
-            double result = 0.0;
-            switch (displayUnitType)
-            {
-                case DisplayUnitType.DUT_MILLIMETERS:
-                case DisplayUnitType.DUT_CENTIMETERS:
-                case DisplayUnitType.DUT_DECIMETERS:
-                case DisplayUnitType.DUT_METERS:
-                case DisplayUnitType.DUT_METERS_CENTIMETERS:
-                case DisplayUnitType.DUT_DECIMAL_FEET:
-                case DisplayUnitType.DUT_DECIMAL_INCHES:
-                    double.TryParse(value, out result);
-                    return result;
-                case DisplayUnitType.DUT_DECIMAL_DEGREES:
-                    double.TryParse(value.Trim('°'), out result);
-                    return result;
-                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
-                    return ConvertFeetInches(value);
-                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
-                    return ConvertInches(value);
-                default:
-                    return 0.0;
-            }
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static double DoubleFromStringConvert(ForgeTypeId dut, string value)
         {
             double result = 0.0;
@@ -157,7 +90,6 @@ namespace FamilyEditorInterface.Helpers
             else if (dut.Equals(UnitTypeId.FractionalInches)) return ConvertInches(value);
             return result;
         }
-#endif
         //Convert string to double fractional inches
         private static double ConvertInches(string value)
         {

@@ -1,351 +1,89 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-      None
-    </ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>
-    </ProductVersion>
-    <SchemaVersion>
-    </SchemaVersion>
-    <ProjectGuid>{EB9ACB02-3104-48F9-AA3E-09BB391D99AF}</ProjectGuid>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FamilyEditorInterface</RootNamespace>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\FamilyEditorInterface.bundle\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <AssemblyName>FamilyEditorInterface</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>AnyCPU</Platforms>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <!-- Windows-only add-in; AssemblyInfo is hand-written so the platform attribute isn't generated. -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+
+    <RevitVersion>2027</RevitVersion>
+    <RevitInstallDir>$(ProgramW6432)\Autodesk\Revit $(RevitVersion)</RevitInstallDir>
+    <BundleDir>$(AppData)\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle</BundleDir>
+
     <StartAction>Program</StartAction>
-    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2015\Revit.exe</StartProgram>
-    <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>x64</PlatformTarget>
+    <StartProgram>$(RevitInstallDir)\Revit.exe</StartProgram>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <StartAction>Program</StartAction>
-    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2015\Revit.exe</StartProgram>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup>
-    <RunPostBuildEvent>Always</RunPostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2022|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Revit2022\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2022</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2021|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Revit2021\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2021</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2019|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Revit2019\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2019</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2020|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Revit2020\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2020</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2023|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Revit2023\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2023</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Revit2024|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Revit2024\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2024</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="AdWindows, Version=2018.11.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2022\AdWindows.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.Build" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Revit2021'">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == 'Revit2022'">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2022\RevitAPI.dll</HintPath>
-    </Reference>
     <Reference Include="RevitAPI">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2024\RevitAPI.dll</HintPath>
+      <HintPath>$(RevitInstallDir)\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == 'Revit2022'">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2022\RevitAPIUI.dll</HintPath>
-    </Reference>
-    <Reference Include="RevitAPIUI, Version=24.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2024\RevitAPIUI.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="RevitAPIUI">
+      <HintPath>$(RevitInstallDir)\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.XML" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationFramework" />
+    <Reference Include="AdWindows">
+      <HintPath>$(RevitInstallDir)\AdWindows.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!-- Needed for Properties.Settings (ApplicationSettingsBase); Revit ships its own copy. -->
+    <Reference Include="System.Configuration.ConfigurationManager">
+      <HintPath>$(RevitInstallDir)\System.Configuration.ConfigurationManager.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Associate\PullParameters.cs" />
-    <Compile Include="Associate\PushParameters.cs" />
-    <Compile Include="Associate\WireParameters.cs" />
-    <Compile Include="Associate\WPFSelectParameters\Model\ParameterSelectorModel.cs" />
-    <Compile Include="Associate\WPFSelectParameters\ViewModel\ParameterSelectorViewModel.cs" />
-    <Compile Include="Associate\WPFSelectParameters\View\ParameterSelectorView.xaml.cs">
-      <DependentUpon>ParameterSelectorView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\Alerts\DialogUtils.cs" />
-    <Compile Include="Dialog\Alerts\FailureDialogView.xaml.cs">
-      <DependentUpon>FailureDialogView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\Alerts\FailureDialogViewModel.cs" />
-    <Compile Include="Dialog\Alerts\NotifyDialogView.cs">
-      <DependentUpon>NotifyDialogView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="App.cs" />
-    <Compile Include="Command.cs" />
-    <Compile Include="Dialog\Alerts\AlertDialogView.xaml.cs">
-      <DependentUpon>AlertDialogView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\Alerts\AlertDialogViewModel.cs" />
-    <Compile Include="Dialog\Alerts\NotifyDialogViewModel.cs" />
-    <Compile Include="Dialog\Alerts\OKDialogView.xaml.cs">
-      <DependentUpon>OKDialogView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\Alerts\OKDialogViewModel.cs" />
-    <Compile Include="Dialog\DialogResults.cs" />
-    <Compile Include="Dialog\Service\DataTemplateCreation.cs" />
-    <Compile Include="Dialog\Service\DialogSerivce.cs" />
-    <Compile Include="Dialog\Service\DialogViewModelBase.cs" />
-    <Compile Include="Dialog\Service\DialogWindow.xaml.cs">
-      <DependentUpon>DialogWIndow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\Service\IDialogService.cs" />
-    <Compile Include="Dialog\Service\IDialogWindow.cs" />
-    <Compile Include="Helpers\BitmapIcons.cs" />
-    <Compile Include="Helpers\ValueConvertUtils.cs" />
-    <Compile Include="ProgressBar\ProgressBar.xaml.cs">
-      <DependentUpon>ProgressBar.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
+    <None Update="Properties\Settings.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Update="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Requests\RequestExecute.cs" />
-    <Compile Include="Requests\Request.cs" />
-    <Compile Include="Requests\RequestError.cs" />
-    <Compile Include="Requests\RequestHandler.cs" />
-    <Compile Include="Requests\RequestHandling.cs" />
-    <Compile Include="FEI\Model\ItemRetriever.cs" />
-    <Compile Include="FEI\ViewModel\AppControl.cs" />
-    <Compile Include="FEI\ViewModel\LabelsAndArrays.cs" />
-    <Compile Include="Helpers\Utils.cs" />
-    <Compile Include="FEI\Model\FamilyParameterModel.cs" />
-    <Compile Include="FEI\ViewModel\FamilyParameterViewModel.cs" />
-    <Compile Include="FEI\View\FamilyParameterView.xaml.cs">
-      <DependentUpon>FamilyParameterView.xaml</DependentUpon>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="FEI\View\Settings.xaml.cs">
-      <DependentUpon>Settings.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="FamilyEditorInterface.addin">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Properties\Settings.settings">
-      <Generator>PublicSettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="Resources\icon_Families.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Associate\WPFSelectParameters\View\ParameterSelectorView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\Alerts\FailureDialogView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialog\Alerts\NotifyDialogView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialog\Alerts\AlertDialogView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialog\Alerts\OKDialogView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialog\Service\DialogWIndow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="ProgressBar\ProgressBar.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\Theme.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="FEI\View\FamilyParameterView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="FEI\View\Settings.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="FEI\icon_Families.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PackageContents.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\icon_Associate Parameters.png" />
     <EmbeddedResource Include="Resources\icon_Pull Parameters.png" />
     <EmbeddedResource Include="Resources\icon_Push Parameters.png" />
+    <Resource Include="FEI\icon_Families.png" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="AfterClean">
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2015\AutodeskRibbonTemplate.addin" />
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2015\AutodeskRibbonTemplate.dll" />
+
+  <!-- Deploy to the ApplicationPlugins bundle so Revit picks it up on startup. -->
+  <Target Name="DeployBundle" AfterTargets="Build">
+    <PropertyGroup>
+      <RevitContentDir>$(BundleDir)\Content\windows\Revit$(RevitVersion)</RevitContentDir>
+    </PropertyGroup>
+    <Copy SourceFiles="$(ProjectDir)PackageContents.xml" DestinationFolder="$(BundleDir)" />
+    <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)$(TargetName).deps.json;$(ProjectDir)FamilyEditorInterface.addin"
+          DestinationFolder="$(RevitContentDir)" ContinueOnError="true" />
   </Target>
-  <PropertyGroup>
-    <PostBuildEvent>echo Copying common features
-copy "$(ProjectDir)PackageContents.xml" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle"
 
-echo Configuration: $(Configuration)
-if $(Configuration) == Revit2020 goto 2020
-if $(Configuration) == Revit2021 goto 2021
-if $(Configuration) == Revit2022 goto 2022
-if $(Configuration) == Revit2023 goto 2023
-if $(Configuration) == Revit2024 goto 2024
-
-echo Copying results to 2020
-:2020
-copy "$(ProjectDir)bin\Revit2020\FamilyEditorInterface.dll" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2020"
-copy "$(ProjectDir)FamilyEditorInterface.addin" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2020"
-goto exit
-
-echo Copying results to 2021
-:2021
-copy "$(ProjectDir)bin\Revit2021\FamilyEditorInterface.dll" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2021"
-copy "$(ProjectDir)FamilyEditorInterface.addin" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2021"
-goto exit
-
-echo Copying results to 2022
-:2022
-copy "$(ProjectDir)bin\Revit2022\FamilyEditorInterface.dll" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022"
-copy "$(ProjectDir)FamilyEditorInterface.addin" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022"
-goto exit
-
-echo Copying results to 2023
-:2023
-copy "$(ProjectDir)bin\Revit2023\FamilyEditorInterface.dll" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2023"
-copy "$(ProjectDir)FamilyEditorInterface.addin" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2023"
-goto exit
-
-echo Copying results to 2024
-:2024
-copy "$(ProjectDir)bin\Revit2024\FamilyEditorInterface.dll" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2024"
-copy "$(ProjectDir)FamilyEditorInterface.addin" "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2024"
-
-goto exit
-
-:exit</PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent>if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows"
-if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2022"
-if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2023" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2023"
-if not exist  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2024" mkdir  "%25Programdata%25\Autodesk\ApplicationPlugins\FamilyEditorInterface.bundle\Content\windows\Revit2024"</PreBuildEvent>
-  </PropertyGroup>
 </Project>

@@ -140,31 +140,6 @@ namespace FamilyEditorInterface.WPF
             }
         }
         //Executes after RaisePropertyChange of UIValue
-#if RELEASE2020
-        private void SetUIValue()
-        {            
-            double newValue = ValueConvertUtils.DoubleFromStringConvert(StorageType, UnitType, UIValue); //Get the double representation of the value based on the display unit type
-            //What could go wrong?
-            //1. The conversion precision fucks it up, leading to circular reference 
-            //2. The string input from the UI was bad, and returned 0.0
-            if(newValue == 0.0 || Math.Abs(Value - newValue) < error) //There was an error, set back the old value
-            {
-                UIValue = ValueConvertUtils.StringFromDoubleConvert(UnitType, Precision, Value);
-            }
-            else
-            {
-                Value = (double)newValue;
-                if(StorageType == StorageType.Integer)
-                {
-                    RevitValue = Value;
-                }
-                else
-                {
-                    RevitValue = Utils.GetDutValueFrom(UnitType, Value); //Make the change in the Value. This should propagate a series of changes as well
-                }
-            }
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024       
         private void SetUIValue()
         {
             double newValue = ValueConvertUtils.DoubleFromStringConvert(StorageType, UnitType, UIValue); //Get the double representation of the value based on the display unit type
@@ -189,7 +164,6 @@ namespace FamilyEditorInterface.WPF
             }
         }
 
-#endif
         private void SetRevitValue()
         {
             //What could go wrong?
@@ -380,11 +354,7 @@ namespace FamilyEditorInterface.WPF
         }
         //Revit Display Unit Type to help us display the correct unit in the UI
 
-#if RELEASE2020
-        public DisplayUnitType UnitType { get; internal set; }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023  || RELEASE2024
         public ForgeTypeId UnitType { get; internal set; }      
-#endif
 
         public ParamType ParamType { get; internal set; }
         public StorageType StorageType { get; internal set; }

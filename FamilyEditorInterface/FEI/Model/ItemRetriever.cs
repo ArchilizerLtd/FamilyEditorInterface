@@ -29,13 +29,9 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             newItem.ParamType = GetParameterType(fp);
             newItem.UnitType = GetDisplayUnitType(fp);   //Set the DisplayUnitType for this parameter
             newItem.Precision = Utils.GetPrecision(newItem.UnitType);   //Properties.Settings.Default.Precision;  //The precision set by the User in the Settings
-#if RELEASE2020 || RELEASE2021
-            newItem.Type = fp.Definition.ParameterType.ToString();  //The parameter type
-#elif RELEASE2022 || RELEASE2023 || RELEASE2024   
             newItem.Type = fp.Definition.GetDataType().ToString();  //The parameter type
-#endif
             newItem.Associated = !fp.AssociatedParameters.IsEmpty;    //If the parameter is being associated
-            newItem.BuiltIn = fp.Id.IntegerValue < 0;
+            newItem.BuiltIn = fp.Id.Value < 0;
             newItem.Modifiable = fp.UserModifiable;
             newItem.Formula = fp.IsDeterminedByFormula;
             newItem.Label = paramLabel.Any(f => f.Id == fp.Id);
@@ -60,20 +56,6 @@ namespace FamilyEditorInterface.Resources.WPF.Model
             return newItem;
         }
         //Get the Display Unit Type
-#if RELEASE2020
-        private static DisplayUnitType GetDisplayUnitType(FamilyParameter fp)
-        {
-            try
-            {
-                var dut = fp.DisplayUnitType;
-                return dut;
-            }
-            catch (Exception)
-            {
-                return DisplayUnitType.DUT_MILLIMETERS;
-            }
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024   
         private static ForgeTypeId GetDisplayUnitType(FamilyParameter fp)
         {
             try
@@ -86,7 +68,6 @@ namespace FamilyEditorInterface.Resources.WPF.Model
                 return UnitTypeId.Millimeters;
             }
         }
-#endif
         //Get the parameter value as Double
         private static double GetParameterValue(FamilyType ft, FamilyParameter fp)
         {
@@ -116,33 +97,11 @@ namespace FamilyEditorInterface.Resources.WPF.Model
         private static ParamType GetParameterType(FamilyParameter fp)
         {
             ParamType type;
-#if RELEASE2020 || RELEASE2021 
-            switch (fp.Definition.ParameterType)
-            {
-                case (Autodesk.Revit.DB.ParameterType.YesNo):
-                    type = ParamType.YesNo;
-                    break;
-                case (Autodesk.Revit.DB.ParameterType.Angle):
-                    type = ParamType.Angle;
-                    break;
-                case (Autodesk.Revit.DB.ParameterType.Area):
-                    type = ParamType.Area;
-                    break;
-                case (Autodesk.Revit.DB.ParameterType.Length):
-                    type = ParamType.Length;
-                    break;
-                default:
-                    type = ParamType.Supported;
-                    break;
-            }
-            return type;
-#elif  RELEASE2022|| RELEASE2023 || RELEASE2024  
             //TO DO - missing Yes/No type
             if (fp.Definition.GetDataType().Equals(SpecTypeId.Angle)) return ParamType.Angle;
             if (fp.Definition.GetDataType().Equals(SpecTypeId.Area)) return ParamType.Area;
             if (fp.Definition.GetDataType().Equals(SpecTypeId.Length)) return ParamType.Length;
             else return ParamType.Supported;
-#endif
         }
         /// <summary>
         /// 1: Value

@@ -71,25 +71,12 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
             {
                 var par = pair.Key;
 
-                if (par.Id.IntegerValue < 0) continue; //Skip built-in parameters
+                if (par.Id.Value < 0) continue; //Skip built-in parameters
 
-#if RELEASE2020 || RELEASE2021 
                 models.Add(new ParameterSelectorModel()
                 {
                     Name = par.Definition.Name,
-                    Group = Utils.GetReadableGroupName(par.Definition.ParameterGroup),
-                    Parameter = par,
-                    ParameterGroup = par.Definition.ParameterGroup,
-                    ParameterType = par.Definition.ParameterType,
-                    IsInstance = par.IsInstance,
-                    IsShared = par.IsShared,
-                    Exists = pair.Value
-                });
-#elif RELEASE2022 || RELEASE2023 || RELEASE2024
-                models.Add(new ParameterSelectorModel()
-                {
-                    Name = par.Definition.Name,
-                    Group = Utils.GetReadableGroupName(par.Definition.ParameterGroup),
+                    Group = Utils.GetReadableGroupName(par.Definition.GetGroupTypeId()),
                     Parameter = par,
                     ParameterGroup = par.Definition.GetGroupTypeId(),
                     ParameterType = par.Definition.GetDataType(),
@@ -97,7 +84,6 @@ namespace FamilyEditorInterface.Associate.WPFSelectParameters.ViewModel
                     IsShared = par.IsShared,
                     Exists = pair.Value
                 }); 
-#endif
             }
 
             models = models.OrderBy(x => x.Group).ToList();

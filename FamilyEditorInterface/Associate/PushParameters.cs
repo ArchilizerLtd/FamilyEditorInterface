@@ -159,13 +159,8 @@ namespace FamilyEditorInterface.Associate
 				using (Transaction ft = new Transaction(nestedFamilyDocument, "Push parameter"))
 				{
 					ft.Start();
-#if RELEASE2019 || RELEASE2020 || RELEASE2021
-					//Adds a Parameter to the Family
-					nestedFamilyDocument.FamilyManager.AddParameter(parameterToPush.Definition.Name, parameterToPush.Definition.ParameterGroup, parameterToPush.Definition.ParameterType, parameterToPush.IsInstance);
-#elif RELEASE2022 || RELEASE2023 || RELEASE2024
 					//Adds a Parameter to the Family
 					nestedFamilyDocument.FamilyManager.AddParameter(parameterToPush.Definition.Name, parameterToPush.Definition.GetGroupTypeId(), parameterToPush.Definition.GetDataType(), parameterToPush.IsInstance);
-#endif
                     ft.Commit();
 				}
 			}
@@ -182,7 +177,7 @@ namespace FamilyEditorInterface.Associate
 				{
 					ft.Start();
 					//Adds a Shared Parameter to the Family
-					nestedFamilyDocument.FamilyManager.AddParameter(sharedParameter, parameterToPush.Definition.ParameterGroup, parameterToPush.IsInstance);
+					nestedFamilyDocument.FamilyManager.AddParameter(sharedParameter, parameterToPush.Definition.GetGroupTypeId(),parameterToPush.IsInstance);
 					ft.Commit();
 				}
 			}

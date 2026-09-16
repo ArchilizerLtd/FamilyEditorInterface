@@ -125,7 +125,7 @@ namespace FamilyEditorInterface
         //Pick existing or new panel
         private RibbonPanel PickPanel(UIControlledApplication application, string panelName, string tabName)
         {
-            List<RibbonPanel> panels = application.GetRibbonPanels();
+            List<RibbonPanel> panels = application.GetRibbonPanels(tabName);
             RibbonPanel panel = null;
 
             // Pick the correct panel
@@ -192,18 +192,16 @@ namespace FamilyEditorInterface
         //This is hacky and experimental method to suppors the Text of stack buttons
         private void SupressStackButtonText(string tab, string panel, string [] buttonNames)
         {
-            // Find Autodes.Windows.RibbonItems
-            var btnTest1 = GetButton(tab, panel, buttonNames[0]);
-            var btnTest2 = GetButton(tab, panel, buttonNames[1]);
-            var btnTest3 = GetButton(tab, panel, buttonNames[2]);
+            // Find Autodes.Windows.RibbonItems and set Size and Text Visibility
+            // (unsupported API - skip silently if the internal ids change between Revit versions)
+            foreach (var buttonName in buttonNames)
+            {
+                var button = GetButton(tab, panel, buttonName);
+                if (button == null) continue;
 
-            // Set Size and Text Visibility
-            btnTest1.Size = AW.RibbonItemSize.Standard;
-            btnTest1.ShowText = false;
-            btnTest2.Size = AW.RibbonItemSize.Standard;
-            btnTest2.ShowText = false;
-            btnTest3.Size = AW.RibbonItemSize.Standard;
-            btnTest3.ShowText = false;
+                button.Size = AW.RibbonItemSize.Standard;
+                button.ShowText = false;
+            }
         }
         //Hacky way to get a ribbon item, not supported officially
         public AW.RibbonItem GetButton(string tabName, string panelName, string itemName)

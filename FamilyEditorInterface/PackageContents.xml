@@ -1,17 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<ApplicationPackage SchemaVersion="1.0" AutodeskProduct="Revit" ProductType="Application" Name="Family Editor Interface" AppVersion="2.0.1" Description="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." Author="Archilizer" AppNameSpace="appstore.exchange.autodesk.com" ProductCode="{928D59F7-16CD-447A-BAC8-EF2B2AE24803}" UpgradeCode="{46253D53-C8B7-4FE2-961B-B1ED0B5BD8BB}" SupportedLocales="Enu" FriendlyVersion="2.0.0" OnlineDocumentation="http://archilizer.com " HelpFile="./Content/Family Editor Interface _ Revit _ Autodesk App Store.html" Icon="./Content/Appicon.ico">
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage SchemaVersion="1.0" AutodeskProduct="Revit" ProductType="Application" Name="Family Editor Interface" AppVersion="3.0.0" Description="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." Author="Archilizer" AppNameSpace="appstore.exchange.autodesk.com" ProductCode="{928D59F7-16CD-447A-BAC8-EF2B2AE24803}" UpgradeCode="{46253D53-C8B7-4FE2-961B-B1ED0B5BD8BB}" SupportedLocales="Enu" FriendlyVersion="3.0.0" OnlineDocumentation="http://archilizer.com " HelpFile="./Content/Family Editor Interface _ Revit _ Autodesk App Store.html" Icon="./Content/Appicon.ico">
   <CompanyDetails Name="Archilizer" Phone=" " Url="http://archilizer.com " Email="support@archilizer.com " />
-  <RuntimeRequirements OS="Win64" Platform="Revit|Revit Architecture|Revit Structure|Revit MEP" SeriesMin="R2022" SeriesMax="R2024" />
-  <Components Description="2022 parts">
-    <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2022" SeriesMax="R2022" />
-    <ComponentEntry AppName="Family Editor Interface" Version="2.0.1" ModuleName="./Content/windows/Revit2022/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
-  </Components>
-  <Components Description="2023 parts">
-	  <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2023" SeriesMax="R2023" />
-	  <ComponentEntry AppName="Family Editor Interface" Version="2.0.2" ModuleName="./Content/windows/Revit2022/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
-  </Components>
-  <Components Description="2024 parts">
-    <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2024" SeriesMax="R2024" />
-    <ComponentEntry AppName="Family Editor Interface" Version="2.0.3" ModuleName="./Content/windows/Revit2022/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
+  <RuntimeRequirements OS="Win64" Platform="Revit|Revit Architecture|Revit Structure|Revit MEP" SeriesMin="R2027" SeriesMax="R2027" />
+  <Components Description="2027 parts">
+    <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2027" SeriesMax="R2027" />
+    <ComponentEntry AppName="Family Editor Interface" Version="3.0.0" ModuleName="./Content/windows/Revit2027/FamilyEditorInterface.addin" AppDescription="Family Editor Interface helps users create/change content faster in the Family Editor by adding an easy to use layer of sliders that control the family parameters." />
   </Components>
 </ApplicationPackage>

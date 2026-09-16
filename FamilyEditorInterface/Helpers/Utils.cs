@@ -32,24 +32,9 @@ namespace FamilyEditorInterface
 
     public static class Utils
     {
-#if RELEASE2020
-        private static DisplayUnitType DUT;
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024   
         private static ForgeTypeId DUT;
-#endif
         public const double METERS_IN_FEET = 0.3048;
 
-#if RELEASE2020
-        public static void InitializeUnits(Document doc)
-        {
-            DUT = doc.GetUnits().GetFormatOptions(UnitType.UT_Length).DisplayUnits;
-            if(!_goUnits())
-            {
-                NotSupported(DUT);
-                DUT = DisplayUnitType.DUT_DECIMAL_FEET;
-            }
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024  
         public static void InitializeUnits(Document doc)
         {
             DUT = doc.GetUnits().GetFormatOptions(SpecTypeId.Length).GetUnitTypeId();
@@ -59,7 +44,6 @@ namespace FamilyEditorInterface
                 DUT = UnitTypeId.Feet;
             }
         }
-#endif
         /// <summary>
         /// UI to Revit internal unit values
         /// </summary>
@@ -159,36 +143,6 @@ namespace FamilyEditorInterface
         /// <param name="displayUnitType"></param>
         /// <returns></returns>
         /// 
-#if RELEASE2020
-        internal static int GetPrecision(DisplayUnitType displayUnitType)
-        {
-            switch (displayUnitType)
-            {
-                case DisplayUnitType.DUT_MILLIMETERS:
-                    return 0;
-                case DisplayUnitType.DUT_CENTIMETERS:
-                    return 2;
-                case DisplayUnitType.DUT_DECIMETERS:
-                    return 3;
-                case DisplayUnitType.DUT_METERS:
-                    return 4;
-                case DisplayUnitType.DUT_METERS_CENTIMETERS:
-                    return 4;
-                case DisplayUnitType.DUT_DECIMAL_FEET:
-                    return 3;
-                case DisplayUnitType.DUT_DECIMAL_INCHES:
-                    return 2;
-                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
-                    return 0;
-                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
-                    return 0;
-                case DisplayUnitType.DUT_DECIMAL_DEGREES:
-                    return 2;
-                default:
-                    return 4;
-            }
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         internal static int GetPrecision(ForgeTypeId dut)
         {
             if (dut.Equals(UnitTypeId.Millimeters)) return 0;
@@ -203,42 +157,12 @@ namespace FamilyEditorInterface
             else if (dut.Equals(UnitTypeId.Degrees)) return 2;
             else return 4;
         }
-#endif
         /// <summary>
         /// UI to Revit internal unit values
         /// </summary>
         /// <param name="dut"></param>
         /// <param name="p"></param>
         /// <returns></returns>
-#if RELEASE2020
-        public static double GetDutValueTo(DisplayUnitType dut, double p)
-        {
-            switch (dut)
-            {
-                case DisplayUnitType.DUT_MILLIMETERS:
-                    return p * METERS_IN_FEET * 1000;
-                case DisplayUnitType.DUT_CENTIMETERS:
-                    return p * METERS_IN_FEET * 100;
-                case DisplayUnitType.DUT_DECIMETERS:
-                    return p * METERS_IN_FEET * 10;
-                case DisplayUnitType.DUT_METERS:
-                    return p * METERS_IN_FEET;
-                case DisplayUnitType.DUT_METERS_CENTIMETERS:
-                    return p * METERS_IN_FEET;
-                case DisplayUnitType.DUT_DECIMAL_FEET:
-                    return p;
-                case DisplayUnitType.DUT_DECIMAL_INCHES:
-                    return p * 12;
-                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
-                    return p;
-                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
-                    return p * 12;
-                case DisplayUnitType.DUT_DECIMAL_DEGREES:
-                    return ToDegrees(p);
-            }
-            return p;
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static double GetDutValueTo(ForgeTypeId dut, double p)
         {
             if (dut.Equals(UnitTypeId.Millimeters)) return p * METERS_IN_FEET * 1000;
@@ -253,7 +177,6 @@ namespace FamilyEditorInterface
             else if (dut.Equals(UnitTypeId.Degrees)) return ToDegrees(p);
             else return p;
         }
-#endif
         /// <summary>
         /// Takes into account the storage type before returning the value
         /// </summary>
@@ -264,20 +187,6 @@ namespace FamilyEditorInterface
         /// <param name="displayUnitType">Display Unit Type of the parameter</param>
         /// <param name="value">The parameter value. We only expect double.</param>
         /// <returns></returns>
-#if RELEASE2020
-        internal static double GetDutValueTo(StorageType storageType, DisplayUnitType displayUnitType, double value)
-        {
-            switch (storageType)
-            {
-                case StorageType.Double:
-                    return GetDutValueTo(displayUnitType, value);
-                case StorageType.Integer:
-                    return value;
-                default:
-                    return 0.0;
-            }
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         internal static double GetDutValueTo(StorageType storageType, ForgeTypeId unitType, double value)
         {
             switch (storageType)
@@ -290,23 +199,16 @@ namespace FamilyEditorInterface
                     return 0.0;
             }
         }
-#endif
         /// <summary>
         /// Retuns human-readable ParameterGroup name
         /// </summary>
         /// <param name="parameterGroup"></param>
         /// <returns></returns>
-        internal static string GetReadableGroupName(BuiltInParameterGroup parameterGroup)
+        internal static string GetReadableGroupName(ForgeTypeId parameterGroup)
         {
-            TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
-            string value = parameterGroup.ToString().Replace("PG_", "");
+            if (parameterGroup == null || parameterGroup.Empty()) return "Other";    //Special case
 
-            if (value.Equals("INVALID")) return "Other";    //Special case
-
-            value = value.Replace("_", " ");
-            value = textInfo.ToTitleCase(value.ToLower());
-
-            return value;
+            return LabelUtils.GetLabelForGroup(parameterGroup);
         }
         /// <summary>
         /// Revit to UI units
@@ -314,32 +216,6 @@ namespace FamilyEditorInterface
         /// <param name="dut"></param>
         /// <param name="p"></param>
         /// <returns></returns>
-#if RELEASE2020
-        public static double GetDutValueFrom(DisplayUnitType dut, double p)
-        {
-            switch (dut)
-            {
-                case DisplayUnitType.DUT_METERS:
-                case DisplayUnitType.DUT_METERS_CENTIMETERS:
-                    return p / METERS_IN_FEET;
-                case DisplayUnitType.DUT_DECIMETERS:
-                    return p / METERS_IN_FEET / 10;
-                case DisplayUnitType.DUT_CENTIMETERS:
-                    return p / METERS_IN_FEET / 100;
-                case DisplayUnitType.DUT_MILLIMETERS:
-                    return p / METERS_IN_FEET / 1000;
-                case DisplayUnitType.DUT_DECIMAL_FEET:
-                case DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES:
-                    return p;
-                case DisplayUnitType.DUT_DECIMAL_INCHES:
-                case DisplayUnitType.DUT_FRACTIONAL_INCHES:
-                    return p / 12;
-                case DisplayUnitType.DUT_DECIMAL_DEGREES:
-                    return ToRadians(p);
-            }
-            return p;
-        }       
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static double GetDutValueFrom(ForgeTypeId dut, double p)
         {
             if (dut.Equals(UnitTypeId.Millimeters)) return p / METERS_IN_FEET / 1000;
@@ -354,41 +230,24 @@ namespace FamilyEditorInterface
             else if (dut.Equals(UnitTypeId.Degrees)) return ToRadians(p);
             else return p;
         }
-#endif
         /// <summary>
         /// Throw exception on unsupported dut type
         /// </summary>
         /// <param name="dut"></param>
-#if RELEASE2020
-        private static void NotSupported(DisplayUnitType dut)
-        {
-            //System.Windows.MessageBox.Show("Unit Type not supported.", "Family Editor Interface");
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         private static void NotSupported(ForgeTypeId dut)
         {
             //System.Windows.MessageBox.Show("Unit Type not supported.", "Family Editor Interface");
         }
-#endif
         /// <summary>
         /// check if we support user units
         /// </summary>
         /// <returns></returns>
-#if RELEASE2020
-        public static Boolean _goUnits()
-        {
-            if (DUT.Equals(DisplayUnitType.DUT_FEET_FRACTIONAL_INCHES)) return false;
-            if (DUT.Equals(DisplayUnitType.DUT_FRACTIONAL_INCHES)) return false;
-            return true;
-        }
-#elif RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
         public static Boolean _goUnits()
         {
             if (DUT.Equals(UnitTypeId.FeetFractionalInches)) return false;
             if (DUT.Equals(UnitTypeId.FractionalInches)) return false;
             return true;
         }
-#endif
         /// <summary>
         /// Returns 1 or 0 instead of 1 or -1
         /// </summary>
