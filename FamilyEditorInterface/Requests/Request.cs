@@ -60,6 +60,10 @@ namespace FamilyEditorInterface
         /// "Shuffle parameters" request
         /// </summary>
         ShuffleParam = 6,
+        /// <summary>
+        /// "Flex test" request: stress-test the family, keep nothing
+        /// </summary>
+        FlexTest = 7,
     }
     /// <summary>
     ///   A class around a variable holding the current request.

@@ -20,6 +20,12 @@
                   Fill="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"/>
         </Canvas>
     </Viewbox>
+    <Viewbox x:Key="FlexIcon" Width="18" Height="18">
+        <Canvas Width="24" Height="24">
+            <Path Data="M2,12H6L9,5L15,19L18,12H22" StrokeThickness="2" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                  Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"/>
+        </Canvas>
+    </Viewbox>
     <Viewbox x:Key="DeleteIcon" Width="18" Height="18">
         <Canvas Width="24" Height="24">
             <Path Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" 

@@ -77,6 +77,11 @@ namespace FamilyEditorInterface
                             RequestExecute.ExecuteParameterChange(uiapp, "Shuffle Parameters", Request.GetShuffleValue());
                             break;
                         }
+                    case RequestId.FlexTest:
+                        {
+                            FlexTest.Execute(uiapp);
+                            break;
+                        }
                     default:
                         {
                             break;

@@ -19,11 +19,22 @@ namespace FamilyEditorInterface.Flex
 
     public sealed class FlexReport
     {
+        public string SchemaVersion => "1.0";
+
         public string FamilyName { get; set; }
         public string Category { get; set; }
         public string RevitVersion { get; set; }
 
-        public List<FlexStepResult> Steps { get; } = new List<FlexStepResult>();
+        public int Seed { get; set; }
+        public List<string> Samplers { get; set; } = new List<string>();
+
+        public FlexVerdict Verdict =>
+            Failed > 0 ? FlexVerdict.Fail
+            : Steps.Any(s => s.Status == FlexStepStatus.PassedWithWarnings) ? FlexVerdict.PassWithWarnings
+            : FlexVerdict.Pass;
+
+        /// <summary>Steps the plan produced; more than were run if the run was truncated.</summary>
+        public int PlannedSteps { get; set; }
 
         public long DurationMs { get; set; }
 
@@ -40,10 +51,13 @@ namespace FamilyEditorInterface.Flex
         public int Failed => Steps.Count(s => s.Status == FlexStepStatus.Failed || s.Status == FlexStepStatus.Error);
         public int Skipped => Steps.Count(s => s.Status == FlexStepStatus.Skipped);
 
-        public FlexVerdict Verdict =>
-            Failed > 0 ? FlexVerdict.Fail
-            : Steps.Any(s => s.Status == FlexStepStatus.PassedWithWarnings) ? FlexVerdict.PassWithWarnings
-            : FlexVerdict.Pass;
+        /// <summary>
+        /// Parameters left out of sampling: determined-by-formula, reporting, unsupported-storage-type,
+        /// no-value, no-range, empty-range, skipped-by-plan.
+        /// </summary>
+        public List<SkippedParameter> SkippedParameters { get; } = new List<SkippedParameter>();
+
+        public List<FlexStepResult> Steps { get; } = new List<FlexStepResult>();
     }
 
     public sealed class FlexStepResult
@@ -62,14 +76,6 @@ namespace FamilyEditorInterface.Flex
 
         /// <summary>Exception message when Status is Error.</summary>
         public string Exception { get; set; }
-    }
-
-    public sealed class SkippedParameter
-    {
-        public string Name { get; set; }
-
-        /// <summary>not-found, determined-by-formula, reporting, unsupported-storage-type</summary>
-        public string Reason { get; set; }
     }
 
     public sealed class FlexFailure

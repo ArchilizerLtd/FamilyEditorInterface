@@ -41,6 +41,7 @@ namespace FamilyEditorInterface.WPF
 
 
         public ICommand ShuffleCommand { get; set; }
+        public ICommand FlexTestCommand { get; set; }
         public ICommand PrecisionCommand { get; set; }
         public ICommand DeleteUnusedCommand { get; set; }
         public ICommand ToggleCommand { get; set; }
@@ -132,6 +133,7 @@ namespace FamilyEditorInterface.WPF
             
 
             ShuffleCommand = new RelayCommand(o => Shuffle("ShuffleButton"));
+            FlexTestCommand = new RelayCommand(o => RunFlexTest("FlexTestButton"));
             PrecisionCommand = new RelayCommand(o => Precision("PrecisionButton"));
             DeleteUnusedCommand = new RelayCommand(o => DeleteUnused("DeleteUnusedButton"));
             ToggleCommand = new RelayCommand(o => ToggleTags("ToggleVisibility"));
@@ -296,6 +298,12 @@ namespace FamilyEditorInterface.WPF
             }
 
             if (requestValues.Count > 0) MakeRequest(RequestId.ShuffleParam, requestValues);
+        }
+        // Stress-test the family; values are restored afterwards
+        private void RunFlexTest(object sender)
+        {
+            Application.Control.handler.Request.Make(RequestId.FlexTest);
+            Application.Control.exEvent.Raise();
         }
         //The collection has changed, notify the UI
         private void ValueParameters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

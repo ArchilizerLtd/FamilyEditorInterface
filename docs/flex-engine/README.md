@@ -7,7 +7,7 @@ It has two consumers:
 1. **FamilyEditorInterface (this add-in).** The interactive "flex / shuffle" features call the engine and show its report in the UI.
 2. **The Parametric Family Builder** (see [../family-builder/README.md](../family-builder/README.md)). The builder's generate → flex → repair loop uses the engine as its verifier. In that setting the engine runs headless, either in a local Revit session or on Autodesk Platform Services Design Automation for Revit.
 
-> Status: F1–F3 implemented in [FamilyEditorInterface.Flex](../../FamilyEditorInterface.Flex/) and not yet verified in Revit. In this first cut `FlexPlan` takes an explicit list of `Steps`; the ranges and samplers below arrive with F4. Everything from F4 onward is still design.
+> Status: F1–F6 implemented in [FamilyEditorInterface.Flex](../../FamilyEditorInterface.Flex/) and the add-in's **Flex Test** button. Not yet verified in Revit. The code differs from the sketch in §4.1 in a few places, and the code is the reference: `AllTypes` (default: current type only) replaces the `Types` list, `RangeDefaults` is one scale for every numeric kind, and `Pairwise`/`TypeCatalog` come with F10. Everything from F7 onward is still design.
 
 ---
 
@@ -303,7 +303,7 @@ Each chunk is small enough to finish and review on its own.
 | F3 | Step runner: TransactionGroup with per-step transactions, reset to baseline, final rollback | Document unchanged after a run (verify by comparing parameter values and element count) |
 | F4 | `FlexPlan` + `Defaults`, `Corners`, `OneAtATime`, `Random` samplers (seeded) | Same seed produces the same step list |
 | F5 | `FlexReport` + JSON serialization (System.Text.Json) | Report round-trips; schema documented |
-| F6 | Port the add-in's Shuffle to the engine; show the report in the existing failure dialog | Feature parity with today, plus a better error list |
+| F6 | **Flex Test** button in the add-in: runs the engine, shows failures in the existing alert dialog, saves the JSON report. Shuffle stays as it is: it keeps its values, while a flex test restores them | A failing family lists its failing steps; the family is unchanged afterwards |
 | F7 | Geometry snapshot + `geom.volume-positive`, `geom.solid-count` | Catches a deliberately broken test family |
 | F8 | `geom.bbox-tracks` with axis mapping from the plan | Catches a parameter that was un-labelled from its dimension |
 | F9 | Bisection for multi-parameter failures | Report names the culprit parameter on a pairwise failure |
