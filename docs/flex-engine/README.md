@@ -7,7 +7,7 @@ It has two consumers:
 1. **FamilyEditorInterface (this add-in).** The interactive "flex / shuffle" features call the engine and show its report in the UI.
 2. **The Parametric Family Builder** (see [../family-builder/README.md](../family-builder/README.md)). The builder's generate → flex → repair loop uses the engine as its verifier. In that setting the engine runs headless, either in a local Revit session or on Autodesk Platform Services Design Automation for Revit.
 
-> Status: design draft. Nothing in this document is implemented yet.
+> Status: F1–F3 implemented in [FamilyEditorInterface.Flex](../../FamilyEditorInterface.Flex/) and not yet verified in Revit. In this first cut `FlexPlan` takes an explicit list of `Steps`; the ranges and samplers below arrive with F4. Everything from F4 onward is still design.
 
 ---
 

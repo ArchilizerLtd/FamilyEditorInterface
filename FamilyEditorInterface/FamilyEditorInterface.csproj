@@ -48,6 +48,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FamilyEditorInterface.Flex\FamilyEditorInterface.Flex.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -86,7 +90,7 @@
     </ItemGroup>
     <Copy SourceFiles="$(ProjectDir)PackageContents.xml" DestinationFolder="$(BundleDir)" />
     <Copy SourceFiles="@(BundleContent)" DestinationFolder="$(BundleDir)\Content\%(RecursiveDir)" />
-    <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)$(TargetName).deps.json;$(ProjectDir)FamilyEditorInterface.addin"
+    <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)$(TargetName).deps.json;$(TargetDir)FamilyEditorInterface.Flex.dll;$(TargetDir)FamilyEditorInterface.Flex.pdb;$(ProjectDir)FamilyEditorInterface.addin"
           DestinationFolder="$(RevitContentDir)" ContinueOnError="true" />
   </Target>
 
