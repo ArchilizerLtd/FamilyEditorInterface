@@ -47,8 +47,9 @@ namespace FamilyEditorInterface
 
         // Get absolute path to this assembly
         static string path = Assembly.GetExecutingAssembly().Location;
-        static string contentPath = Path.GetDirectoryName(Path.GetDirectoryName(path)) + "/";
-        static string helpFile = "file:///C:/ProgramData/Autodesk/ApplicationPlugins/FamilyEditorInterface.bundle/Content/Family%20Editor%20Interface%20_%20Revit%20_%20Autodesk%20App%20Store.html"; 
+        // Bundle Content folder, three levels up from .../Content/windows/Revit20xx/FamilyEditorInterface.dll
+        static string contentPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), "..", ".."));
+        static string helpFile = new Uri(Path.Combine(contentPath, "Family Editor Interface _ Revit _ Autodesk App Store.html")).AbsoluteUri;
         private static string assemblyVersion;
 
         // Marks if the Plugin has been started

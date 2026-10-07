@@ -81,7 +81,11 @@
     <PropertyGroup>
       <RevitContentDir>$(BundleDir)\Content\windows\Revit$(RevitVersion)</RevitContentDir>
     </PropertyGroup>
+    <ItemGroup>
+      <BundleContent Include="$(ProjectDir)Content\**\*" />
+    </ItemGroup>
     <Copy SourceFiles="$(ProjectDir)PackageContents.xml" DestinationFolder="$(BundleDir)" />
+    <Copy SourceFiles="@(BundleContent)" DestinationFolder="$(BundleDir)\Content\%(RecursiveDir)" />
     <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)$(TargetName).deps.json;$(ProjectDir)FamilyEditorInterface.addin"
           DestinationFolder="$(RevitContentDir)" ContinueOnError="true" />
   </Target>
