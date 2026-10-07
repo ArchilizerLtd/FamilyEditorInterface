@@ -7,7 +7,7 @@ It has two consumers:
 1. **FamilyEditorInterface (this add-in).** The interactive "flex / shuffle" features call the engine and show its report in the UI.
 2. **The Parametric Family Builder** (see [../family-builder/README.md](../family-builder/README.md)). The builder's generate → flex → repair loop uses the engine as its verifier. In that setting the engine runs headless, either in a local Revit session or on Autodesk Platform Services Design Automation for Revit.
 
-> Status: F1–F6 implemented in [FamilyEditorInterface.Flex](../../FamilyEditorInterface.Flex/) and the add-in's **Flex Test** button. Not yet verified in Revit. The code differs from the sketch in §4.1 in a few places, and the code is the reference: `AllTypes` (default: current type only) replaces the `Types` list, `RangeDefaults` is one scale for every numeric kind, and `Pairwise`/`TypeCatalog` come with F10. Everything from F7 onward is still design.
+> Status: F1–F6 implemented in [FamilyEditorInterface.Flex](../../FamilyEditorInterface.Flex/) and the add-in's **Flex Test** button. Verified in Revit 2027 on `Door-Passage-Single-Flush` (family restored, Undo list untouched, real sweep failure found). The code differs from the sketch in §4.1 in a few places, and the code is the reference: `AllTypes` (default: current type only) replaces the `Types` list, `RangeDefaults` is one scale for every numeric kind, and `Pairwise`/`TypeCatalog` come with F10. Everything from F7 onward is still design.
 
 ---
 
