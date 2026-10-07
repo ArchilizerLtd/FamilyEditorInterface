@@ -16,6 +16,12 @@ namespace FamilyEditorInterface.Flex
         /// <summary>Run against every family type. When false, only the type current at the start of the run.</summary>
         public bool AllTypes { get; init; } = false;
 
+        /// <summary>
+        /// Only sample parameters that can affect the family (labels, formulas, associations).
+        /// Parameters listed in <see cref="Parameters"/> are always sampled.
+        /// </summary>
+        public bool OnlyUsedParameters { get; init; } = true;
+
         /// <summary>Per-parameter ranges. Parameters not listed fall back to <see cref="Defaults"/>.</summary>
         public List<ParameterRange> Parameters { get; init; } = new List<ParameterRange>();
         public RangeDefaults Defaults { get; init; } = new RangeDefaults();
@@ -85,6 +91,9 @@ namespace FamilyEditorInterface.Flex
     {
         /// <summary>Family type name. Null means the type that is current when the run starts.</summary>
         public string Type { get; init; }
+
+        /// <summary>What the step is testing, e.g. "all at minimum" or "Width at maximum". Optional.</summary>
+        public string Label { get; init; }
 
         public List<ParameterAssignment> Assignments { get; init; } = new List<ParameterAssignment>();
     }

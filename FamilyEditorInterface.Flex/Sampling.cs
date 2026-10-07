@@ -116,13 +116,14 @@ namespace FamilyEditorInterface.Flex
             var steps = new List<FlexStep>();
             var seen = new HashSet<string>(StringComparer.Ordinal);
 
-            void Add(IEnumerable<(ResolvedRange Range, double Value)> values)
+            void Add(string label, IEnumerable<(ResolvedRange Range, double Value)> values)
             {
                 var assignments = values
                     .Where(v => !SameValue(v.Value, v.Range.Parameter.CurrentValue))   // only real changes
                     .Select(v => new ParameterAssignment(v.Range.Parameter.Name, v.Value))
                     .ToList();
-                if (seen.Add(Key(assignments))) steps.Add(new FlexStep { Type = type, Assignments = assignments });
+                if (assignments.Count == 0) label = "baseline";
+                if (seen.Add(Key(assignments))) steps.Add(new FlexStep { Type = type, Label = label, Assignments = assignments });
             }
 
             foreach (SamplerSpec sampler in samplers)
@@ -130,30 +131,33 @@ namespace FamilyEditorInterface.Flex
                 switch (sampler.Kind)
                 {
                     case SamplerKind.Defaults:
-                        Add(Enumerable.Empty<(ResolvedRange, double)>());
+                        Add("baseline", Enumerable.Empty<(ResolvedRange, double)>());
                         break;
 
                     case SamplerKind.Corners:
                         if (ranges.Count == 0) break;
-                        Add(ranges.Select(r => (r, r.Low)));
-                        Add(ranges.Select(r => (r, r.High)));
+                        Add("all at minimum", ranges.Select(r => (r, r.Low)));
+                        Add("all at maximum", ranges.Select(r => (r, r.High)));
                         foreach (ResolvedRange r in ranges)
                         {
-                            Add(new[] { (r, r.Low) });
-                            Add(new[] { (r, r.High) });
+                            Add($"{r.Parameter.Name} at minimum", new[] { (r, r.Low) });
+                            Add($"{r.Parameter.Name} at maximum", new[] { (r, r.High) });
                         }
                         break;
 
                     case SamplerKind.OneAtATime:
                         foreach (ResolvedRange r in ranges)
-                            foreach (double v in r.Spread(Math.Max(2, sampler.Steps)))
-                                Add(new[] { (r, v) });
+                        {
+                            var values = r.Spread(Math.Max(2, sampler.Steps)).ToList();
+                            for (int i = 0; i < values.Count; i++)
+                                Add($"{r.Parameter.Name} sweep {i + 1} of {values.Count}", new[] { (r, values[i]) });
+                        }
                         break;
 
                     case SamplerKind.Random:
                         if (ranges.Count == 0) break;
                         for (int i = 0; i < Math.Max(1, sampler.Count); i++)
-                            Add(ranges.Select(r => (r, r.Random(rng))).ToList());
+                            Add($"random {i + 1}", ranges.Select(r => (r, r.Random(rng))).ToList());
                         break;
                 }
             }

@@ -52,7 +52,7 @@ namespace FamilyEditorInterface.Flex
         public int Skipped => Steps.Count(s => s.Status == FlexStepStatus.Skipped);
 
         /// <summary>
-        /// Parameters left out of sampling: determined-by-formula, reporting, unsupported-storage-type,
+        /// Parameters left out of sampling: determined-by-formula, reporting, unsupported-storage-type, unused,
         /// no-value, no-range, empty-range, skipped-by-plan.
         /// </summary>
         public List<SkippedParameter> SkippedParameters { get; } = new List<SkippedParameter>();
@@ -63,6 +63,7 @@ namespace FamilyEditorInterface.Flex
     public sealed class FlexStepResult
     {
         public int Index { get; set; }
+        public string Label { get; set; }
         public string Type { get; set; }
         public FlexStepStatus Status { get; set; }
 

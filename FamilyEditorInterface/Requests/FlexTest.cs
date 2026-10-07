@@ -83,20 +83,39 @@ namespace FamilyEditorInterface.Requests
             RequestError.NotifyLog =
                 $"Flex test passed: {run}." + Environment.NewLine
                 + (warned > 0 ? $"{warned} steps raised warnings.{Environment.NewLine}" : "")
-                + (report.SkippedParameters.Count > 0 ? $"{report.SkippedParameters.Count} parameters were not flexed (formulas, reporting, no range).{Environment.NewLine}" : "")
+                + (report.SkippedParameters.Count > 0 ? $"{report.SkippedParameters.Count} parameters were not flexed (unused, formulas, reporting, no range).{Environment.NewLine}" : "")
                 + $"Report: {path}";
         }
 
-        private static string Describe(FlexStepResult step) =>
-            step.Applied.Count == 0
-                ? "baseline (no changes)"
+        private static string Describe(FlexStepResult step)
+        {
+            if (step.Applied.Count == 0) return "baseline (no changes)";
+            if (step.Applied.Count == 1)
+            {
+                ParameterAssignment a = step.Applied[0];
+                string value = a.Display ?? a.Value.ToString("0.###");
+                return step.Label != null ? $"{step.Label} ({value})" : $"{a.Name} = {value}";
+            }
+            return step.Label != null
+                ? $"{step.Label} ({step.Applied.Count} parameters)"
                 : string.Join(", ", step.Applied.Select(a => $"{a.Name} = {a.Display ?? a.Value.ToString("0.###")}"));
+        }
 
+        // One line per error: the message and the elements that failed, e.g. "Can't create sweep: Sweep (Frame/Mullion)".
         private static string Problems(FlexStepResult step)
         {
             var lines = step.Failures
                 .Where(f => f.Severity != "Warning")
-                .Select(f => f.Message)
+                .Select(f =>
+                {
+                    var elements = f.FailingElements
+                        .Select(e => e.Category != null ? $"{e.Kind} ({e.Category})" : e.Kind)
+                        .Where(e => e != null)
+                        .Distinct()
+                        .Take(3)
+                        .ToList();
+                    return elements.Count > 0 ? $"{f.Message}: {string.Join(", ", elements)}" : f.Message;
+                })
                 .Distinct()
                 .ToList();
             if (step.Exception != null) lines.Insert(0, step.Exception);

@@ -90,6 +90,8 @@ namespace FamilyEditorInterface.Flex
             FamilyManager mgr = familyDoc.FamilyManager;
             unsampled ??= new List<SkippedParameter>();
             var rng = new Random(plan.Seed);
+            HashSet<long> used = plan.OnlyUsedParameters ? ParameterUsage.UsedParameterIds(familyDoc) : null;
+            var listed = new HashSet<string>(plan.Parameters.Select(p => p.Name), StringComparer.Ordinal);
             var steps = new List<FlexStep>();
 
             var types = new List<FamilyType>();
@@ -101,7 +103,9 @@ namespace FamilyEditorInterface.Flex
                 var parameters = new List<ParameterInfo>();
                 foreach (FamilyParameter fp in mgr.Parameters)
                 {
-                    string reason = SkipReason(fp) ?? (type.HasValue(fp) ? null : "no-value");
+                    string reason = SkipReason(fp)
+                                    ?? (type.HasValue(fp) ? null : "no-value")
+                                    ?? (used == null || used.Contains(fp.Id.Value) || listed.Contains(fp.Definition.Name) ? null : "unused");
                     if (reason != null)
                     {
                         unsampled.Add(new SkippedParameter(fp.Definition.Name, reason));
@@ -128,7 +132,7 @@ namespace FamilyEditorInterface.Flex
 
         private static FlexStepResult RunStep(Document doc, FamilyManager mgr, FlexStep step, int index, bool recordWarnings)
         {
-            var result = new FlexStepResult { Index = index, Type = step.Type ?? mgr.CurrentType?.Name };
+            var result = new FlexStepResult { Index = index, Label = step.Label, Type = step.Type ?? mgr.CurrentType?.Name };
 
             // Resolve everything we can before touching the document.
             FamilyType type = null;
